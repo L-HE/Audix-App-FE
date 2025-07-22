@@ -12,40 +12,60 @@ import {
 
 export const headerShown = false;
 
+// 가능한 상태를 타입으로 정의
+type CardState = 'danger' | 'warning' | 'normal';
+
 interface Card {
   id: string;
   title: string;
   subtitle: string;
   image: any;
+  state: CardState;
 }
 
+// 카드 데이터에 상태(state) 추가
 const cards: Card[] = [
   {
     id: '1',
     title: 'A-1구역',
     subtitle: '2층 자동차 부재료 조립구역',
     image: require('../assets/images/AudixLogoNavy.png'),
+    state: 'danger',    // 위험
   },
   {
     id: '2',
     title: 'B-2구역',
     subtitle: '1층 전장품 검수구역',
     image: require('../assets/images/AudixLogoNavy.png'),
+    state: 'warning',   // 점검 요망
   },
   {
     id: '3',
     title: 'C-2구역',
     subtitle: '1층 전장품 검수구역',
     image: require('../assets/images/AudixLogoNavy.png'),
+    state: 'normal',    // 정상
   },
   {
     id: '4',
     title: 'D-2구역',
     subtitle: '1층 전장품 검수구역',
     image: require('../assets/images/AudixLogoNavy.png'),
+    state: 'normal',    // 정상
   },
-  // 필요에 따라 더 많은 카드 추가
 ];
+
+const getBorderColor = (state: CardState) => {
+  switch (state) {
+    case 'danger':
+      return '#FF3116';
+    case 'warning':
+      return '#FFC525';
+    case 'normal':
+    default:
+      return '#1CAA00';
+  }
+};
 
 const AreaScreen: React.FC = () => {
   return (
@@ -69,26 +89,32 @@ const AreaScreen: React.FC = () => {
 
       {/* Body: Vertical list of cards */}
       <ScrollView contentContainerStyle={styles.body}>
-        {cards.map((item: Card) => (
-          <TouchableOpacity key={item.id} style={styles.card}>
-            <Image source={item.image} style={styles.cardImage} />
-            <View style={styles.textContainer}>
-              <Text style={styles.cardTitle}>{item.title}</Text>
-              <Text style={styles.cardSubtitle}>{item.subtitle}</Text>
-            </View>
-          </TouchableOpacity>
-        ))}
+        {cards.map((item: Card) => {
+          const borderColor = getBorderColor(item.state);
+          return (
+            <TouchableOpacity
+              key={item.id}
+              style={[styles.card, { borderColor }]}
+            >
+              <Image source={item.image} style={styles.cardImage} />
+              <View style={styles.textContainer}>
+                <Text style={styles.cardTitle}>{item.title}</Text>
+                <Text style={styles.cardSubtitle}>{item.subtitle}</Text>
+              </View>
+            </TouchableOpacity>
+          );
+        })}
       </ScrollView>
 
       {/* Bottom Tab Bar */}
       <View style={styles.tabBar}>
         <TouchableOpacity style={styles.tabItem}>
-          <Ionicons name="home-outline" size={24} color="#656565" />
-          <Text style={styles.tabText}>Home</Text>
+          <Ionicons name="map-outline" size={24} color="#656565" />
+          <Text style={styles.tabText}>Area</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.tabItem}>
           <Ionicons name="notifications-outline" size={24} color="#656565" />
-          <Text style={styles.tabText}>Alram</Text>
+          <Text style={styles.tabText}>Alarm</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.tabItem}>
           <Ionicons name="person-outline" size={24} color="#656565" />
@@ -153,6 +179,7 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     backgroundColor: '#fff',
     borderRadius: 8,
+    borderWidth: 2,
     overflow: 'hidden',
     // shadow for iOS
     shadowColor: '#000',
