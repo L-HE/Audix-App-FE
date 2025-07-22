@@ -1,6 +1,16 @@
 // components/common/header.tsx
 import React from 'react';
-import { Image, StyleSheet, View } from 'react-native';
+import { Dimensions, Image, StyleSheet, View } from 'react-native';
+
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+
+// 비율 상수 (필요시 조정)
+const HEADER_HEIGHT_RATIO = 0.115;
+const LOGO_RATIO = 0.4;
+const PADDING_TOP_RATIO = 0.45;
+
+const HEADER_HEIGHT = SCREEN_HEIGHT * HEADER_HEIGHT_RATIO;
+const LOGO_SIZE = SCREEN_WIDTH * LOGO_RATIO;
 
 const Header: React.FC = () => (
   <View style={styles.header}>
@@ -16,14 +26,14 @@ export default Header;
 
 const styles = StyleSheet.create({
   header: {
-    height: 120,
+    height: HEADER_HEIGHT,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingTop: 20,
+    paddingTop: HEADER_HEIGHT * PADDING_TOP_RATIO,
     backgroundColor: '#fff',
   },
   logo: {
-    width: 220,
-    height: 220,
+    width: LOGO_SIZE,
+    height: LOGO_SIZE,
   },
 });

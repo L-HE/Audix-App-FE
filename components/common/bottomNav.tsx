@@ -1,16 +1,27 @@
 // components/common/bottomNav.tsx
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-// Ionicons가 허용하는 name 타입을 가져옵니다
 type IconName = React.ComponentProps<typeof Ionicons>['name'];
-
 export interface NavItem {
   icon: IconName;
   label: string;
-  action: () => void;   // action을 필수로 바꿨어요
+  action: () => void;
 }
+
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+
+// 비율 상수 (필요시 조정)
+const TAB_BAR_HEIGHT_RATIO = 0.1;
+const ICON_RATIO = 0.07;
+const TEXT_RATIO = 0.03;
+const LABEL_MARGIN_RATIO = 0.005;
+
+const TAB_BAR_HEIGHT = SCREEN_HEIGHT * TAB_BAR_HEIGHT_RATIO;
+const ICON_SIZE = SCREEN_WIDTH * ICON_RATIO;
+const FONT_SIZE = SCREEN_WIDTH * TEXT_RATIO;
+const LABEL_MARGIN = SCREEN_WIDTH * LABEL_MARGIN_RATIO;
 
 interface BottomNavProps {
   tabs: NavItem[];
@@ -22,10 +33,10 @@ const BottomNav: React.FC<BottomNavProps> = ({ tabs }) => (
       <TouchableOpacity
         key={i}
         style={styles.tabItem}
-        onPress={action}          // onPress로 변경
+        onPress={action}
         activeOpacity={0.7}
       >
-        <Ionicons name={icon} size={24} color="#656565" />
+        <Ionicons name={icon} size={ICON_SIZE} color="#656565" />
         <Text style={styles.tabText}>{label}</Text>
       </TouchableOpacity>
     ))}
@@ -36,7 +47,7 @@ export default BottomNav;
 
 const styles = StyleSheet.create({
   tabBar: {
-    height: 120,
+    height: TAB_BAR_HEIGHT,
     flexDirection: 'row',
     borderTopWidth: 1,
     borderColor: '#e0e0e0',
@@ -49,7 +60,7 @@ const styles = StyleSheet.create({
   },
   tabText: {
     color: '#333',
-    fontSize: 12,
-    marginTop: 4,
+    fontSize: FONT_SIZE,
+    marginTop: LABEL_MARGIN,
   },
 });
