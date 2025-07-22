@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import React from 'react';
 import {
   Image,
@@ -12,8 +13,7 @@ import {
 
 export const headerShown = false;
 
-// 가능한 상태를 타입으로 정의
-type CardState = 'danger' | 'warning' | 'normal';
+type CardState = 'danger' | 'warning' | 'normal' | 'unknown';
 
 interface Card {
   id: string;
@@ -25,49 +25,23 @@ interface Card {
 
 // 카드 데이터에 상태(state) 추가
 const cards: Card[] = [
-  {
-    id: '1',
-    title: 'A-1구역',
-    subtitle: '2층 자동차 부재료 조립구역',
-    image: require('../assets/images/AudixLogoNavy.png'),
-    state: 'danger',    // 위험
-  },
-  {
-    id: '2',
-    title: 'B-2구역',
-    subtitle: '1층 전장품 검수구역',
-    image: require('../assets/images/AudixLogoNavy.png'),
-    state: 'warning',   // 점검 요망
-  },
-  {
-    id: '3',
-    title: 'C-2구역',
-    subtitle: '1층 전장품 검수구역',
-    image: require('../assets/images/AudixLogoNavy.png'),
-    state: 'normal',    // 정상
-  },
-  {
-    id: '4',
-    title: 'D-2구역',
-    subtitle: '1층 전장품 검수구역',
-    image: require('../assets/images/AudixLogoNavy.png'),
-    state: 'normal',    // 정상
-  },
+  { id: '1', title: 'A-1구역', subtitle: '2층 자동차 부재료 조립구역', image: require('../assets/images/AudixLogoNavy.png'), state: 'danger' },
+  { id: '2', title: 'B-2구역', subtitle: '1층 전장품 검수구역',   image: require('../assets/images/AudixLogoNavy.png'), state: 'warning' },
+  { id: '3', title: 'C-2구역', subtitle: '1층 전장품 검수구역',   image: require('../assets/images/AudixLogoNavy.png'), state: 'normal' },
+  { id: '4', title: 'D-2구역', subtitle: '1층 전장품 검수구역',   image: require('../assets/images/AudixLogoNavy.png'), state: 'unknown' },
 ];
 
 const getBorderColor = (state: CardState) => {
   switch (state) {
-    case 'danger':
-      return '#FF3116';
-    case 'warning':
-      return '#FFC525';
-    case 'normal':
-    default:
-      return '#1CAA00';
+    case 'danger':  return '#FF3116';
+    case 'warning': return '#FFC525';
+    case 'normal':  return '#1CAA00'
+    default:        return '#D7D7D7';
   }
 };
 
 const AreaScreen: React.FC = () => {
+  const router = useRouter();
   return (
     <View style={styles.container}>
       {/* Header with Logo */}
@@ -95,6 +69,12 @@ const AreaScreen: React.FC = () => {
             <TouchableOpacity
               key={item.id}
               style={[styles.card, { borderColor }]}
+              onPress={() =>
+                router.push({
+                  pathname: '/detail/[id]',
+                  params: { id: item.id },
+                })
+              }
             >
               <Image source={item.image} style={styles.cardImage} />
               <View style={styles.textContainer}>
@@ -108,11 +88,11 @@ const AreaScreen: React.FC = () => {
 
       {/* Bottom Tab Bar */}
       <View style={styles.tabBar}>
-        <TouchableOpacity style={styles.tabItem}>
+        <TouchableOpacity style={styles.tabItem} onPress={() => router.push('/')}>  
           <Ionicons name="map-outline" size={24} color="#656565" />
           <Text style={styles.tabText}>Area</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.tabItem}>
+        <TouchableOpacity style={styles.tabItem}>  
           <Ionicons name="notifications-outline" size={24} color="#656565" />
           <Text style={styles.tabText}>Alarm</Text>
         </TouchableOpacity>
@@ -181,12 +161,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 2,
     overflow: 'hidden',
-    // shadow for iOS
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    // elevation for Android
+    boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.2)',
     elevation: 4,
   },
   cardImage: {
