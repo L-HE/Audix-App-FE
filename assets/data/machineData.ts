@@ -1,29 +1,34 @@
 // assets/data/machineData.ts
 
-export interface MachineCardData {
-  id: string;
-  name: string;
-  info: string;
-  image: any;  // ImageSourcePropType 도 가능
-}
+import { ImageSourcePropType } from 'react-native';
+import { MachineCardProps } from '../../components/screens/machineCard';
 
-export const machineData: MachineCardData[] = [
+export const machineData: MachineCardProps[] = [
   {
     id: '1',
-    name: '설비 A-1-1',
-    info: '온도 이상 감지',
-    image: require('../../assets/images/AudixLogoNavy.png'),
+    machineId: 'a1',
+    image: require('../../assets/images/AudixLogoNavy.png') as ImageSourcePropType,
+    state: 'danger',
+    location: '1층 A-1 구역',
+    owner: '김철수',
+    percent: 85,
   },
   {
     id: '1',
-    name: '설비 A-1-2',
-    info: '정상 작동 중',
-    image: require('../../assets/images/AudixLogoNavy.png'),
+    machineId: 'a2',
+    image: require('../../assets/images/AudixLogoNavy.png') as ImageSourcePropType,
+    state: 'warning',
+    location: '2층 B-2 창고',
+    owner: '이영희',
+    percent: 60,
   },
   {
-    id: '2',
-    name: '설비 B-2-1',
-    info: '점검 필요',
-    image: require('../../assets/images/AudixLogoNavy.png'),
+    id: '1',
+    machineId: 'a3',
+    image: require('../../assets/images/AudixLogoNavy.png') as ImageSourcePropType,
+    state: 'normal',
+    location: '3층 C-3 조립 라인',
+    owner: '박민수',
+    percent: 10,
   },
 ];
