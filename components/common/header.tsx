@@ -5,9 +5,9 @@ import { Dimensions, Image, StyleSheet, View } from 'react-native';
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 // 비율 상수 (필요시 조정)
-const HEADER_HEIGHT_RATIO = 0.115;
+const HEADER_HEIGHT_RATIO = 0.07;
 const LOGO_RATIO = 0.4;
-const PADDING_TOP_RATIO = 0.45;
+const PADDING_TOP_RATIO = 0.2;
 
 const HEADER_HEIGHT = SCREEN_HEIGHT * HEADER_HEIGHT_RATIO;
 const LOGO_SIZE = SCREEN_WIDTH * LOGO_RATIO;
