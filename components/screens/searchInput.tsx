@@ -5,7 +5,7 @@ import { Dimensions, StyleSheet, TextInput } from 'react-native';
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 // 비율 상수 (필요시 조정)
-const SEARCH_WIDTH_RATIO = 0.6;
+const SEARCH_WIDTH_RATIO = 0.65;
 const SEARCH_HEIGHT_RATIO = 0.045;
 const PADDING_RATIO = 0.043;
 
@@ -17,7 +17,7 @@ interface SearchInputProps {
   placeholder?: string;
 }
 
-const SearchInput: React.FC<SearchInputProps> = ({ placeholder = '검색어를 입력하세요' }) => (
+const SearchInput: React.FC<SearchInputProps> = ({ placeholder }) => (
   <TextInput
     placeholder={placeholder}
     style={styles.input}

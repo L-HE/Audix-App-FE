@@ -1,5 +1,6 @@
 // components/common/bottomNav.tsx
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import React from 'react';
 import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
@@ -24,24 +25,49 @@ const FONT_SIZE = SCREEN_WIDTH * TEXT_RATIO;
 const LABEL_MARGIN = SCREEN_WIDTH * LABEL_MARGIN_RATIO;
 
 interface BottomNavProps {
-  tabs: NavItem[];
+  tabs?: NavItem[];
 }
 
-const BottomNav: React.FC<BottomNavProps> = ({ tabs }) => (
-  <View style={styles.tabBar}>
-    {tabs.map(({ icon, label, action }, i) => (
-      <TouchableOpacity
-        key={i}
-        style={styles.tabItem}
-        onPress={action}
-        activeOpacity={0.7}
-      >
-        <Ionicons name={icon} size={ICON_SIZE} color="#656565" />
-        <Text style={styles.tabText}>{label}</Text>
-      </TouchableOpacity>
-    ))}
-  </View>
-);
+const BottomNav: React.FC<BottomNavProps> = ({ tabs }) => {
+  const router = useRouter();
+
+  // 기본 탭 배열
+  const defaultTabs: NavItem[] = [
+    {
+      icon: 'map-outline',
+      label: 'Area',
+      action: () => router.push('/'),
+    },
+    {
+      icon: 'notifications-outline',
+      label: 'Alarm',
+      action: () => router.push('/'),
+    },
+    {
+      icon: 'settings-outline',
+      label: 'Setting',
+      action: () => router.push('/'),
+    },
+  ];
+
+  const items = tabs ?? defaultTabs;
+
+  return (
+    <View style={styles.tabBar}>
+      {items.map(({ icon, label, action }, i) => (
+        <TouchableOpacity
+          key={i}
+          style={styles.tabItem}
+          onPress={action}
+          activeOpacity={0.7}
+        >
+          <Ionicons name={icon} size={ICON_SIZE} color="#656565" />
+          <Text style={styles.tabText}>{label}</Text>
+        </TouchableOpacity>
+      ))}
+    </View>
+  );
+};
 
 export default BottomNav;
 
