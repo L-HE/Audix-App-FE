@@ -14,7 +14,7 @@ const DetailScreen: React.FC = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
 
-  // id와 일치하는 데이터만 필터링
+  // id와 일치하는 데이터만 필터링 후 percent 오름차순 정렬
   const cards = machineData.filter(item => item.id === id);
 
   return (

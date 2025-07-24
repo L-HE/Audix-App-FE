@@ -8,7 +8,8 @@ import {
   Text,
   View,
 } from 'react-native';
-import PieChartOriginal from 'react-native-pie-chart';
+import Svg from 'react-native-svg';
+import { VictoryPie } from 'victory-native';
 
 export interface MachineCardProps {
   id: string;
@@ -21,16 +22,10 @@ export interface MachineCardProps {
 }
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-
-// --- Wrap PieChart to extend its Props with doughnut, coverRadius, coverFill, and object-series ---
-type PieChartPropsExtended = React.ComponentProps<typeof PieChartOriginal> & {
-  doughnut?: boolean;
-  coverRadius?: number;
-  coverFill?: string;
-  // override series to accept value/color objects
-  series: { value: number; color: string }[];
-};
-const PieChart = PieChartOriginal as React.ComponentType<PieChartPropsExtended>;
+const CARD_PADDING = 12;
+const SPACING = 8;
+const IMAGE_SIZE = SCREEN_WIDTH * 0.2;
+const CHART_SIZE = IMAGE_SIZE;
 
 // 상태에 따른 테두리 색
 const getBorderColor = (state: string) => {
@@ -46,11 +41,6 @@ const getBorderColor = (state: string) => {
   }
 };
 
-const CARD_PADDING = 12;
-const IMAGE_SIZE = SCREEN_WIDTH * 0.2;
-const CHART_SIZE = IMAGE_SIZE;
-const SPACING = 8;
-
 const MachineCard: React.FC<MachineCardProps> = ({
   image,
   state,
@@ -62,21 +52,27 @@ const MachineCard: React.FC<MachineCardProps> = ({
   const remaining = 100 - percent;
 
   return (
-    <View style={[styles.card, { borderColor }]}>
-      {/* (1) 이미지 + PieChart */}
+    <View style={[styles.card, { borderColor }]}>      
+      {/* (1) 이미지 + 도넛 차트 */}
       <View style={styles.topRow}>
         <Image source={image} style={styles.image} />
 
-        <PieChart
-          widthAndHeight={CHART_SIZE}
-          series={[
-            { value: percent, color: borderColor },
-            { value: remaining, color: '#eee' },
-          ]}
-          doughnut={true}
-          coverRadius={0.6}
-          coverFill="#fff"
-        />
+        <View style={{ width: CHART_SIZE, height: CHART_SIZE }}>
+          <Svg width={CHART_SIZE} height={CHART_SIZE}>
+            <VictoryPie
+              standalone={false}
+              width={CHART_SIZE}
+              height={CHART_SIZE}
+              data={[
+                { x: '', y: percent },
+                { x: '', y: remaining },
+              ]}
+              colorScale={[borderColor, '#EEE']}
+              innerRadius={CHART_SIZE * 0.4}
+              padAngle={2}
+            />
+          </Svg>
+        </View>
       </View>
 
       {/* (2) 위치 & 담당자 */}
