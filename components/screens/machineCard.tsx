@@ -61,10 +61,7 @@ const MachineCard: React.FC<MachineCardProps> = ({
       {/* (1) 이미지 + 도넛 차트 */}
       <View style={styles.topRow}>
         <Image source={image} style={styles.image} />
-
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-		      <PieChart series={sample} />
-		    </View>
+        <PieChart series={sample} />
       </View>
 
       {/* (2) 위치 & 담당자 */}
