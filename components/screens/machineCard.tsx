@@ -42,9 +42,6 @@ const getBorderColor = (state: string) => {
 const sample = [
   { value: 15, color: '#222' },
   { value: 25, color: '#555' },
-  { value: 30, color: '#888' },
-  { value: 20, color: '#BBB' },
-  { value: 10, color: '#DDD' },
 ];
 
 const MachineCard: React.FC<MachineCardProps> = ({
@@ -52,9 +49,10 @@ const MachineCard: React.FC<MachineCardProps> = ({
   state,
   location,
   owner,
+  percent,
 }) => {
   const borderColor = getBorderColor(state);
-  // const remaining = 100 - percent;
+  const remaining = 100 - percent;
 
   return (
     <View style={[styles.card, { borderColor }]}>      
