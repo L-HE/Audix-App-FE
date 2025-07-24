@@ -1,33 +1,44 @@
 // app/detail/[id].tsx
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import React from 'react';
-import {
-  ScrollView,
-  StyleSheet,
-  View
-} from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
+import React, { useMemo } from 'react';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { machineData } from '../../assets/data/machineData';
 import MachineCard from '../../components/screens/machineCard';
 
+type CardState = 'danger' | 'warning' | 'normal' | 'unknown';
+
 const DetailScreen: React.FC = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const router = useRouter();
 
-  // id와 일치하는 데이터만 필터링 후 percent 오름차순 정렬
-  const cards = machineData.filter(item => item.id === id);
+  // 1) 우선순위 맵 정의
+  const orderMap: Record<CardState, number> = {
+    danger: 0,
+    warning: 1,
+    normal: 2,
+    unknown: 3,
+  };
+
+  // 2) 필터 후 정렬: useMemo 로 불필요한 재계산 방지
+  const sortedCards = useMemo(() => {
+    // id 일치하는 항목만
+    const filtered = machineData.filter(item => item.id === id);
+    // 상태 기준으로 오름차순 정렬
+    return [...filtered].sort(
+      (a, b) =>
+        (orderMap[a.state as CardState] ?? 99) -
+        (orderMap[b.state as CardState] ?? 99)
+    );
+  }, [id]);
 
   return (
     <View style={styles.container}>
-
-      {/* Body: MachineCard 리스트 */}
+      {/* Body: 정렬된 MachineCard 리스트 */}
       <ScrollView contentContainerStyle={styles.body}>
-        {cards.map((item, idx) => (
+        {sortedCards.map((item, idx) => (
           <MachineCard key={idx} {...item} />
         ))}
       </ScrollView>
-
-
     </View>
   );
 };
