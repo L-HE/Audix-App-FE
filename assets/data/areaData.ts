@@ -4,20 +4,20 @@ import { AreaCardProps } from '../../components/screens/areaCard';
 
 export type CardData = Omit<AreaCardProps, 'onPress'>;
 
-export const cards: CardData[] = [
+export const area: CardData[] = [
   {
     id: '1',
     title: 'A-1구역',
     subtitle: '2층 자동차 부재료 조립구역',
     image: require('../../assets/images/AudixLogoNavy.png'),
-    state: 'danger',
+    state: 'warning',
   },
   {
     id: '2',
     title: 'B-2구역',
     subtitle: '1층 전장품 검수구역',
     image: require('../../assets/images/AudixLogoNavy.png'),
-    state: 'warning',
+    state: 'danger',
   },
   {
     id: '3',

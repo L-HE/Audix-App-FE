@@ -8,8 +8,7 @@ import {
   Text,
   View,
 } from 'react-native';
-import Svg from 'react-native-svg';
-import { VictoryPie } from 'victory-native';
+import PieChart from '../screens/pieChart';
 
 export interface MachineCardProps {
   id: string;
@@ -25,7 +24,6 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CARD_PADDING = 12;
 const SPACING = 8;
 const IMAGE_SIZE = SCREEN_WIDTH * 0.2;
-const CHART_SIZE = IMAGE_SIZE;
 
 // 상태에 따른 테두리 색
 const getBorderColor = (state: string) => {
@@ -41,15 +39,22 @@ const getBorderColor = (state: string) => {
   }
 };
 
+const sample = [
+  { value: 15, color: '#222' },
+  { value: 25, color: '#555' },
+  { value: 30, color: '#888' },
+  { value: 20, color: '#BBB' },
+  { value: 10, color: '#DDD' },
+];
+
 const MachineCard: React.FC<MachineCardProps> = ({
   image,
   state,
   location,
   owner,
-  percent,
 }) => {
   const borderColor = getBorderColor(state);
-  const remaining = 100 - percent;
+  // const remaining = 100 - percent;
 
   return (
     <View style={[styles.card, { borderColor }]}>      
@@ -57,22 +62,9 @@ const MachineCard: React.FC<MachineCardProps> = ({
       <View style={styles.topRow}>
         <Image source={image} style={styles.image} />
 
-        <View style={{ width: CHART_SIZE, height: CHART_SIZE }}>
-          <Svg width={CHART_SIZE} height={CHART_SIZE}>
-            <VictoryPie
-              standalone={false}
-              width={CHART_SIZE}
-              height={CHART_SIZE}
-              data={[
-                { x: '', y: percent },
-                { x: '', y: remaining },
-              ]}
-              colorScale={[borderColor, '#EEE']}
-              innerRadius={CHART_SIZE * 0.4}
-              padAngle={2}
-            />
-          </Svg>
-        </View>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+		      <PieChart series={sample} />
+		    </View>
       </View>
 
       {/* (2) 위치 & 담당자 */}

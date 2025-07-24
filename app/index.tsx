@@ -3,7 +3,7 @@ import { useRouter } from 'expo-router';
 import React from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
-import { cards } from '../assets/data/areaData';
+import { area } from '../assets/data/areaData';
 import AreaCard from '../components/screens/areaCard';
 
 export const headerShown = false;
@@ -16,9 +16,9 @@ const AreaScreen: React.FC = () => {
 
       {/* Card List */}
       <ScrollView contentContainerStyle={styles.body}>
-        {cards.map(item => (
+        {area.map(item => (
           <AreaCard
-            key={item.id}
+            key={item.state}
             {...item}
             onPress={() =>
               router.push({ pathname: '/detail/[id]', params: { id: item.id } })
