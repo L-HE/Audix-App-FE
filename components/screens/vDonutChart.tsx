@@ -6,11 +6,14 @@ import machineData from '../../assets/data/machineData';
 interface Props {
   /** 표시할 머신의 id */
   id: string;
+  /** 애니메이션 상태를 추가 */
+  animate: boolean;
 }
 
-const MachineDonutChart: React.FC<Props> = ({ id }) => {
+const MachineDonutChart: React.FC<Props> = ({ id, animate }) => {
   const screenWidth = Dimensions.get('window').width;
   const chartSize = screenWidth * 0.4; // 화면 너비의 40%
+
 
   // 선택한 머신 찾기
   const selected = machineData.find(m => m.id === id);
@@ -42,6 +45,7 @@ const MachineDonutChart: React.FC<Props> = ({ id }) => {
         padAngle={2}
         colorScale={colorScale}
         labels={() => null} // 라벨 숨기기
+        animate={animate ? { duration: 2000, easing: 'exp' } : undefined} // 애니메이션 조건부 적용
       />
     </SafeAreaView>
   );

@@ -11,7 +11,11 @@ const orderColor: Record<Machine['state'], string> = {
   unknown: '#ccc',
 };
 
-const MachineCard: React.FC<Machine> = ({
+interface MachineCardProps extends Machine {
+  animate: boolean; // 애니메이션 상태를 추가
+}
+
+const MachineCard: React.FC<MachineCardProps> = ({
   id,
   image,
   name,
@@ -19,6 +23,7 @@ const MachineCard: React.FC<Machine> = ({
   location,
   owner,
   state,
+  animate, // 애니메이션 상태를 받음
 }) => {
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -36,7 +41,7 @@ const MachineCard: React.FC<Machine> = ({
             </View>
           </View>
           <View>
-            <VDonutChart id={String(id)} />
+            <VDonutChart id={String(id)} animate={animate} /> 
           </View>
         </View>
       </View>
@@ -59,14 +64,6 @@ const styles = StyleSheet.create({
   image: { width: 120, height: 120, marginRight: 12 },
   name: { fontSize: 16, fontWeight: 'bold' },
   subName: { fontSize: 14, color: '#777', marginTop: 4 },
-
-  flex2: {
-    width: 200,
-    height: 200,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-
   flex3: { marginTop: 12 },
   infoText: { fontSize: 14, color: '#555', marginTop: 2 },
 });

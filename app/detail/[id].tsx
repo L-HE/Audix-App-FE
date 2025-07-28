@@ -1,6 +1,6 @@
 // app/detail/[id].tsx
 import { useLocalSearchParams } from 'expo-router';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
 import machineData, { Machine } from '../../assets/data/machineData';
 import MachineCard from '../../components/screens/machineCard';
@@ -16,6 +16,11 @@ const orderMap: Record<Machine['state'], number> = {
 
 const DetailScreen: React.FC = () => {
   const { id } = useLocalSearchParams<Params>();
+  const [animate, setAnimate] = useState(false);
+
+  useEffect(() => {
+    setAnimate(true); // 스크린 렌더링 시 애니메이션 활성화
+  }, []);
 
   const sortedMachines = useMemo(() => {
     return machineData
@@ -29,7 +34,7 @@ const DetailScreen: React.FC = () => {
       contentContainerStyle={styles.content}
     >
       {sortedMachines.map(m => (
-        <MachineCard key={m.id} {...m} />
+        <MachineCard key={m.id} {...m} animate={animate} />
       ))}
     </ScrollView>
   );
