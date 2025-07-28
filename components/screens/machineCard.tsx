@@ -35,7 +35,7 @@ const MachineCard: React.FC<Machine> = ({
               <Text style={styles.infoText}>담당자: {owner}</Text>
             </View>
           </View>
-          <View style={styles.flex2}>
+          <View>
             <VDonutChart id={String(id)} />
           </View>
         </View>

@@ -1,27 +1,7 @@
 import React from 'react';
-import { SafeAreaView, StyleSheet } from 'react-native';
+import { Dimensions, SafeAreaView, StyleSheet } from 'react-native';
 import { VictoryPie } from 'victory-native';
-
-// Machine 타입 정의
-export type Machine = {
-  id: string;
-  areaId: string;
-  name: string;
-  model: string;
-  percent: number;
-  location: string;
-  owner: string;
-  state: 'danger' | 'warning' | 'normal' | 'unknown';
-};
-
-// 예시 데이터
-const machineData: Machine[] = [
-  { id: 'm1', areaId: '1', name: '로봇팔', model: 'SO-ARM101', percent: 15,  location: '2층 자동차 부재료 조립구역', owner: '이하은', state: 'danger' },
-  { id: 'm2', areaId: '1', name: '로봇팔', model: 'SO-ARM102', percent: 80,  location: '2층 자동차 부재료 조립구역', owner: '김서현', state: 'normal' },
-  { id: 'm5', areaId: '1', name: '로봇팔', model: 'SO-ARM101', percent: 65,  location: '2층 자동차 부재료 조립구역', owner: '도종명', state: 'warning' },
-  { id: 'm3', areaId: '2', name: '로봇팔', model: 'SO-ARM101', percent: 15,  location: '2층 자동차 부재료 조립구역', owner: '김재걸', state: 'danger' },
-  { id: 'm4', areaId: '2', name: '로봇팔', model: 'SO-ARM101', percent: 55,  location: '2층 자동차 부재료 조립구역', owner: '김현민', state: 'warning' },
-];
+import machineData from '../../assets/data/machineData';
 
 interface Props {
   /** 표시할 머신의 id */
@@ -29,6 +9,9 @@ interface Props {
 }
 
 const MachineDonutChart: React.FC<Props> = ({ id }) => {
+  const screenWidth = Dimensions.get('window').width;
+  const chartSize = screenWidth * 0.4; // 화면 너비의 40%
+
   // 선택한 머신 찾기
   const selected = machineData.find(m => m.id === id);
   if (!selected) {
@@ -51,10 +34,11 @@ const MachineDonutChart: React.FC<Props> = ({ id }) => {
   const colorScale = [primaryColor, '#e0e0e0'];
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { width: chartSize, height: chartSize }]}>
       <VictoryPie
         data={chartData}
-        innerRadius={60}
+        innerRadius={chartSize * 0.3}
+        radius={chartSize * 0.5}
         padAngle={2}
         colorScale={colorScale}
         labels={() => null} // 라벨 숨기기
@@ -65,10 +49,8 @@ const MachineDonutChart: React.FC<Props> = ({ id }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 16,
   },
 });
 
