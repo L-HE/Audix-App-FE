@@ -13,7 +13,7 @@ export type Machine = {
   state: 'danger' | 'warning' | 'normal' | 'unknown';
 };
 
-const machineData: Machine[] = [
+export const machineData: Machine[] = [
   {
     id: 'm1',
     areaId: '1',

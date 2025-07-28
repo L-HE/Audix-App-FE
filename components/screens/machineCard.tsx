@@ -11,11 +11,7 @@ const orderColor: Record<Machine['state'], string> = {
   unknown: '#ccc',
 };
 
-interface MachineCardProps extends Machine {
-  animate: boolean; // 애니메이션 상태를 추가
-}
-
-const MachineCard: React.FC<MachineCardProps> = ({
+const MachineCard: React.FC<Machine> = ({
   id,
   image,
   name,

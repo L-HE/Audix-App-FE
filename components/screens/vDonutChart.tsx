@@ -46,7 +46,7 @@ const VDonutChart: React.FC<Props> = ({ id }) => {
         padAngle={2}
         colorScale={colorScale}
         labels={() => null}
-        animate={{ duration: 800 }}  // onLoad 대신 데이터 변경 애니메이션
+        animate={{ duration: 1000 }}  // onLoad 대신 데이터 변경 애니메이션
       />
     </SafeAreaView>
   );
