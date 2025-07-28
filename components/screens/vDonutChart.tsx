@@ -1,61 +1,59 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Dimensions, SafeAreaView, StyleSheet } from 'react-native';
 import { VictoryPie } from 'victory-native';
 import machineData from '../../assets/data/machineData';
 
-interface Props {
-  /** 표시할 머신의 id */
-  id: string;
-  /** 애니메이션 상태를 추가 */
-  animate: boolean;
-}
+interface Props { id: string; }
 
-const MachineDonutChart: React.FC<Props> = ({ id, animate }) => {
+const VDonutChart: React.FC<Props> = ({ id }) => {
   const screenWidth = Dimensions.get('window').width;
-  const chartSize = screenWidth * 0.4; // 화면 너비의 40%
+  const size = screenWidth * 0.4;
 
-
-  // 선택한 머신 찾기
-  const selected = machineData.find(m => m.id === id);
-  if (!selected) {
-    return null;
-  }
-
+  // 머신 필터링
+  const selected = machineData.find(m => m.id === id)!;
   const used = selected.percent;
   const remaining = 100 - used;
-  const chartData = [
-    { x: `${selected.name}`, y: used },
-    { x: '', y: remaining },
+  const finalData = [
+    { x: selected.name, y: used },
+    { x: '',            y: remaining },
   ];
 
-  // 두 조각에 대한 색상: 첫 번째는 머신 상태에 따라, 두 번째는 회색
+  // 애니메이션용 state
+  const [data, setData] = useState([
+    { x: selected.name, y: 0 },
+    { x: '',            y: 100 },
+  ]);
+
+  useEffect(() => {
+    // 마운트 후 실제 값으로 업데이트 → 데이터 변경 애니메이션 발생
+    const tid = setTimeout(() => setData(finalData), 100);
+    return () => clearTimeout(tid);
+  }, []);
+
+  // 색상 매핑
   const primaryColor =
-    selected.state === 'danger' ? '#e53935' :
+    selected.state === 'danger'  ? '#e53935' :
     selected.state === 'warning' ? '#fdd835' :
-    selected.state === 'normal'  ? '#43a047' :
-    '#9e9e9e';
+    '#43a047';
   const colorScale = [primaryColor, '#e0e0e0'];
 
   return (
-    <SafeAreaView style={[styles.container, { width: chartSize, height: chartSize }]}>
+    <SafeAreaView style={[styles.container, { width: size, height: size }]}>
       <VictoryPie
-        data={chartData}
-        innerRadius={chartSize * 0.3}
-        radius={chartSize * 0.5}
+        data={data}
+        innerRadius={size * 0.3}
+        radius={size * 0.5}
         padAngle={2}
         colorScale={colorScale}
-        labels={() => null} // 라벨 숨기기
-        animate={animate ? { duration: 2000, easing: 'exp' } : undefined} // 애니메이션 조건부 적용
+        labels={() => null}
+        animate={{ duration: 800 }}  // onLoad 대신 데이터 변경 애니메이션
       />
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  container: { justifyContent: 'center', alignItems: 'center' },
 });
 
-export default MachineDonutChart;
+export default VDonutChart;

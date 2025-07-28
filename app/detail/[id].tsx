@@ -1,18 +1,11 @@
 // app/detail/[id].tsx
 import { useLocalSearchParams } from 'expo-router';
-import React, { useEffect, useMemo, useState } from 'react';
-import { ScrollView, StyleSheet } from 'react-native';
-import machineData, { Machine } from '../../assets/data/machineData';
-import MachineCard from '../../components/screens/machineCard';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
+import machineData from '../../assets/data/machineData';
+import VDonutChart from '../../components/screens/vDonutChart';
 
 type Params = { id: string };
-
-const orderMap: Record<Machine['state'], number> = {
-  danger: 0,
-  warning: 1,
-  normal: 2,
-  unknown: 3,
-};
 
 const DetailScreen: React.FC = () => {
   const { id } = useLocalSearchParams<Params>();
@@ -22,27 +15,18 @@ const DetailScreen: React.FC = () => {
     setAnimate(true); // 스크린 렌더링 시 애니메이션 활성화
   }, []);
 
-  const sortedMachines = useMemo(() => {
-    return machineData
-      .filter(m => m.areaId === id)
-      .sort((a, b) => orderMap[a.state] - orderMap[b.state]);
-  }, [id]);
+  // areaId가 id와 일치하는 첫 번째 머신만 선택
+  const machine = machineData.find(m => m.areaId === id);
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.content}
-    >
-      {sortedMachines.map(m => (
-        <MachineCard key={m.id} {...m} animate={animate} />
-      ))}
-    </ScrollView>
+    <View style={styles.container}>
+      {machine && <VDonutChart id={machine.id} />}
+    </View>
   );
 };
 
 export default DetailScreen;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f2f2f2' },
-  content: { padding: 16 },
+  container: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f2f2f2' },
 });

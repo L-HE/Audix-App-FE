@@ -23,7 +23,6 @@ const MachineCard: React.FC<MachineCardProps> = ({
   location,
   owner,
   state,
-  animate, // 애니메이션 상태를 받음
 }) => {
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -41,7 +40,7 @@ const MachineCard: React.FC<MachineCardProps> = ({
             </View>
           </View>
           <View>
-            <VDonutChart id={String(id)} animate={animate} /> 
+            <VDonutChart id={String(id)} />
           </View>
         </View>
       </View>
