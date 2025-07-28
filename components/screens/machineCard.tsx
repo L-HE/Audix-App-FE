@@ -1,6 +1,6 @@
 // components/screens/MachineCard.tsx
 import React from 'react';
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { Image, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import { Machine } from '../../assets/data/machineData';
 import VDonutChart from './vDonutChart';
 
@@ -11,46 +11,36 @@ const orderColor: Record<Machine['state'], string> = {
   unknown: '#ccc',
 };
 
-const sampleData = [
-  { x: 'Android', y: 40 },
-  { x: 'iOS',      y: 30 },
-  { x: 'Web',      y: 20 },
-  { x: 'Others',   y: 10 },
-];
-
 const MachineCard: React.FC<Machine> = ({
+  id,
   image,
   name,
   model,
-  percent,
   location,
   owner,
   state,
 }) => {
   return (
-    <View style={[styles.card, { borderColor: orderColor[state] }]}>
-      <View style={styles.row}>
-        <View style={styles.flex1}>
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={[styles.card, { borderColor: orderColor[state] }]}>
+        <View style={styles.row}>
+          <View style={styles.flex1}>
             <Image source={image} style={styles.image} resizeMode="contain" />
             <View>
-                <Text style={styles.name}>{name}</Text>
-                <Text style={styles.subName}>{model}</Text>
+              <Text style={styles.name}>{name}</Text>
+              <Text style={styles.subName}>{model}</Text>
             </View>
             <View style={styles.flex3}>
-                <Text style={styles.infoText}>위치: {location}</Text>
-                <Text style={styles.infoText}>담당자: {owner}</Text>
+              <Text style={styles.infoText}>위치: {location}</Text>
+              <Text style={styles.infoText}>담당자: {owner}</Text>
             </View>
-        </View>
-        <View style={styles.flex2}>
-          <VDonutChart
-            data={sampleData}
-            colors={['#5E35B1', '#1E88E5', '#43A047', '#FDD835']}
-            innerRadius={140}
-          />
+          </View>
+          <View style={styles.flex2}>
+            <VDonutChart id={String(id)} />
+          </View>
         </View>
       </View>
-        
-    </View>
+    </SafeAreaView>
   );
 };
 
