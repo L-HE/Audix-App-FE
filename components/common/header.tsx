@@ -1,4 +1,5 @@
 // components/common/Header.tsx
+import { Colors } from '@/shared/styles/global';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useSegments } from 'expo-router';
 import React from 'react';
@@ -32,12 +33,7 @@ const Header: React.FC = () => {
   const canGoBack = segments.length > 1;
 
   const handleNotificationPress = () => {
-    console.log('----------------------------------')
-    console.log('Notification button pressed');
-    console.log('Current segments:', segments);
     setModalVisible(true);
-    console.log('Modal visibility set to true');
-    console.log('----------------------------------')
   };
 
   return (
@@ -84,7 +80,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingTop: HEADER_HEIGHT * PADDING_TOP_RATIO,
     paddingHorizontal: SCREEN_WIDTH * 0.05,
-    backgroundColor: '#fff',
+    backgroundColor: Colors.background,
   },
   spacer: {
     width: ICON_BTN_W,

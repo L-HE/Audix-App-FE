@@ -7,9 +7,9 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 // 비율 상수
 const SEARCH_WIDTH_RATIO = 0.65;
-const SEARCH_HEIGHT_RATIO = 0.06;
+const SEARCH_HEIGHT_RATIO = 0.045; // 화면 높이의 4.5%
 const PADDING_RATIO = 0.043;
-const PLACEHOLDER_FONT_RATIO = 0.018; // 화면 높이의 1.8%
+const PLACEHOLDER_FONT_RATIO = 0.015; // 화면 높이의 1.5%
 
 const SEARCH_WIDTH = SCREEN_WIDTH * SEARCH_WIDTH_RATIO;
 const SEARCH_HEIGHT = SCREEN_HEIGHT * SEARCH_HEIGHT_RATIO;
