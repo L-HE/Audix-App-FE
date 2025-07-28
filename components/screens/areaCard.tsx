@@ -1,16 +1,6 @@
 import React from 'react';
-import { Image, ImageSourcePropType, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-
-type CardState = 'danger' | 'warning' | 'normal' | 'unknown';
-
-export interface AreaCardProps {
-  id: string;
-  title: string;
-  subtitle: string;
-  image: ImageSourcePropType;
-  state: CardState;
-  onPress: () => void;
-}
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { AreaCardProps, CardState } from '../../assets/data/areaData';
 
 const getBorderColor = (state: CardState): string => {
   switch (state) {

@@ -1,6 +1,16 @@
 // assets/data/areaData.ts
+import { ImageSourcePropType } from 'react-native';
 
-import { AreaCardProps } from '../../components/screens/areaCard';
+export type CardState = 'warning' | 'danger' | 'normal' | 'unknown';
+
+export interface AreaCardProps {
+  id: string;
+  title: string;
+  subtitle: string;
+  image: ImageSourcePropType;
+  state: CardState;
+  onPress: () => void;
+}
 
 export type CardData = Omit<AreaCardProps, 'onPress'>;
 
