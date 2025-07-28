@@ -1,6 +1,7 @@
 // ./components/screens/SearchInput.tsx
 import React from 'react';
 import { Dimensions, StyleSheet, TextInput } from 'react-native';
+import { Colors } from '../../shared/styles/global';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -32,11 +33,11 @@ const styles = StyleSheet.create({
   input: {
     width: SEARCH_WIDTH,
     height: SEARCH_HEIGHT,
-    backgroundColor: '#fff',
+    backgroundColor: Colors.background,
     borderRadius: SEARCH_HEIGHT * 0.22,
     paddingHorizontal: HORIZONTAL_PADDING,
     borderWidth: 1,
-    borderColor: '#656565',
+    borderColor: Colors.border,
     fontSize: PLACEHOLDER_FONT_SIZE, // 반응형 폰트 사이즈
   },
 });

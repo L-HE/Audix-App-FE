@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Dimensions, SafeAreaView, StyleSheet } from 'react-native';
 import { VictoryPie } from 'victory-native';
 import machineData from '../../assets/data/machineData';
+import { Colors, getBorderColor } from '../../shared/styles/global';
 
 interface Props { id: string; }
 
@@ -31,11 +32,8 @@ const VDonutChart: React.FC<Props> = ({ id }) => {
   }, []);
 
   // 색상 매핑
-  const primaryColor =
-    selected.state === 'danger'  ? '#e53935' :
-    selected.state === 'warning' ? '#fdd835' :
-    '#43a047';
-  const colorScale = [primaryColor, '#e0e0e0'];
+  const primaryColor = getBorderColor(selected.state);
+  const colorScale = [primaryColor, Colors.borderLight];
 
   return (
     <SafeAreaView style={[styles.container, { width: size, height: size }]}>

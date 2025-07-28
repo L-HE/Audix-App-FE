@@ -1,22 +1,11 @@
 import React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { AreaCardProps, CardState } from '../../assets/data/areaData';
-
-const getBorderColor = (state: CardState): string => {
-  switch (state) {
-    case 'danger':
-      return '#FF3116';
-    case 'warning':
-      return '#FFC525';
-    case 'normal':
-      return '#1CAA00';
-    default:
-      return '#D7D7D7';
-  }
-};
+import { AreaCardProps } from '../../assets/data/areaData';
+import { Colors, getBorderColor } from '../../shared/styles/global';
 
 const AreaCard: React.FC<AreaCardProps> = ({ title, subtitle, image, state, onPress }) => {
   const borderColor = getBorderColor(state);
+  
   return (
     <TouchableOpacity style={[styles.card, { borderColor }]} onPress={onPress}>
       <Image source={image} style={styles.cardImage} />
@@ -36,11 +25,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 12,
     marginBottom: 30,
-    backgroundColor: '#fff',
+    backgroundColor: Colors.background,
     borderRadius: 8,
     borderWidth: 2,
     overflow: 'hidden',
-    shadowColor: '#000',
+    shadowColor: Colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
@@ -59,9 +48,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 4,
+    color: Colors.textPrimary,
   },
   cardSubtitle: {
     fontSize: 14,
-    color: '#666',
+    color: Colors.textSecondary,
   },
 });

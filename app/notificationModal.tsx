@@ -16,8 +16,8 @@ interface NotificationModalProps {
 }
 
 const STATUS_COLORS: Record<Status, string> = {
-  danger: '#FF3116',
-  warning: '#FFC525',
+  danger: '#e74c3c',
+  warning: '#f1c40f',
 };
 
 const STATUS_LABELS: Record<Status, string> = {

@@ -3,6 +3,7 @@ import { useSegments } from 'expo-router';
 import React from 'react';
 import { Dimensions, StyleSheet, Text, View } from 'react-native';
 import { area } from '../../assets/data/areaData';
+import { Colors } from '../../shared/styles/global';
 import SearchInput from '../screens/searchInput';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -57,15 +58,15 @@ const styles = StyleSheet.create({
     height: APPBAR_HEIGHT,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: Colors.background,
     marginTop: MARGIN_TOP,
     marginBottom: MARGIN_BOTTOM,
     paddingHorizontal: 16,
   },
   title: {
     marginBottom: 8,
-    fontSize: TITLE_FONT_SIZE, // 반응형 폰트 사이즈
+    fontSize: TITLE_FONT_SIZE,
     fontWeight: '600',
-    color: '#000', // 색상 명시
+    color: Colors.textPrimary,
   },
 });
