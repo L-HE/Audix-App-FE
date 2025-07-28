@@ -2,6 +2,7 @@
 import { Slot, usePathname, useSegments } from 'expo-router';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
+import { Host } from 'react-native-portalize'; // 추가
 import {
   SafeAreaProvider,
   SafeAreaView
@@ -9,6 +10,7 @@ import {
 
 import AppBar from '@/components/common/appBar';
 import Header from '@/components/common/header';
+import { Colors } from '@/shared/styles/global';
 import BottomNav from '../components/common/bottomNav';
 import { ModalProvider } from '../shared/api/modalContextApi';
 import NotificationModal from './notificationModal';
@@ -59,9 +61,11 @@ function RootLayoutContent() {
 export default function RootLayout() {
   return (
     <SafeAreaProvider>
-      <ModalProvider>
-        <RootLayoutContent />
-      </ModalProvider>
+      <Host> {/* Portal Host 추가 */}
+        <ModalProvider>
+          <RootLayoutContent />
+        </ModalProvider>
+      </Host>
     </SafeAreaProvider>
   );
 }
@@ -69,7 +73,7 @@ export default function RootLayout() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: Colors.background,
   },
   slot: {
     flex: 1,

@@ -32,7 +32,12 @@ const Header: React.FC = () => {
   const canGoBack = segments.length > 1;
 
   const handleNotificationPress = () => {
+    console.log('----------------------------------')
+    console.log('Notification button pressed');
+    console.log('Current segments:', segments);
     setModalVisible(true);
+    console.log('Modal visibility set to true');
+    console.log('----------------------------------')
   };
 
   return (

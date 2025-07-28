@@ -78,8 +78,8 @@ const VDonutChart: React.FC<Props> = ({ id }) => {
   const colorScale = [primaryColor, Colors.borderLight];
 
   return (
-    <SafeAreaView style={[styles.container, { width: size, height: size }]}>
-      <View style={styles.chartContainer}>
+    <SafeAreaView style={[styles.container, { width: size, height: size, zIndex: 1 }]}>
+      <View style={[styles.chartContainer, { zIndex: 1 }]}>
         <VictoryPie
           data={data}
           innerRadius={size * 0.3}
@@ -94,7 +94,7 @@ const VDonutChart: React.FC<Props> = ({ id }) => {
         />
         
         {/* 중심에 퍼센트 표시 - ZoomIn 애니메이션 */}
-        <View style={styles.centerContent}>
+        <View style={[styles.centerContent, { zIndex: 2 }]}>
           <Animated.Text 
             style={[
               styles.percentText, 

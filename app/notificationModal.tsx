@@ -2,6 +2,7 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import RNModal from 'react-native-modal';
+import { Portal } from 'react-native-portalize';
 import { modalData } from '../assets/data/modalData';
 import { useModal } from '../shared/api/modalContextApi'; // 모달 컨텍스트 API 사용
 import { Colors } from '../shared/styles/global';
@@ -29,42 +30,45 @@ const NotificationModal: React.FC = () => {
   const statusLabel = STATUS_LABELS[modalData.status];
 
   return (
-    <RNModal
-      isVisible={modalVisible}
-      backdropOpacity={0.5}
-      animationIn="zoomInDown"
-      animationInTiming={400}
-      animationOut="zoomOutDown"
-      animationOutTiming={300}
-      useNativeDriver
-      onBackdropPress={handleClose}  // 배경 터치 시 닫기
-      onBackButtonPress={handleClose} // Android 뒤로가기 시 닫기
-    >
-      <View style={styles.container}>
-        {/* 상단 컬러 헤더 */}
-        <View style={[styles.header, { backgroundColor: topColor }]}>
-          <Text style={styles.headerTitle}>장비 알람</Text>
-          <Text style={styles.headerStatus}>{statusLabel}</Text>
-        </View>
-
-        {/* 본문 */}
-        <View style={styles.body}>
-          <Text style={styles.regionName}>{modalData.regionName}</Text>
-          <Text style={styles.regionLocation}>{modalData.regionLocation}</Text>
-          <Text style={styles.equipmentCode}>{modalData.equipmentCode}</Text>
-
-          <View style={styles.messageBox}>
-            <Text style={styles.messageText}>
-              {modalData.message || '현재 장비에서 이상음이 감지됩니다. 점검이 필요합니다.'}
-            </Text>
+    <Portal>
+      <RNModal
+        isVisible={modalVisible}
+        backdropOpacity={0.5}
+        animationIn="zoomInDown"
+        animationInTiming={400}
+        animationOut="zoomOutDown"
+        animationOutTiming={300}
+        useNativeDriver
+        onBackdropPress={handleClose}
+        onBackButtonPress={handleClose}
+        style={{ zIndex: 10000 }} // 추가
+      >
+        <View style={styles.container}>
+          {/* 상단 컬러 헤더 */}
+          <View style={[styles.header, { backgroundColor: topColor }]}>
+            <Text style={styles.headerTitle}>장비 알람</Text>
+            <Text style={styles.headerStatus}>{statusLabel}</Text>
           </View>
 
-          <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
-            <Text style={styles.closeButtonText}>닫기</Text>
-          </TouchableOpacity>
+          {/* 본문 */}
+          <View style={styles.body}>
+            <Text style={styles.regionName}>{modalData.regionName}</Text>
+            <Text style={styles.regionLocation}>{modalData.regionLocation}</Text>
+            <Text style={styles.equipmentCode}>{modalData.equipmentCode}</Text>
+
+            <View style={styles.messageBox}>
+              <Text style={styles.messageText}>
+                {modalData.message || '현재 장비에서 이상음이 감지됩니다. 점검이 필요합니다.'}
+              </Text>
+            </View>
+
+            <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
+              <Text style={styles.closeButtonText}>닫기</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
-    </RNModal>
+      </RNModal>
+    </Portal>
   );
 };
 
@@ -72,9 +76,11 @@ export default NotificationModal;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#fff',
+    backgroundColor: Colors.background,
     borderRadius: 10,
     overflow: 'hidden',
+    zIndex: 9999, // 최상위 레벨로 설정
+    elevation: 1000, // Android 전용
   },
   header: {
     paddingVertical: 16,
