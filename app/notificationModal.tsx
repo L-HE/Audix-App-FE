@@ -2,22 +2,15 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import RNModal from 'react-native-modal';
+import { modalData } from '../assets/data/modalData';
+import { useModal } from '../shared/api/modalContextApi'; // 모달 컨텍스트 API 사용
+import { Colors } from '../shared/styles/global';
 
 type Status = 'danger' | 'warning';
 
-interface NotificationModalProps {
-  visible: boolean;
-  onClose: () => void;
-  status: Status;
-  regionName: string;
-  regionLocation: string;
-  equipmentCode: string;
-  message?: string;
-}
-
 const STATUS_COLORS: Record<Status, string> = {
-  danger: '#e74c3c',
-  warning: '#f1c40f',
+  danger: Colors.danger,
+  warning: Colors.warning,
 };
 
 const STATUS_LABELS: Record<Status, string> = {
@@ -25,48 +18,48 @@ const STATUS_LABELS: Record<Status, string> = {
   warning: '점검 요망',
 };
 
-const NotificationModal: React.FC<NotificationModalProps> = ({
-  visible,
-  onClose,
-  status,
-  regionName,
-  regionLocation,
-  equipmentCode,
-  message = '현재 장비에서 이상음이 감지됩니다. 점검이 필요합니다.',
-}) => {
-  const topColor = STATUS_COLORS[status];
-  const statusLabel = STATUS_LABELS[status];
+const NotificationModal: React.FC = () => {
+  const { modalVisible, setModalVisible } = useModal();
+  
+  const handleClose = () => {
+    setModalVisible(false);
+  };
+
+  const topColor = STATUS_COLORS[modalData.status];
+  const statusLabel = STATUS_LABELS[modalData.status];
 
   return (
     <RNModal
-      isVisible={visible}
+      isVisible={modalVisible}
       backdropOpacity={0.5}
-      animationIn="zoomInDown"     // 등장 애니메이션
+      animationIn="zoomInDown"
       animationInTiming={400}
-      animationOut="zoomOutDown"     // 퇴장 애니메이션
+      animationOut="zoomOutDown"
       animationOutTiming={300}
       useNativeDriver
-      onBackdropPress={onClose}    // 배경 터치 시 닫기
-      onBackButtonPress={onClose}  // Android 뒤로가기 시 닫기
+      onBackdropPress={handleClose}  // 배경 터치 시 닫기
+      onBackButtonPress={handleClose} // Android 뒤로가기 시 닫기
     >
       <View style={styles.container}>
         {/* 상단 컬러 헤더 */}
         <View style={[styles.header, { backgroundColor: topColor }]}>
-          <Text style={styles.headerTitle}>장비 알림</Text>
+          <Text style={styles.headerTitle}>장비 알람</Text>
           <Text style={styles.headerStatus}>{statusLabel}</Text>
         </View>
 
         {/* 본문 */}
         <View style={styles.body}>
-          <Text style={styles.regionName}>{regionName}</Text>
-          <Text style={styles.regionLocation}>{regionLocation}</Text>
-          <Text style={styles.equipmentCode}>{equipmentCode}</Text>
+          <Text style={styles.regionName}>{modalData.regionName}</Text>
+          <Text style={styles.regionLocation}>{modalData.regionLocation}</Text>
+          <Text style={styles.equipmentCode}>{modalData.equipmentCode}</Text>
 
           <View style={styles.messageBox}>
-            <Text style={styles.messageText}>{message}</Text>
+            <Text style={styles.messageText}>
+              {modalData.message || '현재 장비에서 이상음이 감지됩니다. 점검이 필요합니다.'}
+            </Text>
           </View>
 
-          <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+          <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
             <Text style={styles.closeButtonText}>닫기</Text>
           </TouchableOpacity>
         </View>
@@ -89,12 +82,12 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 16,
-    color: '#fff',
+    color: Colors.textPrimary,
     marginBottom: 4,
   },
   headerStatus: {
-    fontSize: 20,
-    color: '#fff',
+    fontSize: 30,
+    color: Colors.textPrimary,
     fontWeight: '700',
   },
   body: {
@@ -108,7 +101,7 @@ const styles = StyleSheet.create({
   },
   regionLocation: {
     fontSize: 14,
-    color: '#555',
+    color: Colors.textSecondary,
     marginBottom: 4,
     textAlign: 'center',
   },
@@ -119,26 +112,25 @@ const styles = StyleSheet.create({
   },
   messageBox: {
     width: '100%',
-    backgroundColor: '#f2f2f2',
+    backgroundColor: Colors.backgroundSecondary,
     padding: 12,
     borderRadius: 6,
     marginBottom: 20,
   },
   messageText: {
     fontSize: 14,
-    color: '#333',
+    color: Colors.textPrimary,
     textAlign: 'center',
     lineHeight: 20,
   },
   closeButton: {
     width: '100%',
-    backgroundColor: '#333',
     paddingVertical: 12,
     borderRadius: 6,
     alignItems: 'center',
   },
   closeButtonText: {
-    color: '#fff',
+    color: '#000',
     fontSize: 16,
   },
 });

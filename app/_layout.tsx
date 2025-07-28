@@ -10,6 +10,8 @@ import {
 import AppBar from '@/components/common/appBar';
 import Header from '@/components/common/header';
 import BottomNav from '../components/common/bottomNav';
+import { ModalProvider } from '../shared/api/modalContextApi';
+import NotificationModal from './notificationModal';
 
 export const headerShown = false;
 
@@ -47,6 +49,9 @@ function RootLayoutContent() {
 
       {/* 바텀 내비게이션 (SafeAreaView bottom inset이 자동 적용) */}
       <BottomNav />
+      
+      {/* 알림 모달 */}
+      <NotificationModal />
     </SafeAreaView>
   );
 }
@@ -54,7 +59,9 @@ function RootLayoutContent() {
 export default function RootLayout() {
   return (
     <SafeAreaProvider>
-      <RootLayoutContent />
+      <ModalProvider>
+        <RootLayoutContent />
+      </ModalProvider>
     </SafeAreaProvider>
   );
 }
