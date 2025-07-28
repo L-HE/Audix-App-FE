@@ -1,11 +1,10 @@
 // app/_layout.tsx
-import { Slot } from 'expo-router';
+import { Slot, usePathname, useSegments } from 'expo-router';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import {
   SafeAreaProvider,
-  SafeAreaView,
-  useSafeAreaInsets,
+  SafeAreaView
 } from 'react-native-safe-area-context';
 
 import AppBar from '@/components/common/appBar';
@@ -15,7 +14,20 @@ import BottomNav from '../components/common/bottomNav';
 export const headerShown = false;
 
 function RootLayoutContent() {
-  const insets = useSafeAreaInsets();
+  const segments = useSegments();
+  const pathname = usePathname();
+
+  // pathname에서 id 추출 (예: "/detail/1" -> "1")
+  const getCurrentId = () => {
+    if (segments[0] === 'detail' && segments[1] === '[id]') {
+      const pathParts = pathname.split('/');
+      const id = pathParts[pathParts.length - 1]; // 마지막 부분이 id
+      return id;
+    }
+    return undefined;
+  };
+
+  const currentId = getCurrentId();
 
   return (
     <SafeAreaView
@@ -26,7 +38,7 @@ function RootLayoutContent() {
       <Header />
 
       {/* 검색바 포함 AppBar */}
-      <AppBar />
+      <AppBar currentId={currentId} />
 
       {/* 각 화면 컴포넌트 */}
       <View style={styles.slot}>
