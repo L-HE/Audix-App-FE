@@ -1,8 +1,54 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: [],
+  // NativeWind 2.0에서는 content 대신 presets 사용
+  content: [
+    "./app/**/*.{js,jsx,ts,tsx}",
+    "./components/**/*.{js,jsx,ts,tsx}",
+    "./shared/**/*.{js,jsx,ts,tsx}",
+  ],
+  presets: [require("nativewind/preset")],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        // 커스텀 색상 정의 (global.ts와 동일)
+        danger: '#FF3116',
+        warning: '#FFC525',
+        normal: '#1CAA00',
+        unknown: '#D7D7D7',
+        
+        // 배경색
+        'bg-primary': '#fff',
+        'bg-secondary': '#f2f2f2',
+        
+        // 텍스트 색상
+        'text-primary': '#000',
+        'text-secondary': '#666',
+        'text-tertiary': '#777',
+        
+        // 보더 색상
+        'border-primary': '#656565',
+        'border-light': '#e0e0e0',
+      },
+      fontFamily: {
+        // 폰트 패밀리 추가 (필요시)
+        'sans': ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+      },
+      spacing: {
+        // 커스텀 스페이싱 (필요시)
+        '18': '4.5rem',
+        '88': '22rem',
+      },
+      borderRadius: {
+        // 커스텀 보더 반지름
+        'xl': '12px',
+        '2xl': '16px',
+      },
+      shadows: {
+        // 커스텀 그림자
+        'card': '0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24)',
+        'elevated': '0 4px 6px rgba(0, 0, 0, 0.1)',
+      }
+    },
   },
   plugins: [],
 }

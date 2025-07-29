@@ -7,6 +7,7 @@ import {
   SafeAreaProvider,
   SafeAreaView
 } from 'react-native-safe-area-context';
+import '../shared/styles/global.css'; // CSS 파일 import 추가
 
 import AppBar from '@/components/common/appBar';
 import Header from '@/components/common/header';
