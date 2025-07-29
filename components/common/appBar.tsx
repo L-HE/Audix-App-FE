@@ -7,8 +7,8 @@ import { Colors } from '../../shared/styles/global';
 import SearchInput from '../screens/searchInput';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
-const APPBAR_HEIGHT_RATIO = 0.15; // 화면 높이의 15%
-const MARGIN_BOTTOM_RATIO = 0.0001; // 화면 높이의 0.01%
+const APPBAR_HEIGHT_RATIO = 0.13; // 화면 높이의 13%
+const MARGIN_BOTTOM_RATIO = 0.015; // 화면 높이의 1.5%
 const TITLE_FONT_RATIO = 0.025; // 화면 높이의 2.5%
 
 const APPBAR_HEIGHT = SCREEN_HEIGHT * APPBAR_HEIGHT_RATIO;

@@ -51,7 +51,7 @@ function RootLayoutContent() {
 
       {/* 바텀 내비게이션 (SafeAreaView bottom inset이 자동 적용) */}
       <BottomNav />
-      
+
       {/* 알림 모달 */}
       <NotificationModal />
     </SafeAreaView>
@@ -61,7 +61,7 @@ function RootLayoutContent() {
 export default function RootLayout() {
   return (
     <SafeAreaProvider>
-      <Host> {/* Portal Host 추가 */}
+      <Host>
         <ModalProvider>
           <RootLayoutContent />
         </ModalProvider>

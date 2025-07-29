@@ -15,9 +15,9 @@ import { useModal } from '../../shared/api/modalContextApi';
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } =
   Dimensions.get('window');
 
-const HEADER_HEIGHT_RATIO = 0.07;
+const HEADER_HEIGHT_RATIO = 0.05;
 const LOGO_RATIO = 0.4;
-const PADDING_TOP_RATIO = 0.2;
+const PADDING_TOP_RATIO = 0.35;
 const ICON_RATIO = 0.06;
 const ICON_HORIZONTAL_PADDING_RATIO = 0.02;
 
