@@ -10,14 +10,14 @@ import { VictoryPie } from 'victory-native';
 import machineData from '../../assets/data/machineData';
 import { Colors, getBorderColor } from '../../shared/styles/global';
 
-interface Props { id: string; }
+interface Props { machineId: string; }
 
-const VDonutChart: React.FC<Props> = ({ id }) => {
+const VDonutChart: React.FC<Props> = ({ machineId }) => {
   const screenWidth = Dimensions.get('window').width;
   const size = screenWidth * 0.4;
 
   // 머신 데이터
-  const selected = machineData.find(m => m.id === id)!;
+  const selected = machineData.find(m => m.machineId === machineId)!;
   const used = selected.percent;
   const remaining = 100 - used;
 

@@ -6,7 +6,7 @@ import { Colors, getBorderColor } from '../../shared/styles/global';
 import VDonutChart from './vDonutChart';
 
 const MachineCard: React.FC<Machine> = ({
-  id,
+  machineId,
   image,
   name,
   model,
@@ -32,7 +32,7 @@ const MachineCard: React.FC<Machine> = ({
             </View>
           </View>
           <View>
-            <VDonutChart id={String(id)} />
+            <VDonutChart machineId={String(machineId)} />
           </View>
         </View>
       </View>

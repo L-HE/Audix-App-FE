@@ -75,7 +75,7 @@ const DetailScreen: React.FC = () => {
     >
       <ScrollView contentContainerStyle={styles.content}>
         {sortedMachines.map((machine) => (
-          <MachineCard key={machine.id} {...machine} />
+          <MachineCard key={machine.machineId} {...machine} />
         ))}
       </ScrollView>
     </Animated.View>
