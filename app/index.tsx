@@ -1,7 +1,8 @@
 // app/index.tsx
 import { useRouter } from 'expo-router';
 import React, { useMemo } from 'react';
-import { Dimensions, ScrollView, StyleSheet, View } from 'react-native';
+import { Dimensions, ScrollView, StyleSheet } from 'react-native';
+import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 
 import { area } from '../assets/data/areaData';
 import AreaCard from '../components/screens/areaCard';
@@ -33,21 +34,26 @@ const AreaScreen: React.FC = () => {
   );
 
   return (
-    <View style={styles.container}>
-
-      {/* 정렬된 카드 리스트 */}
+    <Animated.View 
+      style={styles.container}
+      entering={FadeInDown.duration(200)}
+    >
       <ScrollView contentContainerStyle={styles.body}>
-        {sortedCards.map(item => (
-          <AreaCard
+        {sortedCards.map((item, index) => (
+          <Animated.View
             key={item.id}
-            {...item}
-            onPress={() =>
-              router.push({ pathname: '/detail/[id]', params: { id: item.id } })
-            }
-          />
+            entering={index < 8 ? FadeIn.delay(index * 40).duration(300) : FadeIn.duration(200)}
+          >
+            <AreaCard
+              {...item}
+              onPress={() =>
+                router.push({ pathname: '/detail/[id]', params: { id: item.id } })
+              }
+            />
+          </Animated.View>
         ))}
       </ScrollView>
-    </View>
+    </Animated.View>
   );
 };
 
@@ -55,12 +61,10 @@ export default AreaScreen;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#fff',
+    flex: 1
   },
   body: {
     flexGrow: 1,
     padding: 16,
-    backgroundColor: '#f2f2f2',
   },
 });

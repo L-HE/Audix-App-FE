@@ -38,22 +38,25 @@ function RootLayoutContent() {
       style={styles.safeArea}
       edges={['top', 'bottom']}
     >
-      {/* 상단 노치·상태바 영역 자동 패딩 */}
-      <Header />
+      <View style={styles.background}>
+        {/* 상단 노치·상태바 영역 자동 패딩 */}
+        <Header />
 
-      {/* 검색바 포함 AppBar */}
-      <AppBar currentId={currentId} />
+        {/* 검색바 포함 AppBar */}
+        <AppBar currentId={currentId} />
 
-      {/* 각 화면 컴포넌트 */}
-      <View style={styles.slot}>
-        <Slot />
+        {/* 각 화면 컴포넌트 */}
+        <View style={styles.slot}>
+          <Slot />
+        </View>
+
+        {/* 바텀 내비게이션 (SafeAreaView bottom inset이 자동 적용) */}
+        <BottomNav />
+
+        {/* 알림 모달 */}
+        <NotificationModal />
+
       </View>
-
-      {/* 바텀 내비게이션 (SafeAreaView bottom inset이 자동 적용) */}
-      <BottomNav />
-
-      {/* 알림 모달 */}
-      <NotificationModal />
     </SafeAreaView>
   );
 }
@@ -77,5 +80,9 @@ const styles = StyleSheet.create({
   },
   slot: {
     flex: 1,
+  },
+  background: {
+    flex: 1,
+    backgroundColor: Colors.backgroundSecondary
   },
 });

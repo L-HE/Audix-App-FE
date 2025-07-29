@@ -1,7 +1,15 @@
-// app/detail/[id].tsx
+// app/detail/[id].tsx - 안전한 버전
+import { Colors } from '@/shared/styles/global';
 import { useLocalSearchParams } from 'expo-router';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
+import Animated, {
+  cancelAnimation,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  withTiming
+} from 'react-native-reanimated';
 import machineData, { Machine } from '../../assets/data/machineData';
 import MachineCard from '../../components/screens/machineCard';
 
@@ -16,6 +24,11 @@ const orderMap: Record<Machine['state'], number> = {
 
 const DetailScreen: React.FC = () => {
   const { id } = useLocalSearchParams<Params>();
+  const [isAnimating, setIsAnimating] = useState(true);
+
+  // 단순한 페이드 인 애니메이션만
+  const opacity = useSharedValue(0);
+  const translateY = useSharedValue(20);
 
   const sortedMachines = useMemo(() => {
     return machineData
@@ -23,21 +36,61 @@ const DetailScreen: React.FC = () => {
       .sort((a, b) => orderMap[a.state] - orderMap[b.state]);
   }, [id]);
 
+  // 화면 진입 애니메이션
+  useEffect(() => {
+    console.log('DetailScreen mounted, starting animations');
+    
+    // 간단한 페이드 인 애니메이션
+    opacity.value = withTiming(1, { duration: 300 });
+    translateY.value = withTiming(0, { duration: 300 });
+
+    const animationTimeout = setTimeout(() => {
+      setIsAnimating(false);
+    }, 400);
+
+    // 컴포넌트 언마운트 시 모든 애니메이션 정리
+    return () => {
+      console.log('DetailScreen unmounting, cleaning up animations');
+      
+      clearTimeout(animationTimeout);
+      cancelAnimation(opacity);
+      cancelAnimation(translateY);
+      
+      // 즉시 초기값으로 리셋
+      opacity.value = 0;
+      translateY.value = 20;
+    };
+  }, [id]);
+
+  // 애니메이션 스타일
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: opacity.value,
+      transform: [{ translateY: translateY.value }],
+    };
+  });
+
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.content}
+    <Animated.View 
+      style={[styles.container, animatedStyle]}
     >
-      {sortedMachines.map(m => (
-        <MachineCard key={m.id} {...m} />
-      ))}
-    </ScrollView>
+      <ScrollView contentContainerStyle={styles.content}>
+        {sortedMachines.map((machine) => (
+          <MachineCard key={machine.id} {...machine} />
+        ))}
+      </ScrollView>
+    </Animated.View>
   );
 };
 
 export default DetailScreen;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f2f2f2' },
-  content: { padding: 16 },
+  container: { 
+    flex: 1, 
+    backgroundColor: Colors.backgroundSecondary, 
+  },
+  content: { 
+    padding: 16 
+  },
 });

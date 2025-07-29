@@ -47,7 +47,7 @@ const VDonutChart: React.FC<Props> = ({ id }) => {
     // 1. 차트 애니메이션 시작
     const timer = setTimeout(() => {
       startChartAnimation();
-    }, 100);
+    }, 400);
 
     // 2. 텍스트 zoomIn 애니메이션 (차트 애니메이션 후 시작)
     const textTimer = setTimeout(() => {
@@ -57,7 +57,7 @@ const VDonutChart: React.FC<Props> = ({ id }) => {
         mass: 1,
       });
       opacity.value = withTiming(1, { duration: 300 });
-    }, 450); // 차트 애니메이션 중간쯤에 시작
+    }, 440); // 차트 애니메이션 중간쯤에 시작
 
     return () => {
       clearTimeout(timer);
