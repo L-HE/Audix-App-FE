@@ -36,49 +36,50 @@ html, body {
 
 /* === 커스텀 컴포넌트 클래스 === */
 @layer components {
-  /* State Badge */
+  /* State Badge - CSS 변수만 사용 */
   .badge-danger {
-    @apply bg-red-500 text-white px-2 py-1 rounded text-xs font-semibold;
+    @apply text-white px-2 py-1 rounded text-xs font-semibold;
     background-color: var(--color-danger);
   }
   
   .badge-warning {
-    @apply bg-yellow-500 text-white px-2 py-1 rounded text-xs font-semibold;
+    @apply text-white px-2 py-1 rounded text-xs font-semibold;
     background-color: var(--color-warning);
   }
   
   .badge-normal {
-    @apply bg-green-500 text-white px-2 py-1 rounded text-xs font-semibold;
+    @apply text-white px-2 py-1 rounded text-xs font-semibold;
     background-color: var(--color-normal);
   }
   
   .badge-unknown {
-    @apply bg-gray-400 text-white px-2 py-1 rounded text-xs font-semibold;
+    @apply text-white px-2 py-1 rounded text-xs font-semibold;
     background-color: var(--color-unknown);
   }
 
-  /* Card Styles */
+  /* Card Styles - CSS 변수만 사용 */
   .card-base {
-    @apply bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-3;
+    @apply bg-white rounded-lg shadow-sm p-4 mb-3;
+    border: 1px solid var(--color-border-light);
   }
   
   .card-danger {
-    @apply card-base border-red-500;
+    @apply card-base;
     border-color: var(--color-danger);
   }
   
   .card-warning {
-    @apply card-base border-yellow-500;
+    @apply card-base;
     border-color: var(--color-warning);
   }
   
   .card-normal {
-    @apply card-base border-green-500;
+    @apply card-base;
     border-color: var(--color-normal);
   }
   
   .card-unknown {
-    @apply card-base border-gray-400;
+    @apply card-base;
     border-color: var(--color-unknown);
   }
 
@@ -123,7 +124,7 @@ html, body {
 
 /* === 유틸리티 클래스 === */
 @layer utilities {
-  /* State Colors */
+  /* State Colors - CSS 변수 사용 */
   .text-danger {
     color: var(--color-danger);
   }

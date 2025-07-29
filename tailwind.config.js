@@ -15,6 +15,12 @@ module.exports = {
         warning: '#FFC525',
         normal: '#1CAA00',
         unknown: '#D7D7D7',
+
+        // CSS 변수를 TailwindCSS 색상으로 등록
+        'custom-danger': 'var(--color-danger)',
+        'custom-warning': 'var(--color-warning)',
+        'custom-normal': 'var(--color-normal)',
+        'custom-unknown': 'var(--color-unknown)',
         
         // 배경색
         'bg-primary': '#fff',

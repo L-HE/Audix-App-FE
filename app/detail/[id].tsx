@@ -37,8 +37,6 @@ const DetailScreen: React.FC = () => {
 
   // 화면 진입 애니메이션
   useEffect(() => {
-    console.log('DetailScreen mounted, starting animations');
-    
     // 간단한 페이드 인 애니메이션
     opacity.value = withTiming(1, { duration: 300 });
     translateY.value = withTiming(0, { duration: 300 });
@@ -49,8 +47,6 @@ const DetailScreen: React.FC = () => {
 
     // 컴포넌트 언마운트 시 모든 애니메이션 정리
     return () => {
-      console.log('DetailScreen unmounting, cleaning up animations');
-      
       clearTimeout(animationTimeout);
       cancelAnimation(opacity);
       cancelAnimation(translateY);
