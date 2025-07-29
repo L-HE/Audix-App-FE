@@ -12,9 +12,9 @@ export interface AreaCardProps {
   onPress: () => void;
 }
 
-export type CardData = Omit<AreaCardProps, 'onPress'>;
+export type Area = Omit<AreaCardProps, 'onPress'>;
 
-export const area: CardData[] = [
+export const areaData: Area[] = [
   {
     id: '1',
     title: 'A-1구역',

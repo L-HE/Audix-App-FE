@@ -7,7 +7,6 @@ import Animated, {
   cancelAnimation,
   useAnimatedStyle,
   useSharedValue,
-  withSpring,
   withTiming
 } from 'react-native-reanimated';
 import machineData, { Machine } from '../../assets/data/machineData';
@@ -32,7 +31,7 @@ const DetailScreen: React.FC = () => {
 
   const sortedMachines = useMemo(() => {
     return machineData
-      .filter(m => m.areaId === id)
+      .filter(m => m.id === id)
       .sort((a, b) => orderMap[a.state] - orderMap[b.state]);
   }, [id]);
 

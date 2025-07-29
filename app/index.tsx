@@ -4,7 +4,7 @@ import React, { useMemo } from 'react';
 import { Dimensions, ScrollView, StyleSheet } from 'react-native';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 
-import { area } from '../assets/data/areaData';
+import { areaData } from '../assets/data/areaData';
 import AreaCard from '../components/screens/areaCard';
 
 export const headerShown = false;
@@ -27,7 +27,7 @@ const AreaScreen: React.FC = () => {
   // 2) useMemo 로 정렬된 배열 생성 (매 렌더링마다 불필요한 sort 방지)
   const sortedCards = useMemo(
     () =>
-      [...area].sort(
+      [...areaData].sort(
         (a, b) => (orderMap[a.state as CardState] ?? 99) - (orderMap[b.state as CardState] ?? 99)
       ),
     []

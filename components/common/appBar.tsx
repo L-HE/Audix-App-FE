@@ -2,7 +2,7 @@
 import { useSegments } from 'expo-router';
 import React from 'react';
 import { Dimensions, StyleSheet, Text, View } from 'react-native';
-import { area } from '../../assets/data/areaData';
+import { areaData } from '../../assets/data/areaData';
 import { Colors } from '../../shared/styles/global';
 import SearchInput from '../screens/searchInput';
 
@@ -26,7 +26,7 @@ const AppBar: React.FC<AppBarProps> = ({ currentId }) => {
   // detail 스크린일 때 해당 id의 title 찾기
   const getTitle = () => {
     if (segments[0] === 'detail' && currentId) {
-      const currentArea = area.find(a => a.id === currentId);
+      const currentArea = areaData.find(a => a.id === currentId);
       return currentArea ? currentArea.title : '장비 상세';
     } else {
       // 루트 화면일 때 전체 관리 구역

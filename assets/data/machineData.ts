@@ -1,22 +1,23 @@
 // assets/data/machineData.ts
 import { ImageSourcePropType } from 'react-native';
+import { CardState } from './areaData';
 
 export type Machine = {
+  machineId: string;
   id: string;
-  areaId: string;
   image: ImageSourcePropType;
   name: string;
   model: string;
   percent: number;
   location: string;
   owner: string;
-  state: 'danger' | 'warning' | 'normal' | 'unknown';
+  state: CardState;
 };
 
 export const machineData: Machine[] = [
   {
-    id: 'm1',
-    areaId: '1',
+    machineId: 'm1',
+    id: '1',
     image: require('../images/AudixLogoNavy.png'),
     name: '로봇팔',
     model: 'SO-ARM101',
@@ -26,8 +27,8 @@ export const machineData: Machine[] = [
     state: 'danger',
   },
   {
-    id: 'm2',
-    areaId: '1',
+    machineId: 'm2',
+    id: '1',
     image: require('../images/AudixLogoNavy.png'),
     name: '로봇팔',
     model: 'SO-ARM102',
@@ -37,8 +38,8 @@ export const machineData: Machine[] = [
     state: 'normal',
   },
   {
-    id: 'm5',
-    areaId: '1',
+    machineId: 'm5',
+    id: '1',
     image: require('../images/AudixLogoNavy.png'),
     name: '로봇팔',
     model: 'SO-ARM101',
@@ -48,19 +49,19 @@ export const machineData: Machine[] = [
     state: 'warning',
   },
   {
-    id: 'm3',
-    areaId: '2',
+    machineId: 'm3',
+    id: '2',
     image: require('../images/AudixLogoNavy.png'),
     name: '로봇팔',
     model: 'SO-ARM101',
-    percent: 15,
+    percent: 35,
     location: '2층 자동차 부재료 조립구역',
     owner: '김재걸',
     state: 'danger',
   },
   {
-    id: 'm4',
-    areaId: '2',
+    machineId: 'm4',
+    id: '2',
     image: require('../images/AudixLogoNavy.png'),
     name: '로봇팔',
     model: 'SO-ARM101',
