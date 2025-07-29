@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   title: {
-    marginBottom: 8,
+    marginBottom: 12,
     fontSize: TITLE_FONT_SIZE,
     fontWeight: '600',
     color: Colors.textPrimary,
