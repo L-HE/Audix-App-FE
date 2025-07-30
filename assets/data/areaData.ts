@@ -1,0 +1,46 @@
+// assets/data/areaData.ts
+import { ImageSourcePropType } from 'react-native';
+
+export type CardState = 'warning' | 'danger' | 'normal' | 'unknown';
+
+export interface AreaCardProps {
+  id: string;
+  title: string;
+  subtitle: string;
+  image: ImageSourcePropType;
+  state: CardState;
+  onPress: () => void;
+}
+
+export type Area = Omit<AreaCardProps, 'onPress'>;
+
+export const areaData: Area[] = [
+  {
+    id: '1',
+    title: 'A-1구역',
+    subtitle: '2층 자동차 부재료 조립구역',
+    image: require('../../assets/images/AudixLogoNavy.png'),
+    state: 'warning',
+  },
+  {
+    id: '2',
+    title: 'B-2구역',
+    subtitle: '1층 전장품 검수구역',
+    image: require('../../assets/images/AudixLogoNavy.png'),
+    state: 'danger',
+  },
+  {
+    id: '3',
+    title: 'C-2구역',
+    subtitle: '1층 전장품 검수구역',
+    image: require('../../assets/images/AudixLogoNavy.png'),
+    state: 'normal',
+  },
+  {
+    id: '4',
+    title: 'D-2구역',
+    subtitle: '1층 전장품 검수구역',
+    image: require('../../assets/images/AudixLogoNavy.png'),
+    state: 'unknown',
+  },
+];
