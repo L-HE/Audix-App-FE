@@ -1,51 +1,222 @@
-# Welcome to your Expo app 👋
+# Audix Mobile App - AI 기반 산업용 이상음 감지 모바일 앱
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+## 📱 앱 개요
 
-## Get started
+Audix Mobile App은 자동차 공장의 기계 이상음을 실시간으로 모니터링하고 관리할 수 있는 React Native 기반 크로스플랫폼 모바일 애플리케이션입니다. 관리자가 언제 어디서나 공장 상태를 확인하고 즉시 대응할 수 있도록 설계되었습니다.
 
-1. Install dependencies
+## ✨ 주요 기능
 
-   ```bash
-   npm install
-   ```
+### 🔔 실시간 알림
+- Push 알림을 통한 즉시 이상 징후 전달
+- 알림 우선순위별 분류 (긴급, 주의, 정보)
+- 알림 히스토리 및 읽음 상태 관리
 
-2. Start the app
+### 📊 실시간 모니터링
+- 공장별/기계별 실시간 상태 대시보드
+- 음성 데이터 시각화 (파형, 주파수 분석)
+- 이상 감지 현황 실시간 업데이트
 
-   ```bash
-   npx expo start
-   ```
+### 🏭 다중 공장 관리
+- 여러 공장 간 빠른 전환
+- 공장별 기계 목록 및 상태
+- 위치 기반 공장 정보
 
-In the output, you'll find options to open the app in a
+### 📈 간편 통계
+- 일/주/월별 이상 감지 요약
+- 기계별 성능 지표
+- 트렌드 분석 차트
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## 🛠️ 기술 스택
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+### Core
+- **React Native** - 크로스플랫폼 모바일 개발
+- **Expo** - 개발/빌드/배포 플랫폼
+- **TypeScript** - 정적 타입 검사
 
-## Get a fresh project
+### UI/UX
+- **NativeWind** - Tailwind CSS for React Native
+- **React Navigation** - 네비게이션
+- **React Native Paper** - Material Design 컴포넌트
 
-When you're ready, run:
+### 상태 관리
+- **Zustand** - 경량 상태 관리
+- **React Query** - 서버 상태 관리
 
-```bash
-npm run reset-project
+### 통신
+- **Axios** - HTTP 클라이언트
+- **Socket.io** - 실시간 통신
+- **Expo Push Notifications** - 푸시 알림
+
+### 데이터 시각화
+- **Victory Native** - 차트 라이브러리
+- **React Native SVG** - SVG 렌더링
+
+## 📁 프로젝트 구조
+
+```
+audix-app/
+├── src/
+│   ├── components/          # 재사용 가능한 컴포넌트
+│   │   ├── common/          # 공통 컴포넌트
+│   │   ├── charts/          # 차트 컴포넌트
+│   │   └── notifications/   # 알림 관련 컴포넌트
+│   ├── screens/             # 화면 컴포넌트
+│   │   ├── auth/            # 인증 화면
+│   │   ├── dashboard/       # 대시보드
+│   │   ├── monitoring/      # 모니터링 화면
+│   │   ├── notifications/   # 알림 화면
+│   │   └── settings/        # 설정 화면
+│   ├── navigation/          # 네비게이션 설정
+│   ├── services/            # API 및 외부 서비스
+│   │   ├── api/             # REST API 호출
+│   │   ├── socket/          # WebSocket 통신
+│   │   └── notifications/   # 푸시 알림
+│   ├── store/               # 상태 관리
+│   │   ├── auth.ts          # 인증 상태
+│   │   ├── monitoring.ts    # 모니터링 상태
+│   │   └── notifications.ts # 알림 상태
+│   ├── utils/               # 유틸리티 함수
+│   │   ├── audio.ts         # 오디오 처리
+│   │   ├── formatting.ts    # 데이터 포맷팅
+│   │   └── constants.ts     # 상수 정의
+│   └── types/               # TypeScript 타입 정의
+├── assets/                  # 정적 자산
+│   ├── images/
+│   ├── icons/
+│   └── sounds/
+├── app.config.js            # Expo 설정
+├── tailwind.config.js       # NativeWind 설정
+├── package.json
+└── README.md
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## 🚀 시작하기
 
-## Learn more
+### 사전 요구사항
+- Node.js 18+
+- npm 또는 yarn
+- Expo CLI
+- iOS Simulator (Mac) 또는 Android Emulator
 
-To learn more about developing your project with Expo, look at the following resources:
+### 설치
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+1. **의존성 설치**
+```bash
+npm install
+```
 
-## Join the community
 
-Join our community of developers creating universal apps.
+### 개발 실행
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
-# audix-app
+```bash
+# Expo 개발 서버 시작
+npm start
+
+# iOS 시뮬레이터에서 실행
+npm run ios
+
+# Android 에뮬레이터에서 실행
+npm run android
+
+# 웹에서 실행 (개발용)
+npm run web
+```
+
+
+## 📱 주요 화면
+
+### 1. 대시보드
+- 전체 공장 상태 요약
+- 실시간 알림 피드
+- 빠른 액션 버튼
+
+### 2. 모니터링
+- 공장별/기계별 상세 모니터링
+- 실시간 음성 데이터 시각화
+- 이상 감지 알림 내역
+
+### 3. 알림 센터
+- 모든 알림 히스토리
+- 중요도별 필터링
+- 읽음/미읽음 상태 관리
+
+### 4. 통계
+- 일/주/월별 통계
+- 기계별 성능 지표
+- 트렌드 분석 차트
+
+### 5. 설정
+- 알림 설정
+- 계정 관리
+- 앱 환경설정
+
+## 🔧 주요 컴포넌트
+
+### `<RealtimeChart />`
+실시간 음성 데이터를 시각화하는 차트 컴포넌트
+```typescript
+<RealtimeChart
+  data={audioData}
+  type="waveform"
+  height={200}
+  anomalyThreshold={0.8}
+/>
+```
+
+### `<NotificationCard />`
+알림을 표시하는 카드 컴포넌트
+```typescript
+<NotificationCard
+  notification={notification}
+  onPress={handleNotificationPress}
+  onDismiss={handleDismiss}
+/>
+```
+
+### `<StatusIndicator />`
+기계 상태를 표시하는 인디케이터
+```typescript
+<StatusIndicator
+  status="normal" | "warning" | "critical"
+  size="small" | "medium" | "large"
+/>
+```
+
+## 🔔 푸시 알림 설정
+
+### 알림 권한 요청
+```typescript
+import { registerForPushNotificationsAsync } from './src/services/notifications';
+
+// 앱 시작 시 권한 요청
+await registerForPushNotificationsAsync();
+```
+
+### 백그라운드 알림 처리
+```typescript
+import { useEffect } from 'react';
+import * as Notifications from 'expo-notifications';
+
+useEffect(() => {
+  const subscription = Notifications.addNotificationReceivedListener(
+    handleNotificationReceived
+  );
+  return () => subscription.remove();
+}, []);
+```
+
+## 🔐 보안
+
+### API 인증
+- JWT 토큰 기반 인증
+- 자동 토큰 갱신
+- 안전한 토큰 저장 (Expo SecureStore)
+
+
+### 코드 스타일
+- ESLint + Prettier 사용
+- TypeScript strict 모드
+- Conventional Commits
+
+
+**Audix Mobile App** - 언제 어디서나 안전한 공장 관리
