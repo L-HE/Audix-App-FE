@@ -3,7 +3,9 @@
 # dependencies
 node_modules/
 
+expo-env.d.ts
 .idea
+
 # Expo
 .expo/
 dist/
