@@ -1,30 +1,15 @@
 // components/common/Header.tsx
-import { Colors } from '@/shared/styles/global';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useSegments } from 'expo-router';
 import React from 'react';
-import {
-  Dimensions,
-  Image,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { Dimensions, Image, TouchableOpacity, View } from 'react-native';
 import { useModal } from '../../shared/api/modalContextApi';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } =
   Dimensions.get('window');
-
-const HEADER_HEIGHT_RATIO = 0.05;
-const LOGO_RATIO = 0.4;
-const PADDING_TOP_RATIO = 0.35;
-const ICON_RATIO = 0.06;
-const ICON_HORIZONTAL_PADDING_RATIO = 0.02;
-
-const HEADER_HEIGHT = SCREEN_HEIGHT * HEADER_HEIGHT_RATIO;
-const LOGO_SIZE    = SCREEN_WIDTH * LOGO_RATIO;
-const ICON_SIZE    = SCREEN_WIDTH * ICON_RATIO;
-const ICON_BTN_W   = ICON_SIZE + SCREEN_WIDTH * ICON_HORIZONTAL_PADDING_RATIO * 2;
+const ICON_SIZE = SCREEN_WIDTH * 0.06;
+const LOGO_SIZE = SCREEN_WIDTH * 0.4;
+const ICON_BTN_W = ICON_SIZE + (SCREEN_WIDTH * 0.02 * 2);
 
 const Header: React.FC = () => {
   const { setModalVisible } = useModal();
@@ -37,62 +22,45 @@ const Header: React.FC = () => {
   };
 
   return (
-    <View style={styles.header}>
+    <View className="header-container">
       {/* 왼쪽: 뒤로 버튼 or spacer */}
       {canGoBack ? (
         <TouchableOpacity
+          className="header-icon-button active:opacity-70"
+          style={{ width: ICON_BTN_W, height: ICON_BTN_W }}
           onPress={() => router.back()}
-          style={styles.iconButton}
-          activeOpacity={0.7}
         >
-          <Ionicons name="arrow-back" size={ICON_SIZE} color="#656565" />
+          <Ionicons
+            name="arrow-back"
+            size={ICON_SIZE}
+            color="var(--color-border)"
+          />
         </TouchableOpacity>
       ) : (
-        <View style={styles.spacer} />
+        <View style={{ width: ICON_BTN_W }} />
       )}
 
       {/* 중앙 로고 */}
       <Image
         source={require('../../assets/images/AudixLogoNavy.png')}
-        style={styles.logo}
-        resizeMode="contain"
+        style={{resizeMode: 'contain'}}
+        className='header-logo'
       />
 
       {/* 오른쪽 알림 버튼 */}
       <TouchableOpacity
-        style={styles.iconButton}
-        activeOpacity={0.7}
+        className="header-icon-button active:opacity-70"
+        style={{ width: ICON_BTN_W, height: ICON_BTN_W }}
         onPress={handleNotificationPress}
       >
-        <Ionicons name="notifications-outline" size={ICON_SIZE} color="#656565" />
+        <Ionicons
+          name="notifications-outline"
+          size={ICON_SIZE}
+          color="var(--color-border)"
+        />
       </TouchableOpacity>
     </View>
   );
 };
 
 export default Header;
-
-const styles = StyleSheet.create({
-  header: {
-    height: HEADER_HEIGHT,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingTop: HEADER_HEIGHT * PADDING_TOP_RATIO,
-    paddingHorizontal: SCREEN_WIDTH * 0.05,
-    backgroundColor: Colors.background,
-  },
-  spacer: {
-    width: ICON_BTN_W,
-  },
-  logo: {
-    width: LOGO_SIZE,
-    height: LOGO_SIZE,
-  },
-  iconButton: {
-    width: ICON_BTN_W,
-    height: ICON_BTN_W,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});
