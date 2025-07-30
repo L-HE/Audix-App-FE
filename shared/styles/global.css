@@ -1,6 +1,51 @@
-@tailwind base;
+/* @tailwind base;
 @tailwind components;
-@tailwind utilities;
+@tailwind utilities; */
+
+/* 기본 스타일 직접 정의 */
+.flex { display: flex; }
+.flex-1 { flex: 1; }
+.flex-row { flex-direction: row; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+
+/* 컴포넌트 스타일 */
+@import './components.css';
+
+/* 유틸리티 스타일 */
+@import './utilities.css';
+
+/* Light Theme */
+[data-theme="light"] {
+  --color-bg-primary: #ffffff;
+  --color-bg-secondary: #f8f9fa;
+  --color-text-primary: #000000; /* 검은색 */
+  --color-text-secondary: #6B7280; /* Tailwind gray-500 */
+}
+
+/* === 기본 스페이싱 === */
+.p-2 { padding: 8px; }
+.p-4 { padding: 16px; }
+.px-4 { padding-left: 16px; padding-right: 16px; }
+.py-2 { padding-top: 8px; padding-bottom: 8px; }
+.m-2 { margin: 8px; }
+.mb-3 { margin-bottom: 12px; }
+.mt-2 { margin-top: 8px; }
+
+/* === 기본 크기 === */
+.w-full { width: 100%; }
+.h-full { height: 100%; }
+.w-8 { width: 32px; }
+.h-8 { height: 32px; }
+
+/* === 기본 배경 및 텍스트 === */
+.bg-white { background-color: white; }
+.rounded-lg { border-radius: 8px; }
+.font-bold { font-weight: bold; }
+.text-lg { font-size: 18px; }
+.text-center { text-align: center; }
 
 /* === 커스텀 CSS 변수 === */
 :root {
@@ -16,7 +61,7 @@
   
   /* Text Colors */
   --color-text-primary: #000;
-  --color-text-secondary: #666;
+  --color-text-secondary: #6B7280; /* Tailwind gray-500 */
   --color-text-tertiary: #777;
   
   /* Border Colors */
@@ -27,187 +72,3 @@
   --color-shadow: #000;
 }
 
-/* === Base Styles === */
-html, body {
-  margin: 0;
-  padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-}
-
-/* === 커스텀 컴포넌트 클래스 === */
-@layer components {
-  /* State Badge - CSS 변수만 사용 */
-  .badge-danger {
-    @apply text-white px-2 py-1 rounded text-xs font-semibold;
-    background-color: var(--color-danger);
-  }
-  
-  .badge-warning {
-    @apply text-white px-2 py-1 rounded text-xs font-semibold;
-    background-color: var(--color-warning);
-  }
-  
-  .badge-normal {
-    @apply text-white px-2 py-1 rounded text-xs font-semibold;
-    background-color: var(--color-normal);
-  }
-  
-  .badge-unknown {
-    @apply text-white px-2 py-1 rounded text-xs font-semibold;
-    background-color: var(--color-unknown);
-  }
-
-  /* Card Styles - CSS 변수만 사용 */
-  .card-base {
-    @apply bg-white rounded-lg shadow-sm p-4 mb-3;
-    border: 1px solid var(--color-border-light);
-  }
-  
-  .card-danger {
-    @apply card-base;
-    border-color: var(--color-danger);
-  }
-  
-  .card-warning {
-    @apply card-base;
-    border-color: var(--color-warning);
-  }
-  
-  .card-normal {
-    @apply card-base;
-    border-color: var(--color-normal);
-  }
-  
-  .card-unknown {
-    @apply card-base;
-    border-color: var(--color-unknown);
-  }
-
-  /* Button Styles */
-  .btn-primary {
-    @apply bg-blue-500 text-white px-4 py-2 rounded-lg font-semibold;
-  }
-  
-  .btn-secondary {
-    @apply bg-gray-200 text-gray-800 px-4 py-2 rounded-lg font-semibold;
-  }
-  
-  .btn-danger {
-    @apply text-white px-4 py-2 rounded-lg font-semibold;
-    background-color: var(--color-danger);
-  }
-
-  /* Header Styles */
-  .header-container {
-    @apply flex flex-row items-center justify-between px-4 py-3;
-    background-color: var(--color-bg-primary);
-  }
-  
-  .header-title {
-    @apply text-lg font-semibold;
-    color: var(--color-text-primary);
-  }
-
-  /* Text Styles */
-  .text-primary {
-    color: var(--color-text-primary);
-  }
-  
-  .text-secondary {
-    color: var(--color-text-secondary);
-  }
-  
-  .text-tertiary {
-    color: var(--color-text-tertiary);
-  }
-}
-
-/* === 유틸리티 클래스 === */
-@layer utilities {
-  /* State Colors - CSS 변수 사용 */
-  .text-danger {
-    color: var(--color-danger);
-  }
-  
-  .text-warning {
-    color: var(--color-warning);
-  }
-  
-  .text-normal {
-    color: var(--color-normal);
-  }
-  
-  .text-unknown {
-    color: var(--color-unknown);
-  }
-  
-  .bg-danger {
-    background-color: var(--color-danger);
-  }
-  
-  .bg-warning {
-    background-color: var(--color-warning);
-  }
-  
-  .bg-normal {
-    background-color: var(--color-normal);
-  }
-  
-  .bg-unknown {
-    background-color: var(--color-unknown);
-  }
-  
-  .border-danger {
-    border-color: var(--color-danger);
-  }
-  
-  .border-warning {
-    border-color: var(--color-warning);
-  }
-  
-  .border-normal {
-    border-color: var(--color-normal);
-  }
-  
-  .border-unknown {
-    border-color: var(--color-unknown);
-  }
-
-  /* Background Utilities */
-  .bg-primary {
-    background-color: var(--color-bg-primary);
-  }
-  
-  .bg-secondary {
-    background-color: var(--color-bg-secondary);
-  }
-
-  /* Shadow Utilities */
-  .shadow-custom {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  }
-  
-  .shadow-card {
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-  }
-}
-
-/* === 반응형 스타일 === */
-@layer utilities {
-  /* 모바일 우선 반응형 */
-  .container-mobile {
-    @apply px-4 py-2;
-  }
-  
-  .text-mobile {
-    @apply text-sm;
-  }
-  
-  .text-tablet {
-    @apply md:text-base;
-  }
-  
-  .text-desktop {
-    @apply lg:text-lg;
-  }
-}

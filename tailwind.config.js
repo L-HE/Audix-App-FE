@@ -10,7 +10,7 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // 커스텀 색상 정의 (global.ts와 동일)
+        // 주요 색상
         danger: '#FF3116',
         warning: '#FFC525',
         normal: '#1CAA00',
@@ -21,6 +21,10 @@ module.exports = {
         'custom-warning': 'var(--color-warning)',
         'custom-normal': 'var(--color-normal)',
         'custom-unknown': 'var(--color-unknown)',
+        'app-bg-primary': 'var(--color-bg-primary)',
+        'app-bg-secondary': 'var(--color-bg-secondary)',
+        'app-text-primary': 'var(--color-text-primary)',
+        'app-text-secondary': 'var(--color-text-secondary)',
         
         // 배경색
         'bg-primary': '#fff',
@@ -40,9 +44,11 @@ module.exports = {
         'sans': ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
       },
       spacing: {
-        // 커스텀 스페이싱 (필요시)
-        '18': '4.5rem',
-        '88': '22rem',
+        // 앱 전용 스페이싱
+        'header': '120px',
+        'bottom-nav': '60px',
+        'safe-top': '44px',
+        'safe-bottom': '34px',
       },
       borderRadius: {
         // 커스텀 보더 반지름
@@ -53,6 +59,13 @@ module.exports = {
         // 커스텀 그림자
         'card': '0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24)',
         'elevated': '0 4px 6px rgba(0, 0, 0, 0.1)',
+      },
+      zIndex: {
+        // 레이어 관리
+        'header': '100',
+        'navigation': '200',
+        'modal': '1000',
+        'overlay': '9999',
       }
     },
   },
