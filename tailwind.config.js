@@ -21,6 +21,10 @@ module.exports = {
         'custom-warning': 'var(--color-warning)',
         'custom-normal': 'var(--color-normal)',
         'custom-unknown': 'var(--color-unknown)',
+        'app-bg-primary': 'var(--color-bg-primary)',
+        'app-bg-secondary': 'var(--color-bg-secondary)',
+        'app-text-primary': 'var(--color-text-primary)',
+        'app-text-secondary': 'var(--color-text-secondary)',
         
         // 배경색
         'bg-primary': '#fff',

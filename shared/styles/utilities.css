@@ -1,19 +1,19 @@
 /* === Spacing === */
 @layer utilities {
-  /* Custom Spacing */
-  .spacing-xs { @apply p-1; }
-  .spacing-sm { @apply p-2; }
-  .spacing-md { @apply p-4; }
-  .spacing-lg { @apply p-6; }
-  .spacing-xl { @apply p-8; }
+  /* Custom Spacing - @apply 제거 */
+  .spacing-xs { padding: 4px; }
+  .spacing-sm { padding: 8px; }
+  .spacing-md { padding: 16px; }
+  .spacing-lg { padding: 24px; }
+  .spacing-xl { padding: 32px; }
   
   /* Margin Utilities */
-  .margin-section { @apply my-4; }
-  .margin-component { @apply my-2; }
+  .margin-section { margin-top: 16px; margin-bottom: 16px; }
+  .margin-component { margin-top: 8px; margin-bottom: 8px; }
   
   /* Padding Utilities */
-  .padding-container { @apply px-4 py-2; }
-  .padding-content { @apply p-4; }
+  .padding-container { padding-left: 16px; padding-right: 16px; padding-top: 8px; padding-bottom: 8px; }
+  .padding-content { padding: 16px; }
 }
 
 /* === Colors === */
@@ -75,33 +75,27 @@
   .bg-secondary {
     background-color: var(--color-bg-secondary);
   }
-
-  /* Shadow Utilities */
-  .shadow-custom {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  }
-  
-  .shadow-card {
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-  }
 }
 
 /* === Responsive === */
 @layer utilities {
-  /* 모바일 우선 반응형 */
+  /* 모바일 우선 반응형 - @apply 제거 */
   .container-mobile {
-    @apply px-4 py-2;
+    padding-left: 16px;
+    padding-right: 16px;
+    padding-top: 8px;
+    padding-bottom: 8px;
   }
   
   .text-mobile {
-    @apply text-sm;
+    font-size: 14px;
   }
   
   .text-tablet {
-    @apply md:text-base;
+    font-size: 16px;
   }
   
   .text-desktop {
-    @apply lg:text-lg;
+    font-size: 18px;
   }
 }

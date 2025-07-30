@@ -4,6 +4,7 @@ import { useRouter, useSegments } from 'expo-router';
 import React from 'react';
 import { Dimensions, Image, TouchableOpacity, View } from 'react-native';
 import { useModal } from '../../shared/api/modalContextApi';
+import Test from '../test';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } =
   Dimensions.get('window');
@@ -23,6 +24,7 @@ const Header: React.FC = () => {
 
   return (
     <View className="header-container">
+      <Test />
       {/* 왼쪽: 뒤로 버튼 or spacer */}
       {canGoBack ? (
         <TouchableOpacity
