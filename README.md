@@ -55,39 +55,41 @@ Audix Mobile App은 자동차 공장의 기계 이상음을 실시간으로 모�
 
 ```
 audix-app/
-├── src/
-│   ├── components/          # 재사용 가능한 컴포넌트
-│   │   ├── common/          # 공통 컴포넌트
-│   │   ├── charts/          # 차트 컴포넌트
-│   │   └── notifications/   # 알림 관련 컴포넌트
-│   ├── screens/             # 화면 컴포넌트
-│   │   ├── auth/            # 인증 화면
-│   │   ├── dashboard/       # 대시보드
-│   │   ├── monitoring/      # 모니터링 화면
-│   │   ├── notifications/   # 알림 화면
-│   │   └── settings/        # 설정 화면
-│   ├── navigation/          # 네비게이션 설정
-│   ├── services/            # API 및 외부 서비스
-│   │   ├── api/             # REST API 호출
-│   │   ├── socket/          # WebSocket 통신
-│   │   └── notifications/   # 푸시 알림
-│   ├── store/               # 상태 관리
-│   │   ├── auth.ts          # 인증 상태
-│   │   ├── monitoring.ts    # 모니터링 상태
-│   │   └── notifications.ts # 알림 상태
-│   ├── utils/               # 유틸리티 함수
-│   │   ├── audio.ts         # 오디오 처리
-│   │   ├── formatting.ts    # 데이터 포맷팅
-│   │   └── constants.ts     # 상수 정의
-│   └── types/               # TypeScript 타입 정의
-├── assets/                  # 정적 자산
-│   ├── images/
-│   ├── icons/
-│   └── sounds/
-├── app.config.js            # Expo 설정
-├── tailwind.config.js       # NativeWind 설정
+├── app/
+│   ├── detail/
+│   │   └── [id].tsx
+│   ├── _layout.tsx
+│   ├── index.tsx
+│   └── notificationModal.tsx
+├── assets/
+│   ├── data/
+│   │   ├── areaData.ts
+│   │   ├── machineData.ts
+│   │   └── modalData.ts
+│   ├── fonts
+│   └── images
+├── components/                  # 재사용 가능한 컴포넌트
+│   ├── common/                  # 공통 컴포넌트
+│   │   ├── appBar.tsx
+│   │   ├── bottomNav.tsx
+│   │   └── header.tsx
+│   └── screens/                 # 화면 컴포넌트
+│       ├── areaCard.tsx
+│       ├── machineCard.tsx
+│       ├── searchInput.tsx
+│       └── vDonutChart.tsx
+├── shared/
+│   ├── api/
+│   │   └── modalContextApi.tsx
+│   └── styles/
+│       └── global.ts
+├── app.json
+├── babel.config.js
+├── eslint.config.js
+├── metro.config.js
 ├── package.json
-└── README.md
+├── README.md
+└── tsconfig.json
 ```
 
 ## 🚀 시작하기
