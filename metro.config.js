@@ -1,8 +1,8 @@
 const { getDefaultConfig } = require('expo/metro-config');
-const { withNativeWind } = require('nativewind/metro');
 
 const config = getDefaultConfig(__dirname);
 
-module.exports = withNativeWind(config, { 
-    input: './shared/styles/global.css' 
-});
+// NativeWind 사용 시
+config.resolver.sourceExts.push('css');
+
+module.exports = config;
