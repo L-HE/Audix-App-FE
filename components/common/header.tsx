@@ -53,7 +53,7 @@ const Header: React.FC = () => {
 
       {/* 중앙 로고 */}
       <Image
-        source={require('../../assets/images/AudixLogoNavy.png')}
+        source={require('@/images/logos/AudixLogoNavy.png')}
         style={styles.logo}
         resizeMode="contain"
       />
