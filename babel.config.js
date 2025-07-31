@@ -32,6 +32,7 @@ module.exports = function (api) {
 
               // 자산 관련
               '@/assets': './assets',
+              '@/data': './assets/data',
               '@/images': './assets/images',
 
               // 앱 관련

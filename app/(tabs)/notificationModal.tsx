@@ -1,7 +1,7 @@
 // components/common/notificationModal.tsx
-import { modalData } from '@/assets/data/modalData';
-import { useModal } from '@/shared/api/modalContextApi'; // 모달 컨텍스트 API 사용
-import { Colors } from '@/shared/styles/global';
+import { useModal } from '@/api/modalContextApi'; // 모달 컨텍스트 API 사용
+import { modalData } from '@/data/modalData';
+import { Colors } from '@/styles/global';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import RNModal from 'react-native-modal';
