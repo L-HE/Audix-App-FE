@@ -27,14 +27,17 @@ function RootLayoutContent() {
   const [isAppInitialized, setIsAppInitialized] = useState(false);
 
   // 앱 초기화
-  useEffect(() => {
+  useEffect(() => {    
     const initializeApp = async () => {
       try {
+        
         // 초기화 작업 수행
         await new Promise(resolve => setTimeout(resolve, 2000));
-        setIsAppInitialized(true);
+
+        // 초기화 완료 후 상태 변경
+        setIsAppInitialized(true);    
       } catch (error) {
-        console.error('앱 초기화 실패:', error);
+        console.error('앱 초기화 실패 :', error);
         setIsAppInitialized(true);
       }
     };
