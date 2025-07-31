@@ -8,14 +8,14 @@ import {
   SafeAreaView
 } from 'react-native-safe-area-context';
 
-import AppBar from '../components/common/appBar';
-import BottomNav from '../components/common/bottomNav';
-import Header from '../components/common/header';
-import LoadingScreen from '../components/common/loadingScreen';
-import SplashScreen from '../components/common/splashScreen';
-import { ModalProvider } from '../shared/api/modalContextApi';
-import { useLoadingStore } from '../shared/store/loadingStore';
-import { Colors } from '../shared/styles/global';
+import AppBar from '@/components/common/appBar';
+import BottomNav from '@/components/common/bottomNav';
+import Header from '@/components/common/header';
+import LoadingScreen from '@/components/common/loadingScreen';
+import SplashScreen from '@/components/common/splashScreen';
+import { ModalProvider } from '@/shared/api/modalContextApi';
+import { useLoadingStore } from '@/shared/store/loadingStore';
+import { Colors } from '@/shared/styles/global';
 import NotificationModal from './notificationModal';
 
 export const headerShown = false;

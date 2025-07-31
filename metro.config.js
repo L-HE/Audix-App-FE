@@ -1,8 +1,9 @@
+// metro.config.js
 const { getDefaultConfig } = require('expo/metro-config');
 
 const config = getDefaultConfig(__dirname);
 
-// NativeWind 사용 시
+// NativeWind 지원
 config.resolver.sourceExts.push('css');
 
 module.exports = config;
