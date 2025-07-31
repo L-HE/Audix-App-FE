@@ -1,4 +1,5 @@
 // app/detail/[id].tsx - 안전한 버전
+import { useLoadingStore } from '@/shared/store/loadingStore';
 import { Colors } from '@/shared/styles/global';
 import { useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -24,19 +25,37 @@ const orderMap: Record<Machine['state'], number> = {
 const DetailScreen: React.FC = () => {
   const { id } = useLocalSearchParams<Params>();
   const [isAnimating, setIsAnimating] = useState(true);
+  const { setLoading } = useLoadingStore();
 
   // 단순한 페이드 인 애니메이션만
   const opacity = useSharedValue(0);
   const translateY = useSharedValue(20);
 
+  // 카드 정렬
   const sortedMachines = useMemo(() => {
     return machineData
       .filter(m => m.id === id)
       .sort((a, b) => orderMap[a.state] - orderMap[b.state]);
   }, [id]);
 
+  // 데이터 로딩 함수
+  const fetchData = async () => {
+    setLoading(true, '데이터를 불러오는 중...');
+    
+    try {
+      // API 호출 등
+      await new Promise(resolve => setTimeout(resolve, 1200));
+    } catch (error) {
+      console.error('데이터 로딩 실패:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // 화면 진입 애니메이션
   useEffect(() => {
+    fetchData();
+    
     // 간단한 페이드 인 애니메이션
     opacity.value = withTiming(1, { duration: 300 });
     translateY.value = withTiming(0, { duration: 300 });

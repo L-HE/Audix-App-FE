@@ -20,9 +20,6 @@ export const Colors = {
   // Border Colors
   border: '#656565',
   borderLight: '#e0e0e0',
-  
-  // Shadow Colors
-  shadow: '#000',
 
 } as const;
 

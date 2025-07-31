@@ -1,19 +1,21 @@
 // app/_layout.tsx
 import { Slot, usePathname, useSegments } from 'expo-router';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Host } from 'react-native-portalize'; // 추가
+import { Host } from 'react-native-portalize';
 import {
   SafeAreaProvider,
   SafeAreaView
 } from 'react-native-safe-area-context';
-import '../shared/styles/global.css'; // CSS 파일 import 추가
 
-import AppBar from '@/components/common/appBar';
-import Header from '@/components/common/header';
-import { Colors } from '@/shared/styles/global';
+import AppBar from '../components/common/appBar';
 import BottomNav from '../components/common/bottomNav';
+import Header from '../components/common/header';
+import LoadingScreen from '../components/common/loadingScreen';
+import SplashScreen from '../components/common/splashScreen';
 import { ModalProvider } from '../shared/api/modalContextApi';
+import { useLoadingStore } from '../shared/store/loadingStore';
+import { Colors } from '../shared/styles/global';
 import NotificationModal from './notificationModal';
 
 export const headerShown = false;
@@ -21,6 +23,29 @@ export const headerShown = false;
 function RootLayoutContent() {
   const segments = useSegments();
   const pathname = usePathname();
+  const { isLoading, loadingMessage } = useLoadingStore();
+  const [isAppInitialized, setIsAppInitialized] = useState(false);
+
+  // 앱 초기화
+  useEffect(() => {
+    const initializeApp = async () => {
+      try {
+        // 초기화 작업 수행
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        setIsAppInitialized(true);
+      } catch (error) {
+        console.error('앱 초기화 실패:', error);
+        setIsAppInitialized(true);
+      }
+    };
+
+    initializeApp();
+  }, []);
+
+  // 앱이 초기화되지 않았으면 스플래시 화면 표시
+  if (!isAppInitialized) {
+    return <SplashScreen />;
+  }
 
   // pathname에서 id 추출 (예: "/detail/1" -> "1")
   const getCurrentId = () => {
@@ -57,6 +82,9 @@ function RootLayoutContent() {
         {/* 알림 모달 */}
         <NotificationModal />
 
+        {/* 전역 로딩 화면 */}
+        {isLoading && <LoadingScreen message={loadingMessage} />}
+
       </View>
     </SafeAreaView>
   );
@@ -87,3 +115,4 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.backgroundSecondary
   },
 });
+

@@ -45,7 +45,8 @@
     "react-native-webview": "13.13.5",
     "victory": "^37.3.6",
     "victory-native": "^37.3.6",
-    "victory-pie": "^37.3.6"
+    "victory-pie": "^37.3.6",
+    "zustand": "^5.0.7"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
