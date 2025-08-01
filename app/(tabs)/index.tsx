@@ -4,8 +4,8 @@ import React, { useMemo } from 'react';
 import { Dimensions, ScrollView, StyleSheet } from 'react-native';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 
-import { areaData } from '@/data/areaData';
-import AreaCard from '@/screens/areaCard';
+import { areaData } from '../../assets/data/areaData';
+import AreaCard from '../../components/screens/areaCard';
 export const headerShown = false;
 
 type CardState = 'danger' | 'warning' | 'normal' | 'unknown';

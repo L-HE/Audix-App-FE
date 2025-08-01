@@ -1,10 +1,10 @@
 // app/_layout.tsx
-import { ModalProvider } from '@/api/modalContextApi';
-import SplashScreen from '@/common/splashScreen';
 import { router, Slot } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Host } from 'react-native-portalize';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import SplashScreen from '../components/common/splashScreen';
+import { ModalProvider } from '../shared/api/modalContextApi';
 
 export const headerShown = false;
 

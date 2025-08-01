@@ -1,8 +1,4 @@
 // app/detail/[id].tsx - 안전한 버전
-import machineData, { Machine } from '@/assets/data/machineData';
-import MachineCard from '@/components/screens/machineCard';
-import { useLoadingStore } from '@/shared/store/loadingStore';
-import { Colors } from '@/shared/styles/global';
 import { useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useMemo, useState } from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
@@ -12,6 +8,10 @@ import Animated, {
   useSharedValue,
   withTiming
 } from 'react-native-reanimated';
+import machineData, { Machine } from '../../../assets/data/machineData';
+import MachineCard from '../../../components/screens/machineCard';
+import { useLoadingStore } from '../../../shared/store/loadingStore';
+import { Colors } from '../../../shared/styles/global';
 
 type Params = { id: string };
 

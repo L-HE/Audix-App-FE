@@ -18,7 +18,7 @@ export const machineData: Machine[] = [
   {
     machineId: 'm1',
     id: '1',
-    image: require('@/images/logos/AudixLogoNavy.png'),
+    image: require('../images/logos/AudixLogoNavy.png'),
     name: '로봇팔',
     model: 'SO-ARM101',
     percent: 15,
@@ -29,7 +29,7 @@ export const machineData: Machine[] = [
   {
     machineId: 'm2',
     id: '1',
-    image: require('@/images/logos/AudixLogoNavy.png'),
+    image: require('../images/logos/AudixLogoNavy.png'),
     name: '로봇팔',
     model: 'SO-ARM102',
     percent: 80,
@@ -40,7 +40,7 @@ export const machineData: Machine[] = [
   {
     machineId: 'm5',
     id: '1',
-    image: require('@/images/logos/AudixLogoNavy.png'),
+    image: require('../images/logos/AudixLogoNavy.png'),
     name: '로봇팔',
     model: 'SO-ARM101',
     percent: 65,
@@ -51,7 +51,7 @@ export const machineData: Machine[] = [
   {
     machineId: 'm3',
     id: '2',
-    image: require('@/images/logos/AudixLogoNavy.png'),
+    image: require('../images/logos/AudixLogoNavy.png'),
     name: '로봇팔',
     model: 'SO-ARM101',
     percent: 35,
@@ -62,7 +62,7 @@ export const machineData: Machine[] = [
   {
     machineId: 'm4',
     id: '2',
-    image: require('@/images/logos/AudixLogoNavy.png'),
+    image: require('../images/logos/AudixLogoNavy.png'),
     name: '로봇팔',
     model: 'SO-ARM101',
     percent: 55,

@@ -23,22 +23,13 @@ module.exports = function (api) {
               '.json',
             ],
             alias: {
-              // 루트 경로
               '@': './',
-
-              // 컴포넌트 관련
               '@/common': './components/common',
               '@/screens': './components/screens',
-
-              // 자산 관련
               '@/assets': './assets',
               '@/data': './assets/data',
               '@/images': './assets/images',
-
-              // 앱 관련
               '@/app': './app',
-
-              // 비즈니스 로직 및 스타일 관련
               '@/api': './shared/api',
               '@/store': './shared/store',
               '@/styles': './shared/styles',

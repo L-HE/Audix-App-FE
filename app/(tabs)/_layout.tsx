@@ -4,12 +4,12 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import AppBar from '@/common/appBar';
-import BottomNav from '@/common/bottomNav';
-import Header from '@/common/header';
-import LoadingScreen from '@/common/loadingScreen';
-import { useLoadingStore } from '@/store/loadingStore';
-import { Colors } from '@/styles/global';
+import AppBar from '../../components/common/appBar';
+import BottomNav from '../../components/common/bottomNav';
+import Header from '../../components/common/header';
+import LoadingScreen from '../../components/common/loadingScreen';
+import { useLoadingStore } from '../../shared/store/loadingStore';
+import { Colors } from '../../shared/styles/global';
 import NotificationModal from './notificationModal';
 
 function TabsLayoutContent() {

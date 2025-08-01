@@ -4,16 +4,16 @@
     "slug": "audix-app",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "@/images/icons/AudixLogoNavySimple.png",
+    "icon": "./assets/images/icons/AudixLogoNavySimple.png",
     "scheme": "audixapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "icon": "@/images/icons/AudixLogoNavySimple.png"
+      "icon": "./assets/images/icons/AudixLogoNavySimple.png"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "@/images/icons/AudixLogoNavySimple.png",
+        "foregroundImage": "./assets/images/icons/AudixLogoNavySimple.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true
@@ -21,7 +21,7 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "@/images/icons/favicon.png"
+      "favicon": "./assets/images/icons/favicon.png"
     },
     "experiments": {
       "typedRoutes": true

@@ -1,7 +1,7 @@
 // components/common/LoadingScreen.tsx
-import { Colors } from '@/shared/styles/global';
 import React from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { Colors } from '../../shared/styles/global';
 
 interface LoadingScreenProps {
   message?: string;
