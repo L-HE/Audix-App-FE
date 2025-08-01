@@ -1,5 +1,5 @@
 // app/_layout.tsx
-import { router, Slot } from 'expo-router';
+import { Slot } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Host } from 'react-native-portalize';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -28,17 +28,9 @@ function RootLayoutContent() {
         console.log('앱 초기화 완료');
         setIsAppInitialized(true);
         
-        // 인증 상태에 따라 라우팅
-        if (token) {
-          router.replace('/(tabs)');
-        } else {
-          router.replace('/(auth)/login');
-        }
-        
       } catch (error) {
         console.error('앱 초기화 실패:', error);
         setIsAppInitialized(true);
-        router.replace('/(auth)/login');
       }
     };
 
@@ -49,7 +41,7 @@ function RootLayoutContent() {
   if (!isAppInitialized) {
     return <SplashScreen />;
   }
-
+  // 인증되지 않은 경우 로그인 화면으로 리다이렉트
   return <Slot />;
 }
 

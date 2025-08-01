@@ -2,42 +2,45 @@
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
-    Alert,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
 } from 'react-native';
 
 export default function LoginScreen() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  // const [email, setEmail] = useState('');
+  // const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async () => {
-    if (!email || !password) {
-      Alert.alert('오류', '이메일과 비밀번호를 입력해주세요.');
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      // 실제 로그인 API 호출
-      await new Promise(resolve => setTimeout(resolve, 1000)); // 임시 딜레이
-      
-      // 로그인 성공 시 토큰 저장
-      // await saveAuthToken(token);
-      
-      // 메인 앱으로 이동
-      router.replace('/(tabs)');
-      
-    } catch (error) {
-      Alert.alert('로그인 실패', '이메일 또는 비밀번호가 올바르지 않습니다.');
-    } finally {
-      setIsLoading(false);
-    }
+    router.replace('/(tabs)');
   };
+
+  // const handleLogin = async () => {
+  //   if (!email || !password) {
+  //     Alert.alert('오류', '이메일과 비밀번호를 입력해주세요.');
+  //     return;
+  //   }
+
+  //   setIsLoading(true);
+  //   try {
+  //     // 실제 로그인 API 호출
+  //     await new Promise(resolve => setTimeout(resolve, 1000)); // 임시 딜레이
+      
+  //     // 로그인 성공 시 토큰 저장
+  //     // await saveAuthToken(token);
+      
+  //     // 메인 앱으로 이동
+  //     router.replace('/(tabs)');
+      
+  //   } catch (error) {
+  //     Alert.alert('로그인 실패', '이메일 또는 비밀번호가 올바르지 않습니다.');
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
   return (
     <View style={styles.container}>
@@ -50,8 +53,6 @@ export default function LoginScreen() {
             style={styles.input}
             placeholder="이메일"
             placeholderTextColor="#666"
-            value={email}
-            onChangeText={setEmail}
             keyboardType="email-address"
             autoCapitalize="none"
           />
@@ -60,15 +61,13 @@ export default function LoginScreen() {
             style={styles.input}
             placeholder="비밀번호"
             placeholderTextColor="#666"
-            value={password}
-            onChangeText={setPassword}
             secureTextEntry
           />
 
           <TouchableOpacity
-            style={[styles.button, isLoading && styles.buttonDisabled]}
             onPress={handleLogin}
             disabled={isLoading}
+            style={[styles.button, isLoading && styles.buttonDisabled]}
           >
             <Text style={styles.buttonText}>
               {isLoading ? '로그인 중...' : '로그인'}

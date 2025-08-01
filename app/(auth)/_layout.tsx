@@ -20,12 +20,7 @@ export default function AuthLayout() {
               title: '로그인',
             }}
           />
-          <Stack.Screen
-            name="register"
-            options={{
-              title: '회원가입',
-            }}
-          />
+          
         </Stack>
       </View>
     </SafeAreaView>
