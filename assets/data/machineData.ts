@@ -4,7 +4,7 @@ import { CardState } from './areaData';
 
 export type Machine = {
   machineId: string;
-  id: string;
+  id: number;
   image: ImageSourcePropType;
   name: string;
   model: string;
@@ -17,7 +17,7 @@ export type Machine = {
 export const machineData: Machine[] = [
   {
     machineId: 'm1',
-    id: '1',
+    id: 1,
     image: require('../images/logos/AudixLogoNavy.png'),
     name: '로봇팔',
     model: 'SO-ARM101',
@@ -28,7 +28,7 @@ export const machineData: Machine[] = [
   },
   {
     machineId: 'm2',
-    id: '1',
+    id: 1,
     image: require('../images/logos/AudixLogoNavy.png'),
     name: '로봇팔',
     model: 'SO-ARM102',
@@ -39,7 +39,7 @@ export const machineData: Machine[] = [
   },
   {
     machineId: 'm5',
-    id: '1',
+    id: 1,
     image: require('../images/logos/AudixLogoNavy.png'),
     name: '로봇팔',
     model: 'SO-ARM101',
@@ -50,7 +50,7 @@ export const machineData: Machine[] = [
   },
   {
     machineId: 'm3',
-    id: '2',
+    id: 2,
     image: require('../images/logos/AudixLogoNavy.png'),
     name: '로봇팔',
     model: 'SO-ARM101',
@@ -61,7 +61,7 @@ export const machineData: Machine[] = [
   },
   {
     machineId: 'm4',
-    id: '2',
+    id: 2,
     image: require('../images/logos/AudixLogoNavy.png'),
     name: '로봇팔',
     model: 'SO-ARM101',
@@ -69,6 +69,51 @@ export const machineData: Machine[] = [
     location: '2층 자동차 부재료 조립구역',
     owner: '김현민',
     state: 'warning',
+  },
+  // 추가 테스트 데이터
+  {
+    machineId: 'm6',
+    id: 3,
+    image: require('../images/logos/AudixLogoNavy.png'),
+    name: '컨베이어 벨트',
+    model: 'CONV-001',
+    percent: 90,
+    location: '1층 전장품 검수구역',
+    owner: '박영희',
+    state: 'normal',
+  },
+  {
+    machineId: 'm7',
+    id: 4,
+    image: require('../images/logos/AudixLogoNavy.png'),
+    name: '압축기',
+    model: 'COMP-202',
+    percent: 45,
+    location: '지하 1층 동력실',
+    owner: '최민수',
+    state: 'warning',
+  },
+  {
+    machineId: 'm8',
+    id: 5,
+    image: require('../images/logos/AudixLogoNavy.png'),
+    name: '용접기',
+    model: 'WELD-303',
+    percent: 25,
+    location: '2층 용접 작업장',
+    owner: '이수진',
+    state: 'danger',
+  },
+  {
+    machineId: 'm9',
+    id: 5,
+    image: require('../images/logos/AudixLogoNavy.png'),
+    name: '절단기',
+    model: 'CUT-404',
+    percent: 70,
+    location: '2층 용접 작업장',
+    owner: '김태호',
+    state: 'normal',
   },
 ];
 

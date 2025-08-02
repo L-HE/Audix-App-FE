@@ -33,15 +33,21 @@ const DetailScreen: React.FC = () => {
 
   // 카드 정렬
   const sortedMachines = useMemo(() => {
-    return machineData
-      .filter(m => m.id === id)
-      .sort((a, b) => orderMap[a.state] - orderMap[b.state]);
+    console.log('🔍 Detail Screen - 받은 id:', id);
+    console.log('📊 Detail Screen - 전체 machineData:', machineData);
+
+    const numericId = parseInt(id || '0', 10);
+    const filteredMachines = machineData.filter(m => m.id === numericId);
+    console.log('✅ Detail Screen - 숫자 변환된 id:', numericId);
+    console.log('✅ Detail Screen - 필터된 machines:', filteredMachines);
+
+    return filteredMachines.sort((a, b) => orderMap[a.state] - orderMap[b.state]);
   }, [id]);
 
   // 데이터 로딩 함수
   const fetchData = async () => {
     setLoading(true, '데이터를 불러오는 중...');
-    
+
     try {
       // API 호출 등
       await new Promise(resolve => setTimeout(resolve, 1200));
@@ -55,7 +61,7 @@ const DetailScreen: React.FC = () => {
   // 화면 진입 애니메이션
   useEffect(() => {
     fetchData();
-    
+
     // 간단한 페이드 인 애니메이션
     opacity.value = withTiming(1, { duration: 300 });
     translateY.value = withTiming(0, { duration: 300 });
@@ -69,7 +75,7 @@ const DetailScreen: React.FC = () => {
       clearTimeout(animationTimeout);
       cancelAnimation(opacity);
       cancelAnimation(translateY);
-      
+
       // 즉시 초기값으로 리셋
       opacity.value = 0;
       translateY.value = 20;
@@ -85,13 +91,22 @@ const DetailScreen: React.FC = () => {
   });
 
   return (
-    <Animated.View 
+    <Animated.View
       style={[styles.container, animatedStyle]}
     >
       <ScrollView contentContainerStyle={styles.content}>
-        {sortedMachines.map((machine) => (
-          <MachineCard key={machine.machineId} {...machine} />
-        ))}
+        {sortedMachines.length > 0 ? (
+          sortedMachines.map((machine) => (
+            <MachineCard key={machine.machineId} {...machine} />
+          ))
+        ) : (
+          <Animated.Text style={{ color: '#fff', textAlign: 'center', marginTop: 50 }}>
+            ID {id}에 해당하는 머신이 없습니다.{'\n'}
+            전체 머신 수: {machineData.length}개{'\n'}
+            받은 ID: {id} (타입: {typeof id}){'\n'}
+            변환된 ID: {parseInt(id || '0', 10)} (타입: number)
+          </Animated.Text>
+        )}
       </ScrollView>
     </Animated.View>
   );
@@ -100,11 +115,11 @@ const DetailScreen: React.FC = () => {
 export default DetailScreen;
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    backgroundColor: Colors.backgroundSecondary, 
+  container: {
+    flex: 1,
+    backgroundColor: Colors.backgroundSecondary,
   },
-  content: { 
-    padding: 16 
+  content: {
+    padding: 16
   },
 });
