@@ -1,12 +1,13 @@
 import { io, Socket } from 'socket.io-client';
+import { BASE_URL } from '../api/config';
 
 class WebSocketClient {
     private socket: Socket | null = null;
     private onAlertCallback: ((data: any) => void) | null = null;
 
     connect() {
-        console.log('🔌 WebSocket 연결 시도: http://165.246.116.100:3000');
-        this.socket = io('http://165.246.116.100:3000');
+        console.log(`🔌 WebSocket 연결 시도: ${BASE_URL}`);
+        this.socket = io(BASE_URL);
 
         this.socket.on('connect', () => {
             console.log('✅ WebSocket 연결 성공:', this.socket?.id);
