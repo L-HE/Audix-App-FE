@@ -19,15 +19,14 @@ function TabsLayoutContent() {
   const { isLoading, loadingMessage } = useLoadingStore();
   const [currentPath, setCurrentPath] = useState(pathname);
 
-  // 경로 변경 감지 - 딜레이 추가
+  // ✅ 단순한 경로 동기화
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (pathname !== currentPath) {
-        setCurrentPath(pathname);
-      }
-    }, 100); // ✅ 100ms 딜레이
-
-    return () => clearTimeout(timer);
+    //console.log('📊 [useEffect] pathname changed:', pathname, '-> currentPath:', currentPath);
+    
+    if (pathname !== currentPath) {
+      //console.log('🚀 [Transition] Path change detected');
+      setCurrentPath(pathname);
+    }
   }, [pathname, currentPath]);
 
   // pathname에서 id 추출
@@ -50,9 +49,9 @@ function TabsLayoutContent() {
         
         <View style={styles.slot}>
           <Animated.View
-            key={currentPath} // 경로 변경 시 새로운 컴포넌트로 인식
+            key={currentPath}
             style={styles.animatedSlot}
-            entering={FadeInDown.duration(200)} // ✅ 시간 단축
+            entering={FadeInDown.duration(200)}
           >
             <Slot />
           </Animated.View>
@@ -68,13 +67,14 @@ function TabsLayoutContent() {
 }
 
 export default function TabsLayout() {
+  //console.log('🏗️ [TabsLayout] Component mounting/re-mounting');
   return <TabsLayoutContent />;
 }
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: Colors.background || '#1a1a1a',
+    backgroundColor: Colors.background,
   },
   slot: {
     flex: 1,
@@ -82,6 +82,12 @@ const styles = StyleSheet.create({
   },
   animatedSlot: {
     flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: Colors.backgroundSecondary || '#2a2a2a',
   },
   background: {
     flex: 1,
