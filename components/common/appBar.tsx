@@ -20,31 +20,54 @@ interface AppBarProps {
 }
 
 const AppBar: React.FC<AppBarProps> = ({ currentId }) => {
-  // segments[0]이 'detail'이면 장비 검색, 아니면 구역 검색
   const segments = useSegments();
   
-  // detail 스크린일 때 해당 id의 title 찾기
-  const getTitle = () => {
+  // 화면별 설정 객체
+  const getScreenConfig = () => {
     if (segments[0] === 'detail' && currentId) {
       const currentArea = areaData.find(a => a.id === currentId);
-      return currentArea ? currentArea.title : '장비 상세';
+      return {
+        title: currentArea ? currentArea.title : '장비 상세',
+        showSearch: true,
+        placeholder: '장비를 검색하세요'
+      };
+    } else if (segments[1] === 'alarms') {
+      return {
+        title: '알림 목록',
+        showSearch: false,
+        placeholder: ''
+      };
+    } else if (segments[1] === 'menu') {
+      return {
+        title: '메뉴',
+        showSearch: false,
+        placeholder: ''
+      };
     } else {
-      // 루트 화면일 때 전체 관리 구역
-      return '전체 관리 구역';
+      return {
+        title: '전체 관리 구역',
+        showSearch: true,
+        placeholder: '구역을 검색하세요'
+      };
     }
   };
 
-  const placeholder =
-    segments[0] === 'detail'
-      ? '장비를 검색하세요'
-      : '구역을 검색하세요';
+  const config = getScreenConfig();
   
   return (
-    <View style={styles.appBar}>
-      <Text style={styles.title}>
-        {getTitle()}
+    <View style={[
+      styles.appBar, 
+      !config.showSearch && styles.appBarCompact
+    ]}>
+      <Text style={[
+        styles.title,
+        !config.showSearch && styles.titleCentered
+      ]}>
+        {config.title}
       </Text>
-      <SearchInput placeholder={placeholder} />
+      {config.showSearch && (
+        <SearchInput placeholder={config.placeholder} />
+      )}
     </View>
   );
 };
@@ -60,10 +83,16 @@ const styles = StyleSheet.create({
     marginBottom: MARGIN_BOTTOM,
     paddingHorizontal: 16,
   },
+  appBarCompact: {
+    height: APPBAR_HEIGHT * 0.6,
+  },
   title: {
     marginBottom: 12,
     fontSize: TITLE_FONT_SIZE,
     fontWeight: '600',
     color: Colors.textPrimary,
+  },
+  titleCentered: {
+    marginBottom: 0, // 검색이 없을 때 하단 마진 제거
   },
 });

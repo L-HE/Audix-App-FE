@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Dimensions, ScrollView, StyleSheet } from 'react-native';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 
-import { getAreaData, Area } from '../../assets/data/areaData';
+import { Area, getAreaData } from '../../assets/data/areaData';
 import AreaCard from '../../components/screens/areaCard';
 export const headerShown = false;
 

@@ -11,6 +11,9 @@ export const Colors = {
   // Background Colors
   background: '#fff',
   backgroundSecondary: '#f2f2f2',
+
+  // menu icon Colors
+  menuIcon: '#2c4d6b',
   
   // Text Colors
   textPrimary: '#000',

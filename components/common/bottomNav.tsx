@@ -48,7 +48,7 @@ const BottomNav: React.FC<BottomNavProps> = ({ tabs }) => {
     {
       icon: 'notifications-outline',
       label: 'Alarm',
-      action: () => router.push('/'),
+      action: () => router.push('/alarms'),
     },
     {
       icon: 'map-outline',
@@ -58,7 +58,7 @@ const BottomNav: React.FC<BottomNavProps> = ({ tabs }) => {
     {
       icon: 'ellipsis-horizontal-outline',  // triple-dot 아이콘
       label: 'Menu',
-      action: () => router.push('/'),
+      action: () => router.push('/menu'),
     },
   ];
 
