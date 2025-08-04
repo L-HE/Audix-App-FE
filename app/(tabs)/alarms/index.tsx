@@ -1,14 +1,14 @@
 // app/(tabs)/alarms/index.tsx
-import { useRouter } from 'expo-router';
 import React from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
+import { useModal } from '@/shared/api/modalContextApi';
 import { Colors } from '@/shared/styles/global';
 import { alarmData } from '../../../assets/data/alarmData';
 import AlarmCard from '../../../components/screens/alarmCard';
 
 const AlarmScreen: React.FC = () => {
-  const router = useRouter();
+  const { showModal } = useModal();
 
   return (
     <View style={styles.container}>
@@ -21,14 +21,16 @@ const AlarmScreen: React.FC = () => {
           <View key={item.alarmId}>
             <AlarmCard
               alarmId={item.alarmId}
-              title={item.title}
-              subtitle={item.subtitle}
+              machineStatus={item.machineStatus}
+              alarmTitle={item.alarmTitle}
+              regionName={item.regionName}
+              regionLocation={item.regionLocation}
+              model={item.model}
               timestamp={item.timestamp}
               createdAt={item.createdAt}
-              status={item.status}
-              onPress={() =>
-                console.log(`알람 상세: ${item.title}`)
-              }
+              message={item.message}
+              type={item.type}
+              onPress={() => showModal(item)}
             />
           </View>
         ))}

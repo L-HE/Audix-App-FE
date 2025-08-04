@@ -4,16 +4,16 @@ import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Colors, getBorderColor } from '../../shared/styles/global';
 
-
-const AlarmCard: React.FC<AlarmData> = ({ title, subtitle, status, timestamp, onPress }) => {
-  const borderColor = getBorderColor(status);
+const AlarmCard: React.FC<AlarmData> = ({ alarmTitle, regionName, regionLocation, machineStatus, timestamp, onPress }) => {
+  const borderColor = getBorderColor(machineStatus);
 
   return (
     <TouchableOpacity style={[styles.card, { borderColor, borderWidth: 2 }]} onPress={onPress}>
       <View style={styles.content}>
         <View style={styles.textContainer}>
-          <Text style={styles.title}>{title}</Text>
-          <Text style={styles.subtitle}>{subtitle}</Text>
+          <Text style={styles.title}>{alarmTitle}</Text>
+          <Text style={styles.subtitle}>{regionName}</Text>
+          <Text style={styles.subtitle}>{regionLocation}</Text>
         </View>
         <Text style={styles.timestamp}>{timestamp}</Text>
       </View>

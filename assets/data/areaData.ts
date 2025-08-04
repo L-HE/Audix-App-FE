@@ -1,8 +1,8 @@
 // assets/data/areaData.ts
 import { ImageSourcePropType } from 'react-native';
-import { getAreaList, Area as ApiArea } from '../../shared/api/area';
+import { Area as ApiArea, getAreaList } from '../../shared/api/area';
 
-export type CardState = 'warning' | 'danger' | 'normal' | 'unknown';
+export type CardState = 'danger' | 'warning' | 'normal' | 'fixing' | 'unknown';
 
 export interface AreaCardProps {
   id: string;
