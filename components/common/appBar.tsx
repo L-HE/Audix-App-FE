@@ -24,7 +24,7 @@ const AppBar: React.FC<AppBarProps> = ({ currentId }) => {
   
   // 화면별 설정 객체
   const getScreenConfig = () => {
-    if (segments[0] === 'detail' && currentId) {
+    if (segments[1] === 'detail' && currentId) {
       const currentArea = areaData.find(a => a.id === currentId);
       return {
         title: currentArea ? currentArea.title : '장비 상세',
