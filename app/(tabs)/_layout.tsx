@@ -1,7 +1,8 @@
 // app/(tabs)/_layout.tsx
 import { Slot, usePathname, useSegments } from 'expo-router';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import AppBar from '../../components/common/appBar';
@@ -16,6 +17,17 @@ function TabsLayoutContent() {
   const segments = useSegments();
   const pathname = usePathname();
   const { isLoading, loadingMessage } = useLoadingStore();
+  const [currentPath, setCurrentPath] = useState(pathname);
+
+  // ✅ 단순한 경로 동기화
+  useEffect(() => {
+    //console.log('📊 [useEffect] pathname changed:', pathname, '-> currentPath:', currentPath);
+    
+    if (pathname !== currentPath) {
+      //console.log('🚀 [Transition] Path change detected');
+      setCurrentPath(pathname);
+    }
+  }, [pathname, currentPath]);
 
   // pathname에서 id 추출
   const getCurrentId = () => {
@@ -36,7 +48,13 @@ function TabsLayoutContent() {
         <AppBar currentId={currentId} />
         
         <View style={styles.slot}>
-          <Slot />
+          <Animated.View
+            key={currentPath}
+            style={styles.animatedSlot}
+            entering={FadeInDown.duration(200)}
+          >
+            <Slot />
+          </Animated.View>
         </View>
 
         <BottomNav />
@@ -49,16 +67,27 @@ function TabsLayoutContent() {
 }
 
 export default function TabsLayout() {
+  //console.log('🏗️ [TabsLayout] Component mounting/re-mounting');
   return <TabsLayoutContent />;
 }
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: Colors.background || '#1a1a1a',
+    backgroundColor: Colors.background,
   },
   slot: {
     flex: 1,
+    position: 'relative',
+  },
+  animatedSlot: {
+    flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: Colors.backgroundSecondary || '#2a2a2a',
   },
   background: {
     flex: 1,

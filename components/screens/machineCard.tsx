@@ -7,28 +7,28 @@ import VDonutChart from './vDonutChart';
 
 const MachineCard: React.FC<Machine> = ({
   machineId,
-  image,
-  name,
+  machineImage,
+  machineName,
   model,
-  location,
-  owner,
-  state,
+  regionLocation,
+  machineOwner,
+  machineState
 }) => {
-  const borderColor = getBorderColor(state);
+  const borderColor = getBorderColor(machineState);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={[styles.card, { borderColor }]}>
         <View style={styles.row}>
           <View style={styles.flex1}>
-            <Image source={image} style={styles.image} resizeMode="contain" />
+            <Image source={machineImage} style={styles.image} resizeMode="contain" />
             <View>
-              <Text style={styles.name}>{name}</Text>
+              <Text style={styles.name}>{machineName}</Text>
               <Text style={styles.subName}>{model}</Text>
             </View>
             <View style={styles.flex3}>
-              <Text style={styles.infoText}>위치: {location}</Text>
-              <Text style={styles.infoText}>담당자: {owner}</Text>
+              <Text style={styles.infoText}>위치: {regionLocation}</Text>
+              <Text style={styles.infoText}>담당자: {machineOwner}</Text>
             </View>
           </View>
           <View>

@@ -1,33 +1,61 @@
-// components/common/notificationModal.tsx
+// app/(tabs)/notificationModal.tsx
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import RNModal from 'react-native-modal';
 import { Portal } from 'react-native-portalize';
-import { modalData } from '../../assets/data/modalData';
-import { useModal } from '../../shared/api/modalContextApi'; // 모달 컨텍스트 API 사용
+import { AlarmType } from '../../assets/data/alarmData';
+import { useModal } from '../../shared/api/modalContextApi';
 import { Colors } from '../../shared/styles/global';
 
-type Status = 'danger' | 'warning';
-
-const STATUS_COLORS: Record<Status, string> = {
-  danger: Colors.danger,
-  warning: Colors.warning,
-};
-
-const STATUS_LABELS: Record<Status, string> = {
-  danger: '위험',
-  warning: '점검 요망',
-};
+// CardState를 Status로 매핑
+type Status = 'danger' | 'warning' | 'normal' | 'fixing' | 'unknown';
 
 const NotificationModal: React.FC = () => {
-  const { modalVisible, setModalVisible } = useModal();
-  
-  const handleClose = () => {
-    setModalVisible(false);
+  const { modalVisible, modalData, hideModal } = useModal();
+
+  // modalData가 없으면 모달을 표시하지 않음
+  if (!modalData) return null;
+
+  // CardState를 Status로 매핑
+  const mapCardStateToStatus = (cardState: string): Status => {
+    switch (cardState) {
+      case 'danger':
+        return 'danger';
+      case 'warning':
+        return 'warning';
+      case 'normal':
+        return 'normal';
+      default:
+        return 'fixing';
+    }
   };
 
-  const topColor = STATUS_COLORS[modalData.status];
-  const statusLabel = STATUS_LABELS[modalData.status];
+  const STATUS_COLORS: Record<Status, string> = {
+    danger: Colors.danger,
+    warning: Colors.warning,
+    normal: Colors.normal,
+    fixing: Colors.textSecondary,
+    unknown: Colors.textSecondary,
+  };
+
+  const STATUS_LABELS: Record<Status, string> = {
+    danger: '위험',
+    warning: '점검 요망',
+    normal: '정상',
+    fixing: '점검 중',
+    unknown: '알 수 없음',
+  };
+
+  const ALARM_LABELS: Record<AlarmType, string> = {
+    machine: '장비 알람',
+    safety: '비상 알람',
+    other: '장비 상태',
+  };
+  
+  const mappedStatus = mapCardStateToStatus(modalData.machineStatus as string);
+  const topColor = STATUS_COLORS[mappedStatus];
+  const statusLabel = STATUS_LABELS[mappedStatus];
+  const alarmType = ALARM_LABELS[modalData.type];
 
   return (
     <Portal>
@@ -39,30 +67,30 @@ const NotificationModal: React.FC = () => {
         animationOut="zoomOutDown"
         animationOutTiming={300}
         useNativeDriver
-        onBackdropPress={handleClose}
-        onBackButtonPress={handleClose}
-        style={{ zIndex: 10000 }} // 추가
+        onBackdropPress={hideModal}
+        onBackButtonPress={hideModal}
+        style={{ zIndex: 10000 }}
       >
         <View style={styles.container}>
           {/* 상단 컬러 헤더 */}
           <View style={[styles.header, { backgroundColor: topColor }]}>
-            <Text style={styles.headerTitle}>장비 알람</Text>
+            <Text style={styles.headerTitle}>{alarmType}</Text>
             <Text style={styles.headerStatus}>{statusLabel}</Text>
           </View>
 
           {/* 본문 */}
           <View style={styles.body}>
-            <Text style={styles.regionName}>{modalData.regionName}</Text>
-            <Text style={styles.regionLocation}>{modalData.regionLocation}</Text>
-            <Text style={styles.equipmentCode}>{modalData.equipmentCode}</Text>
+            <Text style={styles.alarmTitle}>{modalData.regionName}</Text>
+            <Text style={styles.alarmSubtitle}>{modalData.regionLocation}</Text>
+            <Text style={styles.alarmSubtitle}>{modalData.model}</Text>
 
             <View style={styles.messageBox}>
               <Text style={styles.messageText}>
-                {modalData.message || '현재 장비에서 이상음이 감지됩니다. 점검이 필요합니다.'}
+                {modalData.message}
               </Text>
             </View>
 
-            <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
+            <TouchableOpacity style={styles.closeButton} onPress={hideModal}>
               <Text style={styles.closeButtonText}>닫기</Text>
             </TouchableOpacity>
           </View>
@@ -72,15 +100,13 @@ const NotificationModal: React.FC = () => {
   );
 };
 
-export default NotificationModal;
-
 const styles = StyleSheet.create({
   container: {
     backgroundColor: Colors.background,
     borderRadius: 10,
     overflow: 'hidden',
-    zIndex: 9999, // 최상위 레벨로 설정
-    elevation: 1000, // Android 전용
+    zIndex: 9999,
+    elevation: 1000,
   },
   header: {
     paddingVertical: 16,
@@ -100,20 +126,22 @@ const styles = StyleSheet.create({
     padding: 20,
     alignItems: 'center',
   },
-  regionName: {
+  alarmTitle: {
     fontSize: 18,
     fontWeight: '700',
     marginBottom: 4,
+    color: Colors.textPrimary,
   },
-  regionLocation: {
+  alarmSubtitle: {
     fontSize: 14,
     color: Colors.textSecondary,
-    marginBottom: 4,
+    marginBottom: 8,
     textAlign: 'center',
+    lineHeight: 20,
   },
-  equipmentCode: {
-    fontSize: 16,
-    fontWeight: '700',
+  timestamp: {
+    fontSize: 12,
+    color: Colors.textSecondary,
     marginBottom: 16,
   },
   messageBox: {
@@ -132,11 +160,15 @@ const styles = StyleSheet.create({
   closeButton: {
     width: '100%',
     paddingVertical: 12,
+    backgroundColor: Colors.background,
     borderRadius: 6,
     alignItems: 'center',
   },
   closeButtonText: {
-    color: '#000',
+    color: Colors.textPrimary,
     fontSize: 16,
+    fontWeight: '600',
   },
 });
+
+export default NotificationModal;

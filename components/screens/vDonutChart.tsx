@@ -23,13 +23,13 @@ const VDonutChart: React.FC<Props> = ({ machineId }) => {
 
   // 최종 데이터를 메모화
   const finalData = React.useMemo(() => [
-    { x: selected.name, y: used },
+    { x: selected.machineName, y: used },
     { x: '', y: remaining },
-  ], [selected.name, used, remaining]);
+  ], [selected.machineName, used, remaining]);
 
   // 애니메이션용 state
   const [data, setData] = useState([
-    { x: selected.name, y: 0 },
+    { x: selected.machineName, y: 0 },
     { x: '', y: 100 },
   ]);
 
@@ -74,7 +74,7 @@ const VDonutChart: React.FC<Props> = ({ machineId }) => {
   });
 
   // 색상 매핑
-  const primaryColor = getBorderColor(selected.state);
+  const primaryColor = getBorderColor(selected.machineState);
   const colorScale = [primaryColor, Colors.borderLight];
 
   return (

@@ -1,10 +1,10 @@
 // app/index.tsx
 import { useRouter } from 'expo-router';
 import React, { useEffect, useMemo, useState } from 'react';
-import { Dimensions, ScrollView, StyleSheet } from 'react-native';
-import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
+import { Dimensions, ScrollView, StyleSheet, View } from 'react-native';
+import Animated, { FadeIn } from 'react-native-reanimated';
 
-import { getAreaData, Area } from '../../assets/data/areaData';
+import { Area, getAreaData } from '../../assets/data/areaData';
 import AreaCard from '../../components/screens/areaCard';
 export const headerShown = false;
 
@@ -53,10 +53,7 @@ const AreaScreen: React.FC = () => {
   );
 
   return (
-    <Animated.View
-      style={styles.container}
-      entering={FadeInDown.duration(200)}
-    >
+    <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.body}>
         {loading ? (
           <Animated.Text
@@ -81,7 +78,7 @@ const AreaScreen: React.FC = () => {
           ))
         )}
       </ScrollView>
-    </Animated.View>
+    </View>
   );
 };
 

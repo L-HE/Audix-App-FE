@@ -3,7 +3,7 @@ import { ImageSourcePropType } from 'react-native';
 import { getAreaList, Area as ApiArea } from '../../shared/api/area';
 import { BASE_URL } from '../../shared/api/config';
 
-export type CardState = 'warning' | 'danger' | 'normal' | 'unknown';
+export type CardState = 'danger' | 'warning' | 'normal' | 'fixing' | 'unknown';
 
 export interface AreaCardProps {
   id: string;

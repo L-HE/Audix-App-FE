@@ -30,7 +30,7 @@ const Header: React.FC = () => {
   const { setModalVisible } = useModal();
   const router = useRouter();
   const segments = useSegments();
-  const canGoBack = segments.length > 1;
+  const canGoBack = segments.length > 2;
 
   const handleNotificationPress = () => {
     setModalVisible(true);
