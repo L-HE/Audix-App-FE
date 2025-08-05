@@ -10,7 +10,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { useModal } from '../../shared/api/modalContextApi';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } =
   Dimensions.get('window');
@@ -27,14 +26,9 @@ const ICON_SIZE    = SCREEN_WIDTH * ICON_RATIO;
 const ICON_BTN_W   = ICON_SIZE + SCREEN_WIDTH * ICON_HORIZONTAL_PADDING_RATIO * 2;
 
 const Header: React.FC = () => {
-  const { setModalVisible } = useModal();
   const router = useRouter();
   const segments = useSegments();
   const canGoBack = segments.length > 2;
-
-  const handleNotificationPress = () => {
-    setModalVisible(true);
-  };
 
   return (
     <View style={styles.header}>
@@ -58,14 +52,7 @@ const Header: React.FC = () => {
         resizeMode="contain"
       />
 
-      {/* 오른쪽 알림 버튼 */}
-      <TouchableOpacity
-        style={styles.iconButton}
-        activeOpacity={0.7}
-        onPress={handleNotificationPress}
-      >
-        <Ionicons name="notifications-outline" size={ICON_SIZE} color="#656565" />
-      </TouchableOpacity>
+      <View style={styles.spacer} />
     </View>
   );
 };
@@ -88,6 +75,7 @@ const styles = StyleSheet.create({
   logo: {
     width: LOGO_SIZE,
     height: LOGO_SIZE,
+    alignItems: 'center',
   },
   iconButton: {
     width: ICON_BTN_W,
