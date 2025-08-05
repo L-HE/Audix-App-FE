@@ -1,12 +1,12 @@
 // components/screens/MachineCard.tsx
 import React from 'react';
 import { Image, SafeAreaView, StyleSheet, Text, View } from 'react-native';
-import { Machine } from '../../assets/data/machineData';
 import { CardState } from '../../assets/data/areaData';
+import { Machine } from '../../assets/data/machineData';
 import { Colors, getBorderColor } from '../../shared/styles/global';
 import VDonutChart from './vDonutChart';
 
-const MachineCard: React.FC<Machine> = ({
+const MachineCard: React.FC<Machine> = React.memo(({
   deviceId,
   name,
   explain,
@@ -16,17 +16,23 @@ const MachineCard: React.FC<Machine> = ({
   image,
   normalScore
 }) => {
-  const borderColor = getBorderColor(status as CardState);
-
-  // 이미지 처리
-  const imageSource = image ? { uri: image } : require('../../assets/images/logos/AudixLogoNavy.png');
+  const borderColor = React.useMemo(() => getBorderColor(status as CardState), [status]);
+  const imageSource = React.useMemo(() => 
+    image ? { uri: image } : require('../../assets/images/logos/AudixLogoNavy.png'), 
+    [image]
+  );
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={[styles.card, { borderColor }]}>
         <View style={styles.row}>
           <View style={styles.flex1}>
-            <Image source={imageSource} style={styles.image} resizeMode="cover" />
+            <Image 
+              source={imageSource} 
+              style={styles.image} 
+              resizeMode="cover"
+              fadeDuration={0}
+            />
             <View>
               <Text style={styles.name}>{name}</Text>
               <Text style={styles.subName}>{explain}</Text>
@@ -43,7 +49,13 @@ const MachineCard: React.FC<Machine> = ({
       </View>
     </SafeAreaView>
   );
-};
+}, (prevProps, nextProps) => {
+  // 핵심 데이터만 비교하여 리렌더링 결정
+  return (
+    prevProps.status === nextProps.status &&
+    prevProps.normalScore === nextProps.normalScore
+  );
+});
 
 export default MachineCard;
 

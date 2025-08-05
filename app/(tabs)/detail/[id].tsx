@@ -1,9 +1,8 @@
 // app/detail/[id].tsx - Redis API 버전
 import { useLocalSearchParams } from 'expo-router';
-import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { FlatList, StyleSheet } from 'react-native';
 import Animated, {
-  cancelAnimation,
   useAnimatedStyle,
   useSharedValue,
   withTiming
@@ -16,18 +15,8 @@ import { Colors } from '../../../shared/styles/global';
 
 type Params = { id: string };
 
-// normalScore 기준 정렬을 사용하므로 orderMap은 더 이상 필요하지 않음
-// const orderMap: Record<string, number> = {
-//   danger: 0,
-//   warning: 1,
-//   normal: 2,
-//   unknown: 3,
-//   fixing: 4,
-// };
-
 const DetailScreen: React.FC = () => {
   const { id } = useLocalSearchParams<Params>();
-  const [isAnimating, setIsAnimating] = useState(true);
   const [machines, setMachines] = useState<Machine[]>([]);
   const [error, setError] = useState<string | null>(null);
   const { setLoading } = useLoadingStore();
@@ -35,7 +24,15 @@ const DetailScreen: React.FC = () => {
 
   // 단순한 페이드 인 애니메이션만
   const opacity = useSharedValue(0);
-  const translateY = useSharedValue(20);
+
+  // 정렬된 데이터를 메모이제이션
+  const sortedMachines = useMemo(() => {
+    return machines.sort((a: Machine, b: Machine) => {
+      const scoreA = a.normalScore <= 1 ? a.normalScore * 100 : a.normalScore;
+      const scoreB = b.normalScore <= 1 ? b.normalScore * 100 : b.normalScore;
+      return scoreA - scoreB;
+    });
+  }, [machines]);
 
   // 데이터 로딩 함수
   const fetchData = async () => {
@@ -49,14 +46,7 @@ const DetailScreen: React.FC = () => {
       const machineData = await getMachineDataByAreaId(id);
       console.log('✅ Detail Screen - 받은 기기 데이터:', machineData);
 
-      // normalScore 기준으로 정렬 (낮은 점수가 위에 - 위험한 기기 우선)
-      const sortedData = machineData.sort((a: Machine, b: Machine) => {
-        const scoreA = a.normalScore <= 1 ? a.normalScore * 100 : a.normalScore;
-        const scoreB = b.normalScore <= 1 ? b.normalScore * 100 : b.normalScore;
-        return scoreA - scoreB; // 오름차순: 낮은 점수(위험) → 높은 점수(안전)
-      });
-      console.log('📊 normalScore 기준 정렬 완료:', sortedData.map(m => `${m.name}: ${m.normalScore}`));
-      setMachines(sortedData);
+      setMachines(machineData);
     } catch (error) {
       console.error('❌ Detail Screen - 데이터 로딩 실패:', error);
       setError('데이터를 불러오는데 실패했습니다.');
@@ -71,22 +61,6 @@ const DetailScreen: React.FC = () => {
 
     // 간단한 페이드 인 애니메이션
     opacity.value = withTiming(1, { duration: 300 });
-    translateY.value = withTiming(0, { duration: 300 });
-
-    const animationTimeout = setTimeout(() => {
-      setIsAnimating(false);
-    }, 400);
-
-    // 컴포넌트 언마운트 시 모든 애니메이션 정리
-    return () => {
-      clearTimeout(animationTimeout);
-      cancelAnimation(opacity);
-      cancelAnimation(translateY);
-
-      // 즉시 초기값으로 리셋
-      opacity.value = 0;
-      translateY.value = 20;
-    };
   }, [id]);
 
   // 웹소켓 알림을 받으면 데이터 새로고침
@@ -97,34 +71,31 @@ const DetailScreen: React.FC = () => {
     }
   }, [refreshTrigger]);
 
+  // FlatList 렌더링 최적화
+  const renderMachine = useCallback(({ item }: { item: Machine }) => (
+    <MachineCard {...item} />
+  ), []);
+
+  const keyExtractor = useCallback((item: Machine) => item.deviceId.toString(), []);
+
   // 애니메이션 스타일
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      opacity: opacity.value,
-      transform: [{ translateY: translateY.value }],
-    };
-  });
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+  }));
 
   return (
-    <Animated.View
-      style={[styles.container, animatedStyle]}
-    >
-      <ScrollView contentContainerStyle={styles.content}>
-        {machines.length > 0 ? (
-          machines.map((machine) => (
-            <MachineCard key={machine.deviceId} {...machine} />
-          ))
-        ) : error ? (
-          <Animated.Text style={{ color: '#fff', textAlign: 'center', marginTop: 50 }}>
-            {error}
-          </Animated.Text>
-        ) : (
-          <Animated.Text style={{ color: '#fff', textAlign: 'center', marginTop: 50 }}>
-            이 지역에는 등록된 기기가 없습니다.{'\n'}
-            관리자에게 문의하여 기기를 등록해주세요.
-          </Animated.Text>
-        )}
-      </ScrollView>
+    <Animated.View style={[styles.container, animatedStyle]}>
+      <FlatList
+        data={sortedMachines}
+        renderItem={renderMachine}
+        keyExtractor={keyExtractor}
+        contentContainerStyle={styles.content}
+        removeClippedSubviews={true}
+        maxToRenderPerBatch={10}
+        windowSize={20}
+        initialNumToRender={8}
+        updateCellsBatchingPeriod={100}
+      />
     </Animated.View>
   );
 };

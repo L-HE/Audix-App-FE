@@ -1,6 +1,7 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Dimensions, SafeAreaView, StyleSheet, View } from 'react-native';
 import Animated, {
+  cancelAnimation,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
@@ -15,7 +16,9 @@ interface Props {
   normalScore: number;
   status: string;
   name: string;
-}const VDonutChart: React.FC<Props> = ({ deviceId, normalScore, status, name }) => {
+}
+
+const VDonutChart: React.FC<Props> = ({ deviceId, normalScore, status, name }) => {
   const screenWidth = Dimensions.get('window').width;
   const size = screenWidth * 0.4;
 
@@ -45,29 +48,51 @@ interface Props {
     setData(finalData);
   }, [finalData]);
 
+  const prevNormalScore = useRef(normalScore);
+  const isFirstRender = useRef(true);
+
   useEffect(() => {
-    // 1. 차트 애니메이션 시작
-    const timer = setTimeout(() => {
-      startChartAnimation();
-    }, 400);
+    const hasDataChanged = prevNormalScore.current !== normalScore;
+    
+    if (hasDataChanged) {
+      // 데이터 변경 시에만 애니메이션 실행
+      console.log(`🎯 Chart 애니메이션 실행`);
+      // 애니메이션 로직
+      // 1. 차트 애니메이션 시작
+      const timer = setTimeout(() => {
+        startChartAnimation();
+      }, 400);
 
-    // 2. 텍스트 zoomIn 애니메이션 (차트 애니메이션 후 시작)
-    const textTimer = setTimeout(() => {
-      scale.value = withSpring(1, {
-        damping: 15,
-        stiffness: 150,
-        mass: 1,
-      });
-      opacity.value = withTiming(1, { duration: 300 });
-    }, 440); // 차트 애니메이션 중간쯤에 시작
+      // 2. 텍스트 zoomIn 애니메이션 (차트 애니메이션 후 시작)
+      const textTimer = setTimeout(() => {
+        scale.value = withSpring(1, {
+          damping: 15,
+          stiffness: 150,
+          mass: 1,
+        });
+        opacity.value = withTiming(1, { duration: 300 });
+      }, 440); // 차트 애니메이션 중간쯤에 시작
 
+      return () => {
+        clearTimeout(timer);
+        clearTimeout(textTimer);
+      };
+    } else {
+      // 데이터 변경이 없으면 애니메이션 없이 업데이트
+      setData(finalData);
+    }
+
+    prevNormalScore.current = normalScore;
+  }, [finalData, normalScore, scale, opacity, startChartAnimation]);
+
+  // 컴포넌트 언마운트 시 애니메이션 정리
+  useEffect(() => {
     return () => {
-      clearTimeout(timer);
-      clearTimeout(textTimer);
+      cancelAnimation(scale);
+      cancelAnimation(opacity);
     };
-  }, [startChartAnimation, scale, opacity]);
+  }, [scale, opacity]);
 
-  // 애니메이션 스타일
   const animatedTextStyle = useAnimatedStyle(() => {
     return {
       transform: [{ scale: scale.value }],
