@@ -1,7 +1,7 @@
 // components/screens/alarmCard.tsx
 import { AlarmData } from '@/assets/data/alarmData';
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Colors, getBorderColor } from '../../shared/styles/global';
 
 const AlarmCard: React.FC<AlarmData> = React.memo(({ 
@@ -26,10 +26,10 @@ const AlarmCard: React.FC<AlarmData> = React.memo(({
       <View style={styles.content}>
         <View style={styles.textContainer}>
           <Text style={styles.title}>{alarmTitle}</Text>
-          <Text style={styles.subtitle}>{regionName}</Text>
-          <Text style={styles.subtitle}>{regionLocation}</Text>
+          {regionName && <Text style={styles.subtitle}>{regionName}</Text>}
+          {regionLocation && <Text style={styles.subtitle}>{regionLocation}</Text>}
         </View>
-        <Text style={styles.timestamp}>{timestamp}</Text>
+        {timestamp && <Text style={styles.timestamp}>{timestamp}</Text>}
       </View>
     </TouchableOpacity>
   );
@@ -50,14 +50,17 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginHorizontal: 16,
     marginVertical: 6,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 3,
+      },
+    }),
   },
   content: {
     padding: 16,

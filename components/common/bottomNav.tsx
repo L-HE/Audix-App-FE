@@ -1,7 +1,8 @@
 // components/common/bottomNav.tsx
+import { Colors } from '@/shared/styles/global';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
 import {
   Dimensions,
   StyleSheet,
@@ -11,29 +12,26 @@ import {
 } from 'react-native';
 
 type IconName = React.ComponentProps<typeof Ionicons>['name'];
+
 export interface NavItem {
   icon: IconName;
   label: string;
   action: () => void;
 }
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } =
-  Dimensions.get('window');
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
-// 비율 상수
+// 비율 상수를 컴포넌트 외부로 이동
 const TAB_BAR_HEIGHT_RATIO = 0.1;
 const ICON_RATIO = 0.07;
 const TEXT_RATIO = 0.03;
 const LABEL_MARGIN_RATIO = 0.005;
 
-// Navy 컬러 (로고 원 배경색)
-const NAVY_COLOR = '#0D2D59';
-
 const TAB_BAR_HEIGHT = SCREEN_HEIGHT * TAB_BAR_HEIGHT_RATIO;
 const ICON_SIZE = SCREEN_WIDTH * ICON_RATIO;
-const AREA_CONTAINER_MULTIPLIER = 1.4;           // Area 아이콘 컨테이너를 1.4배
+const AREA_CONTAINER_MULTIPLIER = 1.4;
 const AREA_ICON_CONTAINER_SIZE = ICON_SIZE * AREA_CONTAINER_MULTIPLIER;
-const AREA_ICON_SIZE = ICON_SIZE * 0.8;          // Area 내부 아이콘을 0.8배
+const AREA_ICON_SIZE = ICON_SIZE * 0.8;
 const FONT_SIZE = SCREEN_WIDTH * TEXT_RATIO;
 const LABEL_MARGIN = SCREEN_WIDTH * LABEL_MARGIN_RATIO;
 
@@ -41,34 +39,43 @@ interface BottomNavProps {
   tabs?: NavItem[];
 }
 
-const BottomNav: React.FC<BottomNavProps> = ({ tabs }) => {
+// 컴포넌트를 먼저 정의
+const BottomNavComponent: React.FC<BottomNavProps> = ({ tabs }) => {
   const router = useRouter();
 
-  const defaultTabs: NavItem[] = [
-    {
-      icon: 'notifications-outline',
-      label: 'Alarm',
-      action: () => router.push('/alarms'),
-    },
-    {
-      icon: 'map-outline',
-      label: 'Area',
-      action: () => router.push('/'),
-    },
-    {
-      icon: 'ellipsis-horizontal-outline',  // triple-dot 아이콘
-      label: 'Menu',
-      action: () => router.push('/menu'),
-    },
-  ];
+  // 네비게이션 함수들을 useCallback으로 캐싱
+  const navigateToAlarms = useCallback(() => router.push('/alarms'), [router]);
+  const navigateToArea = useCallback(() => router.push('/'), [router]);
+  const navigateToMenu = useCallback(() => router.push('/menu'), [router]);
+
+  const defaultTabs = useMemo(
+    () => [
+      {
+        icon: 'notifications-outline' as IconName,
+        label: 'Alarm',
+        action: navigateToAlarms,
+      },
+      {
+        icon: 'map-outline' as IconName,
+        label: 'Area',
+        action: navigateToArea,
+      },
+      {
+        icon: 'ellipsis-horizontal-outline' as IconName,
+        label: 'Menu',
+        action: navigateToMenu,
+      },
+    ],
+    [navigateToAlarms, navigateToArea, navigateToMenu]
+  );
 
   const items = tabs ?? defaultTabs;
 
   return (
     <View style={styles.tabBar}>
-      {items.map(({ icon, label, action }, i) => (
+      {items.map(({ icon, label, action }) => (
         <TouchableOpacity
-          key={i}
+          key={label}
           style={styles.tabItem}
           onPress={action}
           activeOpacity={0.7}
@@ -95,8 +102,11 @@ const BottomNav: React.FC<BottomNavProps> = ({ tabs }) => {
   );
 };
 
-export default BottomNav;
+// React.memo로 감싸고 displayName 설정
+const BottomNav = React.memo(BottomNavComponent);
+BottomNav.displayName = 'BottomNav';
 
+// 스타일을 컴포넌트 뒤에 정의
 const styles = StyleSheet.create({
   tabBar: {
     height: TAB_BAR_HEIGHT,
@@ -114,7 +124,7 @@ const styles = StyleSheet.create({
     width: AREA_ICON_CONTAINER_SIZE,
     height: AREA_ICON_CONTAINER_SIZE,
     borderRadius: AREA_ICON_CONTAINER_SIZE / 2,
-    backgroundColor: NAVY_COLOR,
+    backgroundColor: Colors.menuIcon,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -124,3 +134,6 @@ const styles = StyleSheet.create({
     marginTop: LABEL_MARGIN,
   },
 });
+
+// default export
+export default BottomNav;

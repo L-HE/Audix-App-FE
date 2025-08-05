@@ -90,7 +90,6 @@ const DetailScreen: React.FC = () => {
         renderItem={renderMachine}
         keyExtractor={keyExtractor}
         contentContainerStyle={styles.content}
-        removeClippedSubviews={true}
         maxToRenderPerBatch={10}
         windowSize={20}
         initialNumToRender={8}

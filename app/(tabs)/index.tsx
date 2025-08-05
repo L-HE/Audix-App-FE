@@ -14,6 +14,8 @@ type CardState = 'danger' | 'warning' | 'normal' | 'unknown';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
+const STATE_ORDER_MAP = { danger: 0, warning: 1, normal: 2, unknown: 3 } as const;
+
 const AreaScreen: React.FC = () => {
   const router = useRouter();
   const [areas, setAreas] = useState<Area[]>([]);
@@ -55,22 +57,15 @@ const AreaScreen: React.FC = () => {
     }
   }, [refreshTrigger]);
 
-  // 1) 상태별 우선순위 맵 정의
-  const orderMap: Record<CardState, number> = {
-    danger: 0,
-    warning: 1,
-    normal: 2,
-    unknown: 3,
-  };
-
   // 2) useMemo 로 정렬된 배열 생성 (매 렌더링마다 불필요한 sort 방지)
-  const sortedCards = useMemo(
-    () =>
-      [...areas].sort(
-        (a, b) => (orderMap[a.state as CardState] ?? 99) - (orderMap[b.state as CardState] ?? 99)
-      ),
-    [areas]
-  );
+  const sortedCards = useMemo(() => {
+    if (areas.length === 0) return [];
+    return areas.slice().sort(
+      (a, b) =>
+        (STATE_ORDER_MAP[a.state as keyof typeof STATE_ORDER_MAP] ?? 99) -
+        (STATE_ORDER_MAP[b.state as keyof typeof STATE_ORDER_MAP] ?? 99)
+    );
+  }, [areas]);
 
   return (
     <View style={styles.container}>

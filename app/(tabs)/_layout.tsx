@@ -1,6 +1,6 @@
 // app/(tabs)/_layout.tsx
 import { Slot, usePathname, useSegments } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -19,25 +19,20 @@ function TabsLayoutContent() {
   const { isLoading, loadingMessage } = useLoadingStore();
   const [currentPath, setCurrentPath] = useState(pathname);
 
-  // ✅ 단순한 경로 동기화
+  // 단순한 경로 동기화
   useEffect(() => {
-    //console.log('📊 [useEffect] pathname changed:', pathname, '-> currentPath:', currentPath);
-    
     if (pathname !== currentPath) {
-      //console.log('🚀 [Transition] Path change detected');
       setCurrentPath(pathname);
     }
   }, [pathname, currentPath]);
 
   // pathname에서 id 추출
-  const getCurrentId = () => {
+  const getCurrentId = useCallback(() => {
     if (segments[1] === 'detail' && segments[2] === '[id]') {
-      const pathParts = pathname.split('/');
-      const id = pathParts[pathParts.length - 1];
-      return id;
+      return pathname.split('/').pop();
     }
     return undefined;
-  };
+  }, [segments, pathname]);
 
   const currentId = getCurrentId();
 
@@ -49,7 +44,7 @@ function TabsLayoutContent() {
         
         <View style={styles.slot}>
           <Animated.View
-            key={currentPath}
+            key={pathname}
             style={styles.animatedSlot}
             entering={FadeInDown.duration(200)}
           >
@@ -67,7 +62,6 @@ function TabsLayoutContent() {
 }
 
 export default function TabsLayout() {
-  //console.log('🏗️ [TabsLayout] Component mounting/re-mounting');
   return <TabsLayoutContent />;
 }
 

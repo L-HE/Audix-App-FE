@@ -7,8 +7,8 @@ import SplashScreen from '../components/common/splashScreen';
 import { ModalProvider } from '../shared/api/modalContextApi';
 
 // 수정 부분
-import { webSocketClient } from '../shared/websocket/client';
 import { useModal } from '../shared/api/modalContextApi';
+import { webSocketClient } from '../shared/websocket/client';
 import NotificationModal from './(tabs)/notificationModal';
 //---
 
