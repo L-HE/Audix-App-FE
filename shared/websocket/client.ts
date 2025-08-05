@@ -1,5 +1,6 @@
 import { io, Socket } from 'socket.io-client';
 import { BASE_URL } from '../api/config';
+import { useRefreshStore } from '../store/refreshStore';
 
 class WebSocketClient {
     private socket: Socket | null = null;
@@ -30,6 +31,12 @@ class WebSocketClient {
             console.log('🚨 device-alert 이벤트 수신:', data);
             console.log('🔔 normalScore:', data.normalScore);
             console.log('🎯 deviceId:', data.deviceId);
+
+            // 전역 새로고침 트리거
+            const { triggerRefresh } = useRefreshStore.getState();
+            triggerRefresh();
+            console.log('🔄 전역 데이터 새로고침 트리거됨');
+
             if (this.onAlertCallback) {
                 this.onAlertCallback(data);
             } else {

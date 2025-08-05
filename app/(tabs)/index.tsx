@@ -6,6 +6,8 @@ import Animated, { FadeIn } from 'react-native-reanimated';
 
 import { Area, getAreaData } from '../../assets/data/areaData';
 import AreaCard from '../../components/screens/areaCard';
+import { useRefreshStore } from '../../shared/store/refreshStore';
+import { webSocketClient } from '../../shared/websocket/client';
 export const headerShown = false;
 
 type CardState = 'danger' | 'warning' | 'normal' | 'unknown';
@@ -16,24 +18,42 @@ const AreaScreen: React.FC = () => {
   const router = useRouter();
   const [areas, setAreas] = useState<Area[]>([]);
   const [loading, setLoading] = useState(true);
+  const { refreshTrigger } = useRefreshStore();
 
-  // API 데이터 로드
+  // Area 데이터 로딩 함수
+  const loadAreas = async () => {
+    try {
+      console.log('🌐 Area 데이터 로딩 중...');
+      setLoading(true);
+      const data = await getAreaData();
+      setAreas(data);
+      console.log('✅ Area 데이터 로딩 완료:', data);
+    } catch (error) {
+      console.error('❌ Area 데이터 로딩 실패:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 초기 데이터 로드 및 웹소켓 연결
   useEffect(() => {
-    const loadAreas = async () => {
-      try {
-        console.log('🌐 Area 데이터 로딩 중...');
-        const data = await getAreaData();
-        setAreas(data);
-        console.log('✅ Area 데이터 로딩 완료:', data);
-      } catch (error) {
-        console.error('❌ Area 데이터 로딩 실패:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     loadAreas();
+
+    // 웹소켓 연결
+    webSocketClient.connect();
+
+    return () => {
+      webSocketClient.disconnect();
+    };
   }, []);
+
+  // 웹소켓 알림을 받으면 데이터 새로고침
+  useEffect(() => {
+    if (refreshTrigger > 0) {
+      console.log('🔄 웹소켓 알림으로 인한 Area 데이터 새로고침');
+      loadAreas();
+    }
+  }, [refreshTrigger]);
 
   // 1) 상태별 우선순위 맵 정의
   const orderMap: Record<CardState, number> = {

@@ -11,6 +11,7 @@ import Animated, {
 import { Machine, getMachineDataByAreaId } from '../../../assets/data/machineData';
 import MachineCard from '../../../components/screens/machineCard';
 import { useLoadingStore } from '../../../shared/store/loadingStore';
+import { useRefreshStore } from '../../../shared/store/refreshStore';
 import { Colors } from '../../../shared/styles/global';
 
 type Params = { id: string };
@@ -30,6 +31,7 @@ const DetailScreen: React.FC = () => {
   const [machines, setMachines] = useState<Machine[]>([]);
   const [error, setError] = useState<string | null>(null);
   const { setLoading } = useLoadingStore();
+  const { refreshTrigger } = useRefreshStore();
 
   // 단순한 페이드 인 애니메이션만
   const opacity = useSharedValue(0);
@@ -86,6 +88,14 @@ const DetailScreen: React.FC = () => {
       translateY.value = 20;
     };
   }, [id]);
+
+  // 웹소켓 알림을 받으면 데이터 새로고침
+  useEffect(() => {
+    if (refreshTrigger > 0) {
+      console.log('🔄 웹소켓 알림으로 인한 Machine 데이터 새로고침');
+      fetchData();
+    }
+  }, [refreshTrigger]);
 
   // 애니메이션 스타일
   const animatedStyle = useAnimatedStyle(() => {
