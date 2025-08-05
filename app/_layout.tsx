@@ -19,7 +19,7 @@ function RootLayoutContent() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   // 수정 부분
-  const { setModalVisible } = useModal();
+  const { setModalVisible, setModalData } = useModal();
   //---
 
   // 앱 초기화
@@ -34,12 +34,46 @@ function RootLayoutContent() {
 
         // 수정 부분
         // WebSocket 연결 초기화
+        console.log('🔧 WebSocket 초기화 시작...');
         webSocketClient.connect();
+
         webSocketClient.setOnAlert((data) => {
           console.log('🚨 WebSocket 알림 수신:', data);
+          console.log('🔔 알림 데이터 상세:', {
+            deviceId: data.deviceId,
+            normalScore: data.normalScore,
+            timestamp: new Date().toISOString()
+          });
 
+          // normalScore 기반으로 상태 결정
+          let status: 'danger' | 'warning' | 'normal' = 'normal';
+          if (data.normalScore < 0.3) {
+            status = 'danger';
+          } else if (data.normalScore < 0.5) {
+            status = 'warning';
+          }
+
+          // AlarmCardProps 형식으로 변환
+          const alarmData = {
+            alarmId: `alert_${data.deviceId}_${Date.now()}`,
+            machineStatus: status,
+            alarmTitle: status === 'danger' ? '위험' : '점검 요망',
+            regionName: `Device ${data.deviceId}`,
+            regionLocation: '실시간 모니터링',
+            model: '장비',
+            timestamp: '방금 전',
+            createdAt: new Date(),
+            message: `장비 ${data.deviceId}에서 이상이 감지되었습니다. Normal Score: ${Math.round(data.normalScore * 100)}%`,
+            type: 'machine' as const,
+          };
+
+          console.log('📱 모달 데이터 설정:', alarmData);
+          console.log('📱 모달 표시 시도...');
+          setModalData(alarmData);
           setModalVisible(true);
         });
+
+        console.log('✅ WebSocket 초기화 완료');
         // ---
 
         // 초기화 작업
@@ -61,7 +95,7 @@ function RootLayoutContent() {
     return () => {
       webSocketClient.disconnect();
     };
-  }, [setModalVisible]);
+  }, [setModalVisible, setModalData]);
   //---
 
   // 스플래시 화면 표시

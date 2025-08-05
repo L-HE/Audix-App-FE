@@ -2,37 +2,42 @@
 import React from 'react';
 import { Image, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import { Machine } from '../../assets/data/machineData';
+import { CardState } from '../../assets/data/areaData';
 import { Colors, getBorderColor } from '../../shared/styles/global';
 import VDonutChart from './vDonutChart';
 
 const MachineCard: React.FC<Machine> = ({
-  machineId,
-  machineImage,
-  machineName,
-  model,
-  regionLocation,
-  machineOwner,
-  machineState
+  deviceId,
+  name,
+  explain,
+  address,
+  deviceManager,
+  status,
+  image,
+  normalScore
 }) => {
-  const borderColor = getBorderColor(machineState);
+  const borderColor = getBorderColor(status as CardState);
+
+  // 이미지 처리
+  const imageSource = image ? { uri: image } : require('../../assets/images/logos/AudixLogoNavy.png');
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={[styles.card, { borderColor }]}>
         <View style={styles.row}>
           <View style={styles.flex1}>
-            <Image source={machineImage} style={styles.image} resizeMode="contain" />
+            <Image source={imageSource} style={styles.image} resizeMode="cover" />
             <View>
-              <Text style={styles.name}>{machineName}</Text>
-              <Text style={styles.subName}>{model}</Text>
+              <Text style={styles.name}>{name}</Text>
+              <Text style={styles.subName}>{explain}</Text>
             </View>
             <View style={styles.flex3}>
-              <Text style={styles.infoText}>위치: {regionLocation}</Text>
-              <Text style={styles.infoText}>담당자: {machineOwner}</Text>
+              <Text style={styles.infoText}>위치: {address}</Text>
+              <Text style={styles.infoText}>담당자: {deviceManager}</Text>
             </View>
           </View>
           <View>
-            <VDonutChart machineId={String(machineId)} />
+            <VDonutChart deviceId={String(deviceId)} normalScore={normalScore} status={status} name={name} />
           </View>
         </View>
       </View>
@@ -50,35 +55,37 @@ const styles = StyleSheet.create({
     padding: 16,
     borderWidth: 1,
   },
-  row: { 
-    flexDirection: 'row', 
-    alignItems: 'center' 
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center'
   },
-  flex1: { 
-    flex: 1, 
-    flexDirection: 'column' 
+  flex1: {
+    flex: 1,
+    flexDirection: 'column'
   },
-  image: { 
-    width: 120, 
-    height: 120, 
-    marginRight: 12 
+  image: {
+    width: 120,
+    height: 120,
+    marginRight: 12,
+    borderRadius: 8,
+    backgroundColor: Colors.backgroundSecondary,
   },
-  name: { 
-    fontSize: 16, 
+  name: {
+    fontSize: 16,
     fontWeight: 'bold',
     color: Colors.textPrimary,
   },
-  subName: { 
-    fontSize: 14, 
-    color: Colors.textSecondary, 
-    marginTop: 4 
+  subName: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+    marginTop: 4
   },
-  flex3: { 
-    marginTop: 12 
+  flex3: {
+    marginTop: 12
   },
-  infoText: { 
-    fontSize: 14, 
-    color: Colors.textTertiary, 
-    marginTop: 2 
+  infoText: {
+    fontSize: 14,
+    color: Colors.textTertiary,
+    marginTop: 2
   },
 });

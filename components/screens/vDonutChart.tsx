@@ -7,29 +7,31 @@ import Animated, {
   withTiming
 } from 'react-native-reanimated';
 import { VictoryPie } from 'victory-native';
-import machineData from '../../assets/data/machineData';
+import { CardState } from '../../assets/data/areaData';
 import { Colors, getBorderColor } from '../../shared/styles/global';
 
-interface Props { machineId: string; }
-
-const VDonutChart: React.FC<Props> = ({ machineId }) => {
+interface Props {
+  deviceId: string;
+  normalScore: number;
+  status: string;
+  name: string;
+}const VDonutChart: React.FC<Props> = ({ deviceId, normalScore, status, name }) => {
   const screenWidth = Dimensions.get('window').width;
   const size = screenWidth * 0.4;
 
-  // 머신 데이터
-  const selected = machineData.find(m => m.machineId === machineId)!;
-  const used = selected.percent;
+  // normalScore가 0-1 범위면 100을 곱해서 퍼센트로 변환
+  const used = normalScore <= 1 ? normalScore * 100 : normalScore;
   const remaining = 100 - used;
 
   // 최종 데이터를 메모화
   const finalData = React.useMemo(() => [
-    { x: selected.machineName, y: used },
+    { x: name, y: used },
     { x: '', y: remaining },
-  ], [selected.machineName, used, remaining]);
+  ], [name, used, remaining]);
 
   // 애니메이션용 state
   const [data, setData] = useState([
-    { x: selected.machineName, y: 0 },
+    { x: name, y: 0 },
     { x: '', y: 100 },
   ]);
 
@@ -74,7 +76,7 @@ const VDonutChart: React.FC<Props> = ({ machineId }) => {
   });
 
   // 색상 매핑
-  const primaryColor = getBorderColor(selected.machineState);
+  const primaryColor = getBorderColor(status as CardState);
   const colorScale = [primaryColor, Colors.borderLight];
 
   return (
@@ -87,22 +89,22 @@ const VDonutChart: React.FC<Props> = ({ machineId }) => {
           padAngle={2}
           colorScale={colorScale}
           labels={() => null}
-          animate={{ 
+          animate={{
             duration: 1000,
             easing: 'exp'
           }}
         />
-        
+
         {/* 중심에 퍼센트 표시 - ZoomIn 애니메이션 */}
         <View style={[styles.centerContent, { zIndex: 2 }]}>
-          <Animated.Text 
+          <Animated.Text
             style={[
-              styles.percentText, 
+              styles.percentText,
               { fontSize: size * 0.12 },
               animatedTextStyle
             ]}
           >
-            {used}%
+            {Math.round(used)}%
           </Animated.Text>
         </View>
       </View>
@@ -111,9 +113,9 @@ const VDonutChart: React.FC<Props> = ({ machineId }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { 
-    justifyContent: 'center', 
-    alignItems: 'center' 
+  container: {
+    justifyContent: 'center',
+    alignItems: 'center'
   },
   chartContainer: {
     position: 'relative',
