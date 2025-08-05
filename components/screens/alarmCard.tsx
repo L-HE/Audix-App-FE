@@ -4,11 +4,25 @@ import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Colors, getBorderColor } from '../../shared/styles/global';
 
-const AlarmCard: React.FC<AlarmData> = ({ alarmTitle, regionName, regionLocation, machineStatus, timestamp, onPress }) => {
-  const borderColor = getBorderColor(machineStatus);
+const AlarmCard: React.FC<AlarmData> = React.memo(({ 
+  alarmTitle, 
+  regionName, 
+  regionLocation, 
+  machineStatus, 
+  timestamp, 
+  onPress 
+}) => {
+  // 무거운 계산 캐싱
+  const borderColor = React.useMemo(() => getBorderColor(machineStatus), [machineStatus]);
+  
+  // 동적 스타일 캐싱
+  const cardStyle = React.useMemo(() => [
+    styles.card, 
+    { borderColor, borderWidth: 2 }
+  ], [borderColor]);
 
   return (
-    <TouchableOpacity style={[styles.card, { borderColor, borderWidth: 2 }]} onPress={onPress}>
+    <TouchableOpacity style={cardStyle} onPress={onPress}>
       <View style={styles.content}>
         <View style={styles.textContainer}>
           <Text style={styles.title}>{alarmTitle}</Text>
@@ -19,7 +33,16 @@ const AlarmCard: React.FC<AlarmData> = ({ alarmTitle, regionName, regionLocation
       </View>
     </TouchableOpacity>
   );
-};
+}, (prevProps, nextProps) => {
+  // 커스텀 비교 함수 - 핵심 데이터만 비교
+  return (
+    prevProps.machineStatus === nextProps.machineStatus &&
+    prevProps.timestamp === nextProps.timestamp &&
+    prevProps.alarmTitle === nextProps.alarmTitle
+  );
+});
+
+AlarmCard.displayName = 'AlarmCard';
 
 const styles = StyleSheet.create({
   card: {
