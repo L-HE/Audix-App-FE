@@ -1,6 +1,7 @@
 // assets/data/areaData.ts
 import { ImageSourcePropType } from 'react-native';
-import { Area as ApiArea, getAreaList } from '../../shared/api/area';
+import { getAreaList, Area as ApiArea } from '../../shared/api/area';
+import { BASE_URL } from '../../shared/api/config';
 
 export type CardState = 'danger' | 'warning' | 'normal' | 'fixing' | 'unknown';
 
@@ -42,7 +43,9 @@ const transformApiToAreaData = (apiData: ApiArea[]): Area[] => {
     id: item.id.toString(),        // id → id (number → string)
     title: item.name,              // name → title
     subtitle: item.explain,        // explain → subtitle
-    image: require('../images/logos/AudixLogoNavy.png'), // 기본 이미지 사용
+    image: item.image
+      ? { uri: `${BASE_URL}${item.image}` }  // API 이미지 경로 사용
+      : require('../images/logos/AudixLogoNavy.png'), // fallback 이미지
     state: mapStatusToState(item.status), // status → state (실제 매핑)
   }));
 };
