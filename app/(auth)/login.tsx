@@ -50,12 +50,11 @@ export default function LoginScreen() {
         {/* 입력 폼 */}
         <View style={styles.form}>
           <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>사원번호</Text>
             <View style={styles.inputWrapper}>
               <View style={styles.inputIcon}>
                 <Ionicons 
                   name="person-circle-outline" 
-                  size={20} 
+                  size={35} 
                   color="#999" 
                 />
               </View>
@@ -73,12 +72,11 @@ export default function LoginScreen() {
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>비밀번호</Text>
             <View style={styles.inputWrapper}>
               <View style={styles.inputIcon}>
                 <Ionicons 
                   name="lock-closed-outline" 
-                  size={20} 
+                  size={35} 
                   color="#999" 
                 />
               </View>
@@ -151,27 +149,25 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     alignItems: 'center',
-    marginBottom: 15,
   },
   logo: {
-    width: '60%',
-    height: '60%',
-    marginBottom: '-10%',
+    width: '80%',
+    height: '80%',
+    marginBottom: '-60%',
   },
   form: {
     gap: 24,
   },
   inputContainer: {
+    gap: 12,
     marginBottom: 8,
   },
   inputWrapper: {
     flexDirection: 'row',
-    alignItems: 'center',
-    paddingBottom: 8,
+    alignItems: 'flex-start',
   },
   inputIcon: {
-    width: 20,
-    marginRight: 12,
+    width: '30%',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -184,7 +180,7 @@ const styles = StyleSheet.create({
   inputDivider: {
     height: 1,
     backgroundColor: '#E0E0E0',
-    marginLeft: '10%',
+    marginHorizontal: 12,
   },
   inputLabel: {
     fontSize: 12,
@@ -210,13 +206,13 @@ const styles = StyleSheet.create({
   },
   loginButtonText: {
     color: '#FFFFFF',
-    fontSize: 16,
+    fontSize: 24,
     fontWeight: '600',
     letterSpacing: 1,
   },
   forgotPassword: {
     color: '#666',
-    fontSize: 14,
+    fontSize: 16,
     textAlign: 'center',
     textDecorationLine: 'underline',
   },
