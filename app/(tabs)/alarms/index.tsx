@@ -1,46 +1,57 @@
 // app/(tabs)/alarms/index.tsx
-import React, { useCallback } from 'react';
-import { FlatList, StyleSheet, View } from 'react-native';
+import { useRouter } from 'expo-router';
+import React from 'react';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
-import { useModal } from '@/shared/api/modalContextApi';
 import { Colors } from '@/shared/styles/global';
-import { AlarmCardProps, alarmData } from '../../../assets/data/alarmData';
+import { alarmData } from '../../../assets/data/alarmData';
 import AlarmCard from '../../../components/screens/alarmCard';
+import { useModal } from '../../../shared/api/modalContextApi';
 
 const AlarmScreen: React.FC = () => {
-  const { showModal } = useModal();
+  const router = useRouter();
+  const { setModalVisible, setModalData } = useModal();
 
-  // 렌더 함수와 핸들러 캐싱
-  const renderAlarmItem = useCallback(({ item }: { item: AlarmCardProps }) => (
-    <AlarmCard
-      {...item}
-      onPress={() => showModal(item)}
-    />
-  ), [showModal]);
-
-  const keyExtractor = useCallback((item: AlarmCardProps) => item.alarmId, []);
-
-  const getItemLayout = useCallback((data: any, index: number) => ({
-    length: 88, // 카드 높이 + 마진 (대략적인 값)
-    offset: 88 * index,
-    index,
-  }), []);
+  const handleAlarmPress = (item: any) => {
+    setModalData({
+      alarmId: item.alarmId,
+      alarmTitle: item.alarmTitle,
+      regionName: item.regionName,
+      regionLocation: item.regionLocation,
+      machineStatus: item.machineStatus,
+      model: item.model,
+      createdAt: item.createdAt,
+      message: item.message,
+      type: item.type,
+    });
+    
+    setModalVisible(true);
+  };
 
   return (
     <View style={styles.container}>
-      <FlatList
-        data={alarmData}
-        renderItem={renderAlarmItem}
-        keyExtractor={keyExtractor}
-        getItemLayout={getItemLayout}
-        removeClippedSubviews={true}
-        maxToRenderPerBatch={15}
-        windowSize={10}
-        initialNumToRender={10}
-        updateCellsBatchingPeriod={50}
-        showsVerticalScrollIndicator={false}
+      <ScrollView 
+        style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
-      />
+        showsVerticalScrollIndicator={false}
+      >
+        {alarmData.map((item, index) => (
+          <React.Fragment key={item.alarmId}>
+            <AlarmCard
+              alarmId={item.alarmId}
+              machineStatus={item.machineStatus}
+              alarmTitle={item.alarmTitle}
+              regionName={item.regionName}
+              regionLocation={item.regionLocation}
+              model={item.model}
+              createdAt={item.createdAt}
+              message={item.message}
+              type={item.type}
+              onPress={() => handleAlarmPress(item)}
+            />
+          </React.Fragment>
+        ))}
+      </ScrollView>
     </View>
   );
 };
@@ -49,6 +60,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.backgroundSecondary,
+  },
+  scrollView: {
+    flex: 1,
   },
   scrollContent: {
     paddingTop: 12,

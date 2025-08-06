@@ -1,48 +1,52 @@
 // components/screens/alarmCard.tsx
 import { AlarmData } from '@/assets/data/alarmData';
 import React from 'react';
-import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useTimeStore } from '../../shared/store/timeStore';
 import { Colors, getBorderColor } from '../../shared/styles/global';
 
-const AlarmCard: React.FC<AlarmData> = React.memo(({ 
-  alarmTitle, 
-  regionName, 
-  regionLocation, 
-  machineStatus, 
-  timestamp, 
-  onPress 
-}) => {
-  // 무거운 계산 캐싱
-  const borderColor = React.useMemo(() => getBorderColor(machineStatus), [machineStatus]);
+const AlarmCard: React.FC<AlarmData> = (props) => {
+  // props 구조 분해를 안전하게 처리
+  const {
+    alarmTitle = '',
+    regionName = '',
+    regionLocation = '',
+    machineStatus = 'unknown',
+    createdAt,
+    onPress,
+    ...otherProps
+  } = props;
+
+  const borderColor = getBorderColor(machineStatus);
+  const getRelativeTime = useTimeStore((state) => state.getRelativeTime);
   
-  // 동적 스타일 캐싱
-  const cardStyle = React.useMemo(() => [
-    styles.card, 
-    { borderColor, borderWidth: 2 }
-  ], [borderColor]);
+  const timestamp = React.useMemo(() => {
+    try {
+      if (!createdAt) return '시간 정보 없음';
+      const result = getRelativeTime(createdAt);
+      return String(result);
+    } catch (error) {
+      console.error('Timestamp 계산 오류:', error);
+      return '시간 정보 없음';
+    }
+  }, [createdAt, getRelativeTime]);
 
   return (
-    <TouchableOpacity style={cardStyle} onPress={onPress}>
+    <TouchableOpacity 
+      style={[styles.card, { borderColor, borderWidth: 2 }]} 
+      onPress={onPress}
+    >
       <View style={styles.content}>
         <View style={styles.textContainer}>
           <Text style={styles.title}>{alarmTitle}</Text>
-          {regionName && <Text style={styles.subtitle}>{regionName}</Text>}
-          {regionLocation && <Text style={styles.subtitle}>{regionLocation}</Text>}
+          <Text style={styles.subtitle}>{regionName}</Text>
+          <Text style={styles.subtitle}>{regionLocation}</Text>
         </View>
-        {timestamp && <Text style={styles.timestamp}>{timestamp}</Text>}
+        <Text style={styles.timestamp}>{timestamp}</Text>
       </View>
     </TouchableOpacity>
   );
-}, (prevProps, nextProps) => {
-  // 커스텀 비교 함수 - 핵심 데이터만 비교
-  return (
-    prevProps.machineStatus === nextProps.machineStatus &&
-    prevProps.timestamp === nextProps.timestamp &&
-    prevProps.alarmTitle === nextProps.alarmTitle
-  );
-});
-
-AlarmCard.displayName = 'AlarmCard';
+};
 
 const styles = StyleSheet.create({
   card: {
@@ -50,17 +54,14 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginHorizontal: 16,
     marginVertical: 6,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-      },
-      android: {
-        elevation: 3,
-      },
-    }),
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   content: {
     padding: 16,
