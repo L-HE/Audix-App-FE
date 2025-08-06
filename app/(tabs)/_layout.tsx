@@ -1,8 +1,7 @@
 // app/(tabs)/_layout.tsx
-import { Slot, usePathname, useSegments } from 'expo-router';
+import { Slot, useSegments, usePathname } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import Animated, { FadeInDown } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import AppBar from '../../components/common/appBar';
@@ -43,13 +42,7 @@ function TabsLayoutContent() {
         <AppBar currentId={currentId} />
         
         <View style={styles.slot}>
-          <Animated.View
-            key={pathname}
-            style={styles.animatedSlot}
-            entering={FadeInDown.duration(200)}
-          >
-            <Slot />
-          </Animated.View>
+          <Slot />
         </View>
 
         <BottomNav />
@@ -73,9 +66,6 @@ const styles = StyleSheet.create({
   slot: {
     flex: 1,
     position: 'relative',
-  },
-  animatedSlot: {
-    flex: 1,
   },
   loadingContainer: {
     flex: 1,
