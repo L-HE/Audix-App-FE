@@ -2,8 +2,9 @@
 import { Colors } from '@/shared/styles/global';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React from 'react';
+import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import LogoutModal from '../../../components/screens/logoutModal';
 
 export const headerShown = false;
 
@@ -29,6 +30,26 @@ const MenuItem: React.FC<MenuItemProps> = ({ icon, title, subtitle, onPress }) =
 
 const MenuScreen: React.FC = () => {
   const router = useRouter();
+  
+  // 모달 상태 관리
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+  // 로그아웃 모달 보이기
+  const handleLogoutPress = () => {
+    setShowLogoutModal(true);
+  };
+
+  // 로그아웃 모달 취소
+  const handleLogoutCancel = () => {
+    setShowLogoutModal(false);
+  };
+
+  // 로그아웃 모달 확인
+  const handleLogoutConfirm = () => {
+    setShowLogoutModal(false);
+    // 로그아웃 로직 실행
+    router.replace('/(auth)/login');
+  };
 
   const menuItems = [
     {
@@ -58,10 +79,7 @@ const MenuScreen: React.FC = () => {
     {
       icon: 'exit-outline' as const,
       title: '로그아웃',
-      onPress: () => {
-        // 로그아웃 로직
-        router.replace('/(auth)/login');
-      },
+      onPress: handleLogoutPress, // 모달 표시 함수 연결
     },
   ];
 
@@ -80,6 +98,13 @@ const MenuScreen: React.FC = () => {
           ))}
         </View>
       </ScrollView>
+
+      {/* 로그아웃 확인 모달*/}
+      <LogoutModal
+        visible={showLogoutModal}
+        onCancel={handleLogoutCancel}
+        onConfirm={handleLogoutConfirm}
+      />
     </View>
   );
 };
