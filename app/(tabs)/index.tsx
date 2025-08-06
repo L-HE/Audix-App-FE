@@ -10,11 +10,9 @@ import { useRefreshStore } from '../../shared/store/refreshStore';
 import { webSocketClient } from '../../shared/websocket/client';
 export const headerShown = false;
 
-type CardState = 'danger' | 'warning' | 'normal' | 'unknown';
-
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
-const STATE_ORDER_MAP = { danger: 0, warning: 1, normal: 2, unknown: 3 } as const;
+const STATE_ORDER_MAP = { danger: 0, warning: 1, normal: 2, fixing: 3, mic_issue: 4 } as const;
 
 const AreaScreen: React.FC = () => {
   const router = useRouter();

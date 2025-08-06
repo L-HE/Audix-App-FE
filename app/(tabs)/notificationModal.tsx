@@ -11,15 +11,36 @@ import { Colors } from '../../shared/styles/global';
 const NotificationModal: React.FC = () => {
   const { modalVisible, modalData, hideModal } = useModal();
 
-  // modalData가 없으면 모달을 표시하지 않음
+  // ✅ Hook을 먼저 모두 호출
+  const displayTitle = React.useMemo(() => {
+    // modalData가 없으면 기본값 반환
+    if (!modalData) return '';
+    
+    // safety 타입이면 항상 '안전 사고 발생'
+    if (modalData.type === 'safety') {
+      return '안전 사고 발생';
+    }
+    
+    // machine 타입이면 status에 따라 매핑
+    const STATUS_LABELS: Record<CardState, string> = {
+      danger: '위험',
+      warning: '점검 요망',
+      normal: '정상',
+      fixing: '점검 중',
+      mic_issue: '마이크 미연결',
+    };
+    
+    return STATUS_LABELS[modalData.status];
+  }, [modalData?.type, modalData?.status]);
+
   if (!modalData) return null;
 
   const STATUS_COLORS: Record<CardState, string> = {
     danger: Colors.danger,
     warning: Colors.warning,
     normal: Colors.normal,
-    fixing: Colors.textSecondary,
-    unknown: Colors.textSecondary,
+    fixing: Colors.fixing,
+    mic_issue: Colors.mic_issue,
   };
 
   const STATUS_LABELS: Record<CardState, string> = {
@@ -27,17 +48,16 @@ const NotificationModal: React.FC = () => {
     warning: '점검 요망',
     normal: '정상',
     fixing: '점검 중',
-    unknown: '알 수 없음',
+    mic_issue: '마이크 미연결',
   };
 
   const ALARM_LABELS: Record<AlarmType, string> = {
     machine: '장비 알람',
     safety: '비상 알람',
-    other: '장비 상태',
   };
   
-  const topColor = STATUS_COLORS[modalData.machineStatus];
-  const statusLabel = STATUS_LABELS[modalData.machineStatus];
+  const topColor = STATUS_COLORS[modalData.status];
+  const statusLabel = STATUS_LABELS[modalData.status];
   const alarmType = ALARM_LABELS[modalData.type];
 
   // safety 타입일 때 본문 배경색 결정

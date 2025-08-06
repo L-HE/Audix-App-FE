@@ -1,100 +1,103 @@
 // assets/data/alarmData.ts
 import { CardState } from '../data/areaData';
 
-// 알람 타입 정의: 장비, 안전, 기타(복구 중 혹은 복구 완료)
-export type AlarmType = 'machine' | 'safety' | 'other';
+// 알람 타입 정의: 장비, 안전
+export type AlarmType = 'machine' | 'safety';
 
 export interface AlarmData {
   alarmId: string;
-  machineStatus: CardState;
-  alarmTitle: string;
+  status: CardState;
   regionName: string;
   regionLocation: string;
   model: string;
   createdAt: Date;
   message: string;
   type: AlarmType;
-  onPress: () => void;
 }
 
-export type AlarmCardProps = Omit<AlarmData, 'onPress'>;
+export interface AlarmCardProps extends AlarmData {
+  onPress: () => void; // ✅ UI 컴포넌트용 props에만 onPress 포함
+}
 
-export const alarmData: AlarmCardProps[] = [
+export const alarmData: AlarmData[] = [
   {
-    alarmId: '7',
-    machineStatus: 'warning',
-    alarmTitle: '점검 요망',
+    alarmId: '8',
+    status: 'warning',
     regionName: 'A-1구역',
     regionLocation: '2층 자동차 부재료 조립구역',
     model: 'SO-ARM101',
     createdAt: new Date(Date.now() - 14 * 60 * 1000),
-    message: "현재 장비에서 이상음이 감지됩니다. 점검이 필요합니다.",
+    message: "현재 장비에서 이상음이 감지됩니다.\n점검이 필요합니다.",
     type: 'machine',
   },
   {
-    alarmId: '6',
-    machineStatus: 'warning',
-    alarmTitle: '점검 요망',
+    alarmId: '7',
+    status: 'danger',
     regionName: 'A-1구역',
     regionLocation: '2층 자동차 부재료 조립구역',
     model: 'SO-ARM102',
     createdAt: new Date(Date.now() - 17 * 60 * 60 * 1000),
-    message: "현재 장비에서 이상음이 감지됩니다. 점검이 필요합니다.",
+    message: "현재 장비에서 이상음이 감지됩니다.\n즉시 중단이 필요합니다.",
     type: 'machine',
   },
   {
-    alarmId: '5',
-    machineStatus: 'normal',
-    alarmTitle: '정상 복구',
+    alarmId: '6',
+    status: 'fixing',
     regionName: 'B-2구역',
     regionLocation: '1층 전장품 검수구역',
     model: 'COMP-202',
     createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000),
-    message: "정상 복구되었습니다",
-    type: 'other',
+    message: "장비 점검 중입니다.",
+    type: 'machine',
   },
   {
-    alarmId: '4',
-    machineStatus: 'danger',
-    alarmTitle: '위험 감지',
+    alarmId: '5',
+    status: 'mic_issue',
     regionName: 'C-3구역',
     regionLocation: '지하 1층 원자재 보관구역',
     model: 'WELD-303',
     createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-    message: "현재 장비에서 이상음이 감지됩니다. 즉시 중단이 필요합니다",
+    message: "마이크가 연결되지 않았습니다.",
     type: 'machine',
   },
   {
-    alarmId: '3',
-    machineStatus: 'normal',
-    alarmTitle: '정상 복구',
-    regionName: 'D-1구역',
-    regionLocation: '3층 완제품 포장구역',
-    model: 'WELD-303',
-    createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
-    message: "정상 복구되었습니다",
-    type: 'other',
-  },
-  {
-    alarmId: '2',
-    machineStatus: 'normal',
-    alarmTitle: '정상 복구',
+    alarmId: '4',
+    status: 'danger',
     regionName: 'D-1구역',
     regionLocation: '3층 완제품 포장구역',
     model: 'CUT-404',
-    createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+    createdAt: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000),
+    message: "화재가 일어났습니다.\n즉시 대피하세요.",
+    type: 'safety',
+  },
+  {
+    alarmId: '3',
+    status: 'normal',
+    regionName: 'D-1구역',
+    regionLocation: '3층 완제품 포장구역',
+    model: 'WELD-303',
+    createdAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000),
+    message: "정상 복구되었습니다",
+    type: 'machine',
+  },
+  {
+    alarmId: '2',
+    status: 'normal',
+    regionName: 'D-1구역',
+    regionLocation: '3층 완제품 포장구역',
+    model: 'CUT-404',
+    createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
     message: "정상 복구되었습니다",
     type: 'machine',
   },
   {
     alarmId: '1',
-    machineStatus: 'danger',
-    alarmTitle: '안전 사고 발생',
+    status: 'danger',
     regionName: 'D-1구역',
     regionLocation: '3층 완제품 포장구역',
     model: 'CUT-404',
-    createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
-    message: "화재가 일어났습니다. 즉시 대피하세요.",
+    createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
+    message: "화재가 일어났습니다.\n즉시 대피하세요.",
     type: 'safety',
   },
 ];

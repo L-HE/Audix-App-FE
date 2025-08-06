@@ -1,9 +1,10 @@
 // assets/data/areaData.ts
 import { ImageSourcePropType } from 'react-native';
-import { getAreaList, Area as ApiArea } from '../../shared/api/area';
+import { Area as ApiArea, getAreaList } from '../../shared/api/area';
 import { BASE_URL } from '../../shared/api/config';
 
-export type CardState = 'danger' | 'warning' | 'normal' | 'fixing' | 'unknown';
+// CardState 타입 정의 (위험 / 점검 요망 / 정상 / 고장 / 마이크 미연결)
+export type CardState = 'danger' | 'warning' | 'normal' | 'fixing' | 'mic_issue';
 
 export interface AreaCardProps {
   id: string;
@@ -32,8 +33,16 @@ const mapStatusToState = (status: string): CardState => {
     case 'error':
     case 'critical':
       return 'danger';
+    case '고장':
+    case 'fixing':
+    case 'repair':
+      return 'fixing';
+    case '마이크 미연결':
+    case 'mic_issue':
+    case 'microphone_issue':
+      return 'mic_issue';
     default:
-      return 'unknown';
+      return 'mic_issue';
   }
 };
 
@@ -90,6 +99,6 @@ export const areaData: Area[] = [
     title: 'D-2구역',
     subtitle: '1층 전장품 검수구역',
     image: require('../images/logos/AudixLogoNavy.png'),
-    state: 'unknown',
+    state: 'mic_issue',
   },
 ];

@@ -3,10 +3,11 @@ import { CardState } from '../../assets/data/areaData';
 
 export const Colors = {
   // State Colors
-  danger: '#FF3116',
-  warning: '#FFC525',
-  normal: '#1CAA00',
-  unknown: '#D7D7D7',
+  danger: '#FF2F16', /* 빨강 (위험) */
+  warning: '#FFC525', /* 노랑 (점검요망) */
+  normal: '#1CAA00', /* 초록 (안전) */
+  fixing: '#898989', /* 연한 회색 (수리 중) */
+  mic_issue: '#515151', /* 진한 회색 (마이크 미연결) */
 
   // Background Colors
   background: '#fff',
@@ -24,6 +25,16 @@ export const Colors = {
   border: '#656565',
   borderLight: '#e0e0e0',
 
+  // Gray Colors
+  gray100: '#F2F2F2',
+  gray300: '#808080',
+
+  // Navy Colors
+  navy400: '#212E59',
+  navy100: '#303957',
+  navy500: '#21273E',
+  navy900: '#141B32',
+
 } as const;
 
 // 타입 정의
@@ -39,9 +50,10 @@ export const getBorderColor = (state: CardState): string => {
     case 'normal':
       return Colors.normal;
     case 'fixing':
-      return Colors.warning; // fixing은 warning과 같은 색상
-    case 'unknown':
+      return Colors.fixing;
+    case 'mic_issue':
+      return Colors.mic_issue;
     default:
-      return Colors.unknown;
+      return Colors.mic_issue;
   }
 };

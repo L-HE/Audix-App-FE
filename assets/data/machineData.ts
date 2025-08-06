@@ -1,8 +1,6 @@
 // assets/data/machineData.ts
-import { ImageSourcePropType } from 'react-native';
-import { CardState } from './areaData';
-import { getDevicesByAreaIdFromRedis } from '../../shared/api/device';
 import { BASE_URL } from '../../shared/api/config';
+import { getDevicesByAreaIdFromRedis } from '../../shared/api/device';
 
 export type Machine = {
   deviceId: number;
@@ -101,7 +99,7 @@ const transformDeviceToMachine = (device: any): Machine => {
   }
 
   // Redis에서 온 status가 유효한 값이면 normalScore 결과 덮어쓰기
-  const validStatuses = ['normal', 'warning', 'danger', 'fixing', 'unknown'];
+  const validStatuses = ['normal', 'warning', 'danger', 'fixing', 'mic_issue'];
   if (device.status && validStatuses.includes(device.status)) {
     console.log(`🔄 Redis status "${device.status}" 사용, normalScore 기반 "${status}" 대신`);
     status = device.status;

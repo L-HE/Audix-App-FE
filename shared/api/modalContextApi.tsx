@@ -1,12 +1,12 @@
 import React, { createContext, ReactNode, useContext, useState } from 'react';
-import { AlarmCardProps } from '../../assets/data/alarmData';
+import { AlarmData } from '../../assets/data/alarmData';
 
 interface ModalContextType {
   modalVisible: boolean;
-  modalData: AlarmCardProps | null;
+  modalData: AlarmData | null;
   setModalVisible: (visible: boolean) => void;
-  setModalData: (data: AlarmCardProps | null) => void;
-  showModal: (data: AlarmCardProps) => void;
+  setModalData: (data: AlarmData | null) => void;
+  showModal: (data: AlarmData) => void;
   hideModal: () => void;
 }
 
@@ -26,9 +26,9 @@ interface ModalProviderProps {
 
 export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
   const [modalVisible, setModalVisible] = useState(false);
-  const [modalData, setModalData] = useState<AlarmCardProps | null>(null);
+  const [modalData, setModalData] = useState<AlarmData | null>(null);
 
-  const showModal = (data: AlarmCardProps) => {
+  const showModal = (data: AlarmData) => {
     setModalData(data);
     setModalVisible(true);
   };
