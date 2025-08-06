@@ -1,4 +1,5 @@
 // app/(tabs)/notificationModal.tsx
+import { CardState } from '@/assets/data/areaData';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import RNModal from 'react-native-modal';
@@ -7,30 +8,13 @@ import { AlarmType } from '../../assets/data/alarmData';
 import { useModal } from '../../shared/api/modalContextApi';
 import { Colors } from '../../shared/styles/global';
 
-// CardState를 Status로 매핑
-type Status = 'danger' | 'warning' | 'normal' | 'fixing' | 'unknown';
-
 const NotificationModal: React.FC = () => {
   const { modalVisible, modalData, hideModal } = useModal();
 
   // modalData가 없으면 모달을 표시하지 않음
   if (!modalData) return null;
 
-  // CardState를 Status로 매핑
-  const mapCardStateToStatus = (cardState: string): Status => {
-    switch (cardState) {
-      case 'danger':
-        return 'danger';
-      case 'warning':
-        return 'warning';
-      case 'normal':
-        return 'normal';
-      default:
-        return 'fixing';
-    }
-  };
-
-  const STATUS_COLORS: Record<Status, string> = {
+  const STATUS_COLORS: Record<CardState, string> = {
     danger: Colors.danger,
     warning: Colors.warning,
     normal: Colors.normal,
@@ -38,7 +22,7 @@ const NotificationModal: React.FC = () => {
     unknown: Colors.textSecondary,
   };
 
-  const STATUS_LABELS: Record<Status, string> = {
+  const STATUS_LABELS: Record<CardState, string> = {
     danger: '위험',
     warning: '점검 요망',
     normal: '정상',
@@ -52,10 +36,13 @@ const NotificationModal: React.FC = () => {
     other: '장비 상태',
   };
   
-  const mappedStatus = mapCardStateToStatus(modalData.machineStatus as string);
-  const topColor = STATUS_COLORS[mappedStatus];
-  const statusLabel = STATUS_LABELS[mappedStatus];
+  const topColor = STATUS_COLORS[modalData.machineStatus];
+  const statusLabel = STATUS_LABELS[modalData.machineStatus];
   const alarmType = ALARM_LABELS[modalData.type];
+
+  // safety 타입일 때 본문 배경색 결정
+  const isSafetyAlarm = modalData.type === 'safety';
+  const bodyBackgroundColor = isSafetyAlarm ? Colors.danger : Colors.background;
 
   return (
     <Portal>
@@ -71,7 +58,7 @@ const NotificationModal: React.FC = () => {
         onBackButtonPress={hideModal}
         style={{ zIndex: 10000 }}
       >
-        <View style={styles.container}>
+        <View style={[styles.container, { backgroundColor: bodyBackgroundColor }]}>
           {/* 상단 컬러 헤더 */}
           <View style={[styles.header, { backgroundColor: topColor }]}>
             <Text style={styles.headerTitle}>{alarmType}</Text>
@@ -79,19 +66,42 @@ const NotificationModal: React.FC = () => {
           </View>
 
           {/* 본문 */}
-          <View style={styles.body}>
+          <View style={[styles.body, { backgroundColor: bodyBackgroundColor }]}>
             <Text style={styles.alarmTitle}>{modalData.regionName}</Text>
             <Text style={styles.alarmSubtitle}>{modalData.regionLocation}</Text>
-            <Text style={styles.alarmSubtitle}>{modalData.model}</Text>
+            
+            {/* safety 타입이 아닐 때만 model 출력 */}
+            {!isSafetyAlarm && (
+              <Text style={styles.alarmSubtitle}>{modalData.model}</Text>
+            )}
 
-            <View style={styles.messageBox}>
-              <Text style={styles.messageText}>
+            {/* LLM message box */}
+            <View style={[
+              styles.messageBox, 
+              // safety 타입일 때 메시지 박스 배경색도 조정
+              { backgroundColor: isSafetyAlarm ? 'rgba(255, 255, 255, 0.1)' : Colors.backgroundSecondary }
+            ]}>
+              <Text style={[
+                styles.messageText,
+                // safety 타입일 때 텍스트 색상도 흰색으로 변경
+                { color: isSafetyAlarm ? Colors.textPrimary : Colors.textPrimary }
+              ]}>
                 {modalData.message}
               </Text>
             </View>
 
-            <TouchableOpacity style={styles.closeButton} onPress={hideModal}>
-              <Text style={styles.closeButtonText}>닫기</Text>
+            {/* 닫기 버튼 */}
+            <TouchableOpacity 
+              style={styles.closeButton} 
+              onPress={hideModal}
+            >
+              <Text style={[
+                styles.closeButtonText,
+                // safety 타입일 때 버튼 텍스트 색상 조정
+                { color: isSafetyAlarm ? Colors.textPrimary : Colors.textPrimary }
+              ]}>
+                닫기
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -102,7 +112,6 @@ const NotificationModal: React.FC = () => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: Colors.background,
     borderRadius: 10,
     overflow: 'hidden',
     zIndex: 9999,
@@ -134,7 +143,7 @@ const styles = StyleSheet.create({
   },
   alarmSubtitle: {
     fontSize: 14,
-    color: Colors.textSecondary,
+    color: Colors.textPrimary,
     marginBottom: 8,
     textAlign: 'center',
     lineHeight: 20,
@@ -145,27 +154,24 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   messageBox: {
-    width: '100%',
-    backgroundColor: Colors.backgroundSecondary,
+    width: '80%',
     padding: 12,
     borderRadius: 6,
+    marginTop: 10,
     marginBottom: 20,
   },
   messageText: {
     fontSize: 14,
-    color: Colors.textPrimary,
     textAlign: 'center',
     lineHeight: 20,
   },
   closeButton: {
     width: '100%',
     paddingVertical: 12,
-    backgroundColor: Colors.background,
     borderRadius: 6,
     alignItems: 'center',
   },
   closeButtonText: {
-    color: Colors.textPrimary,
     fontSize: 16,
     fontWeight: '600',
   },
