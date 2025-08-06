@@ -12,18 +12,23 @@ export const Colors = {
   // Background Colors
   background: '#fff',
   backgroundSecondary: '#f2f2f2',
+  backgroundInput: '#e0e0e0',
 
-  // menu icon Colors
+  // icon Colors
   menuIcon: '#2c4d6b',
 
   // Text Colors
   textPrimary: '#000',
   textSecondary: '#666',
   textTertiary: '#777',
+  textWhite: '#fff',
+
+  // Button Colors
+  buttonPrimary: '#000', // 검정색 버튼
+  buttonDisabled: '#999', // 회색 버튼
 
   // Border Colors
   border: '#656565',
-  borderLight: '#e0e0e0',
 
   // Gray Colors
   gray100: '#F2F2F2',

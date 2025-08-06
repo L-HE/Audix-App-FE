@@ -17,10 +17,13 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showPasswordError, setShowPasswordError] = useState(false);
+  
+  // 포커스 상태 관리
+  const [userIdFocused, setUserIdFocused] = useState(false);
+  const [passwordFocused, setPasswordFocused] = useState(false);
 
   const handleLogin = async () => {
     router.replace('/(tabs)'); // 임시로 바로 이동
-
     setIsLoading(true);
     setShowPasswordError(false);
   };
@@ -54,7 +57,7 @@ export default function LoginScreen() {
                 <Ionicons 
                   name="person-circle-outline" 
                   size={35} 
-                  color="#999" 
+                  color={userIdFocused ? Colors.navy400 : "#999"} // 포커스 시 색상 변경
                 />
               </View>
               <TextInput
@@ -65,9 +68,15 @@ export default function LoginScreen() {
                 onChangeText={setUserId}
                 keyboardType="default"
                 autoCapitalize="none"
+                // 포커스 이벤트 추가
+                onFocus={() => setUserIdFocused(true)}
+                onBlur={() => setUserIdFocused(false)}
               />
             </View>
-            <View style={styles.inputDivider} />
+            <View style={[
+              styles.inputDivider,
+              { backgroundColor: userIdFocused ? Colors.navy400 : '#E0E0E0' } // 포커스 시 구분선 색상 변경
+            ]} />
           </View>
 
           <View style={styles.inputContainer}>
@@ -76,7 +85,7 @@ export default function LoginScreen() {
                 <Ionicons 
                   name="lock-closed-outline" 
                   size={35} 
-                  color="#999" 
+                  color={passwordFocused ? Colors.navy400 : "#999"} // 포커스 시 색상 변경
                 />
               </View>
               <TextInput
@@ -86,9 +95,15 @@ export default function LoginScreen() {
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry
+                // 포커스 이벤트 추가
+                onFocus={() => setPasswordFocused(true)}
+                onBlur={() => setPasswordFocused(false)}
               />
             </View>
-            <View style={styles.inputDivider} />
+            <View style={[
+              styles.inputDivider,
+              { backgroundColor: passwordFocused ? Colors.navy400 : '#E0E0E0' } // 포커스 시 구분선 색상 변경
+            ]} />
             
             {showPasswordError && (
               <Text style={styles.errorText}>
@@ -178,7 +193,7 @@ const styles = StyleSheet.create({
   },
   inputDivider: {
     height: 1,
-    backgroundColor: '#E0E0E0',
+    backgroundColor: Colors.backgroundInput,
     marginHorizontal: 12,
   },
   inputLabel: {
@@ -189,28 +204,28 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 12,
-    color: '#FF3B30',
+    color: Colors.danger,
     marginTop: 4,
     marginLeft: 32,
   },
   loginButton: {
-    backgroundColor: '#000000',
+    backgroundColor: Colors.buttonPrimary,
     paddingVertical: 16,
     borderRadius: 20,
     alignItems: 'center',
     marginTop: 20,
   },
   buttonDisabled: {
-    backgroundColor: '#999',
+    backgroundColor: Colors.buttonDisabled,
   },
   loginButtonText: {
-    color: '#FFFFFF',
+    color: Colors.textWhite,
     fontSize: 24,
     fontWeight: '600',
     letterSpacing: 1,
   },
   forgotPassword: {
-    color: '#666',
+    color: Colors.textSecondary,
     fontSize: 16,
     textAlign: 'center',
     textDecorationLine: 'underline',
