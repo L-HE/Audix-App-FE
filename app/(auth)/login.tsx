@@ -11,7 +11,6 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function LoginScreen() {
   const [userId, setUserId] = useState('');
@@ -27,7 +26,7 @@ export default function LoginScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       {/* 배경 도형들 */}
       <View style={styles.backgroundShapes}>
         <View style={styles.circle} />
@@ -113,7 +112,7 @@ export default function LoginScreen() {
           </TouchableOpacity>
         </View>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
