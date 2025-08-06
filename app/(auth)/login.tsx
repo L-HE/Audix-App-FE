@@ -1,135 +1,223 @@
 // app/(auth)/login.tsx
+import { Colors } from '@/shared/styles/global';
+import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
+  Image,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function LoginScreen() {
-  // const [email, setEmail] = useState('');
-  // const [password, setPassword] = useState('');
+  const [userId, setUserId] = useState('');
+  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showPasswordError, setShowPasswordError] = useState(false);
 
   const handleLogin = async () => {
-    router.replace('/(tabs)');
+    router.replace('/(tabs)'); // 임시로 바로 이동
+
+    setIsLoading(true);
+    setShowPasswordError(false);
   };
 
-  // const handleLogin = async () => {
-  //   if (!email || !password) {
-  //     Alert.alert('오류', '이메일과 비밀번호를 입력해주세요.');
-  //     return;
-  //   }
-
-  //   setIsLoading(true);
-  //   try {
-  //     // 실제 로그인 API 호출
-  //     await new Promise(resolve => setTimeout(resolve, 1000)); // 임시 딜레이
-      
-  //     // 로그인 성공 시 토큰 저장
-  //     // await saveAuthToken(token);
-      
-  //     // 메인 앱으로 이동
-  //     router.replace('/(tabs)');
-      
-  //   } catch (error) {
-  //     Alert.alert('로그인 실패', '이메일 또는 비밀번호가 올바르지 않습니다.');
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
-
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
+      {/* 배경 도형들 */}
+      <View style={styles.backgroundShapes}>
+        <View style={styles.circle} />
+        <Image
+          source={require('../../assets/images/pictures/login_left.png')}
+          style={styles.triangleLeft}
+        />
+      </View>
+
       <View style={styles.content}>
-        <Text style={styles.title}>Audix</Text>
-        <Text style={styles.subtitle}>AI 기반 이상음 감지 시스템</Text>
+        {/* 로고 영역 */}
+        <View style={styles.logoContainer}>
+          <Image
+            source={require('../../assets/images/logos/AudixLogoNavy.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+        </View>
 
+        {/* 입력 폼 */}
         <View style={styles.form}>
-          <TextInput
-            style={styles.input}
-            placeholder="이메일"
-            placeholderTextColor="#666"
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
+          <View style={styles.inputContainer}>
+            <Text style={styles.inputLabel}>사원번호</Text>
+            <View style={styles.inputWrapper}>
+              <View style={styles.inputIcon}>
+                <Ionicons 
+                  name="person-circle-outline" 
+                  size={20} 
+                  color="#999" 
+                />
+              </View>
+              <TextInput
+                style={styles.input}
+                placeholder="사원번호를 입력해주세요."
+                placeholderTextColor="#999"
+                value={userId}
+                onChangeText={setUserId}
+                keyboardType="default"
+                autoCapitalize="none"
+              />
+            </View>
+            <View style={styles.inputDivider} />
+          </View>
 
-          <TextInput
-            style={styles.input}
-            placeholder="비밀번호"
-            placeholderTextColor="#666"
-            secureTextEntry
-          />
+          <View style={styles.inputContainer}>
+            <Text style={styles.inputLabel}>비밀번호</Text>
+            <View style={styles.inputWrapper}>
+              <View style={styles.inputIcon}>
+                <Ionicons 
+                  name="lock-closed-outline" 
+                  size={20} 
+                  color="#999" 
+                />
+              </View>
+              <TextInput
+                style={styles.input}
+                placeholder="비밀번호를 입력해주세요."
+                placeholderTextColor="#999"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+              />
+            </View>
+            <View style={styles.inputDivider} />
+            
+            {showPasswordError && (
+              <Text style={styles.errorText}>
+                아이디 또는 비밀번호를 다시 확인해주세요.
+              </Text>
+            )}
+          </View>
 
           <TouchableOpacity
             onPress={handleLogin}
             disabled={isLoading}
-            style={[styles.button, isLoading && styles.buttonDisabled]}
+            style={[styles.loginButton, isLoading && styles.buttonDisabled]}
           >
-            <Text style={styles.buttonText}>
-              {isLoading ? '로그인 중...' : '로그인'}
+            <Text style={styles.loginButtonText}>
+              {isLoading ? '로그인 중...' : 'LOGIN'}
             </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity>
+            <Text style={styles.forgotPassword}>비밀번호 변경</Text>
           </TouchableOpacity>
         </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a1a1a',
+    backgroundColor: Colors.background,
+  },
+  backgroundShapes: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  circle: {
+    position: 'absolute',
+    backgroundColor: '#E8E8E8',
+    borderRadius: 999,
+    width: '25%',
+    height: '12%',
+    top: 100,
+    right: 50,
+  },
+  triangleLeft: {
+    position: 'absolute',
+    left: 60,
+    top: 100,
   },
   content: {
     flex: 1,
-    justifyContent: 'center',
-    paddingHorizontal: 32,
+    paddingHorizontal: '10%',
   },
-  title: {
-    fontSize: 48,
-    fontWeight: 'bold',
-    color: '#fff',
-    textAlign: 'center',
-    marginBottom: 8,
+  logoContainer: {
+    alignItems: 'center',
+    marginBottom: 15,
   },
-  subtitle: {
-    fontSize: 16,
-    color: '#999',
-    textAlign: 'center',
-    marginBottom: 48,
+  logo: {
+    width: '60%',
+    height: '60%',
+    marginBottom: '-10%',
   },
   form: {
-    gap: 16,
+    gap: 24,
+  },
+  inputContainer: {
+    marginBottom: 8,
+  },
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingBottom: 8,
+  },
+  inputIcon: {
+    width: 20,
+    marginRight: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   input: {
-    backgroundColor: '#2a2a2a',
-    color: '#fff',
-    padding: 16,
-    borderRadius: 8,
+    flex: 1,
     fontSize: 16,
+    color: '#333',
+    paddingVertical: 8,
   },
-  button: {
-    backgroundColor: '#007AFF',
-    padding: 16,
-    borderRadius: 8,
+  inputDivider: {
+    height: 1,
+    backgroundColor: '#E0E0E0',
+    marginLeft: '10%',
+  },
+  inputLabel: {
+    fontSize: 12,
+    color: '#999',
+    marginTop: 4,
+    marginLeft: 32,
+  },
+  errorText: {
+    fontSize: 12,
+    color: '#FF3B30',
+    marginTop: 4,
+    marginLeft: 32,
+  },
+  loginButton: {
+    backgroundColor: '#000000',
+    paddingVertical: 16,
+    borderRadius: 20,
     alignItems: 'center',
-    marginTop: 16,
+    marginTop: 20,
   },
   buttonDisabled: {
-    backgroundColor: '#333',
+    backgroundColor: '#999',
   },
-  buttonText: {
-    color: '#fff',
+  loginButtonText: {
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
+    letterSpacing: 1,
   },
-  linkText: {
-    color: '#007AFF',
+  forgotPassword: {
+    color: '#666',
+    fontSize: 14,
     textAlign: 'center',
-    marginTop: 16,
+    textDecorationLine: 'underline',
   },
 });
