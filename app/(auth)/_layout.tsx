@@ -1,17 +1,18 @@
 // app/(auth)/_layout.tsx
 import { Stack } from 'expo-router';
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { AuthLayoutStyles } from '../../shared/styles/screens';
 
 export default function AuthLayout() {
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
+    <SafeAreaView style={AuthLayoutStyles.container}>
+      <View style={AuthLayoutStyles.content}>
         <Stack
           screenOptions={{
             headerShown: false,
-            gestureEnabled: false, // 인증 화면에서는 스와이프 제스처 비활성화
+            gestureEnabled: false,
           }}
         >
           <Stack.Screen
@@ -20,18 +21,8 @@ export default function AuthLayout() {
               title: '로그인',
             }}
           />
-          
         </Stack>
       </View>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  content: {
-    flex: 1,
-  },
-});
