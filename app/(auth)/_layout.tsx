@@ -7,7 +7,7 @@ import { AuthLayoutStyles } from '../../shared/styles/screens';
 
 export default function AuthLayout() {
   return (
-    <SafeAreaView style={AuthLayoutStyles.container}>
+    <SafeAreaView style={AuthLayoutStyles.container} edges={['top', 'bottom']}>
       <View style={AuthLayoutStyles.content}>
         <Stack
           screenOptions={{

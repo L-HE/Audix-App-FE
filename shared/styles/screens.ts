@@ -54,7 +54,7 @@ export const LoginScreenStyles = StyleSheet.create({
     borderRadius: 999,
     width: 120,
     height: 120,
-    top: 25,
+    top: 40,
     right: 25,
   },
   triangleLeft: {

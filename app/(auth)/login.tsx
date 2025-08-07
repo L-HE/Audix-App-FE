@@ -73,7 +73,6 @@ export default function LoginScreen() {
     <KeyboardAvoidingView 
       style={LoginScreenStyles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
     >
       <ScrollView 
         ref={scrollViewRef}
@@ -81,12 +80,11 @@ export default function LoginScreen() {
         contentContainerStyle={LoginScreenStyles.scrollContent}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
-        bounces={false} // 바운스 효과 비활성화
+        bounces={false}
       >
         <View style={LoginScreenStyles.content}>
-          {/* 로고 영역 - 배경 도형들을 포함 */}
+          {/* 로고 영역 - 배경 도형들 포함 */}
           <View style={LoginScreenStyles.logoContainer}>
-            {/* 배경 도형들을 로고 영역 안으로 이동 */}
             <View style={LoginScreenStyles.backgroundShapes}>
               <View style={LoginScreenStyles.circle} />
               <Image
