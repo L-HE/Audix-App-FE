@@ -18,6 +18,13 @@ export const LoginScreenStyles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.background,
   },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    minHeight: '100%',
+  },
   backgroundShapes: {
     position: 'absolute',
     top: 0,
@@ -42,17 +49,19 @@ export const LoginScreenStyles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: '10%',
+    paddingVertical: 20,
   },
   logoContainer: {
     alignItems: 'center',
+    marginBottom: 40,
   },
   logo: {
     width: '80%',
-    height: '80%',
-    marginBottom: '-60%',
+    height: 300,
   },
   form: {
     gap: 24,
+    paddingBottom: 40,
   },
   inputContainer: {
     gap: 12,
