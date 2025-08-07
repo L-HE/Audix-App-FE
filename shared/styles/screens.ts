@@ -7,9 +7,11 @@ import { Colors } from './global';
 export const AuthLayoutStyles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: Colors.background,
   },
   content: {
     flex: 1,
+    backgroundColor: Colors.background,
   },
 });
 
@@ -17,13 +19,6 @@ export const LoginScreenStyles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.background,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    minHeight: '100%',
   },
   backgroundShapes: {
     position: 'absolute',
@@ -34,7 +29,7 @@ export const LoginScreenStyles = StyleSheet.create({
   },
   circle: {
     position: 'absolute',
-    backgroundColor: '#E8E8E8',
+    backgroundColor: Colors.backgroundIcon,
     borderRadius: 999,
     width: '25%',
     height: '12%',
@@ -46,22 +41,34 @@ export const LoginScreenStyles = StyleSheet.create({
     left: 60,
     top: 100,
   },
-  content: {
+  scrollView: {
     flex: 1,
+    backgroundColor: Colors.background,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    backgroundColor: Colors.background,
+  },
+  content: {
     paddingHorizontal: '10%',
     paddingVertical: 20,
+    backgroundColor: 'transparent',
+    zIndex: 1,
+    minHeight: '100%',
   },
   logoContainer: {
     alignItems: 'center',
     marginBottom: 40,
+    marginTop: 40,
   },
   logo: {
     width: '80%',
-    height: 300,
+    height: 200,
   },
   form: {
     gap: 24,
-    paddingBottom: 40,
+    paddingBottom: 60,
   },
   inputContainer: {
     gap: 12,

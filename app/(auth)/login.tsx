@@ -2,9 +2,10 @@
 import { Colors } from '@/shared/styles/global';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Image,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -25,6 +26,43 @@ export default function LoginScreen() {
   const [userIdFocused, setUserIdFocused] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
 
+  const passwordInputRef = useRef<TextInput>(null);
+  const scrollViewRef = useRef<ScrollView>(null);
+
+  // 키보드 이벤트 처리
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => {
+        // 키보드가 올라왔을 때 포커스된 필드로 스크롤
+        if (userIdFocused) {
+          setTimeout(() => {
+            scrollViewRef.current?.scrollTo({ y: 100, animated: true });
+          }, 100);
+        } else if (passwordFocused) {
+          setTimeout(() => {
+            scrollViewRef.current?.scrollTo({ y: 200, animated: true });
+          }, 100);
+        }
+      }
+    );
+
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        // 키보드가 내려갔을 때 원래 위치로 스크롤
+        setTimeout(() => {
+          scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+        }, 100);
+      }
+    );
+
+    return () => {
+      keyboardDidHideListener?.remove();
+      keyboardDidShowListener?.remove();
+    };
+  }, [userIdFocused, passwordFocused]);
+
   const handleLogin = async () => {
     router.replace('/(tabs)'); // 임시로 바로 이동
     setIsLoading(true);
@@ -37,21 +75,23 @@ export default function LoginScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
     >
+      {/* 배경 도형들을 스크롤 밖으로 이동 */}
+      <View style={LoginScreenStyles.backgroundShapes}>
+        <View style={LoginScreenStyles.circle} />
+        <Image
+          source={require('../../assets/images/pictures/login_left.png')}
+          style={LoginScreenStyles.triangleLeft}
+        />
+      </View>
+
       <ScrollView 
+        ref={scrollViewRef}
         style={LoginScreenStyles.scrollView}
         contentContainerStyle={LoginScreenStyles.scrollContent}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
+        bounces={false} // 바운스 효과 비활성화
       >
-        {/* 배경 도형들 */}
-        <View style={LoginScreenStyles.backgroundShapes}>
-          <View style={LoginScreenStyles.circle} />
-          <Image
-            source={require('../../assets/images/pictures/login_left.png')}
-            style={LoginScreenStyles.triangleLeft}
-          />
-        </View>
-
         <View style={LoginScreenStyles.content}>
           {/* 로고 영역 */}
           <View style={LoginScreenStyles.logoContainer}>
@@ -82,8 +122,13 @@ export default function LoginScreen() {
                   keyboardType="default"
                   autoCapitalize="none"
                   returnKeyType="next"
+                  autoFocus={true} // 자동 포커스 활성화
                   onFocus={() => setUserIdFocused(true)}
                   onBlur={() => setUserIdFocused(false)}
+                  onSubmitEditing={() => {
+                    // 다음 TextInput으로 포커스 이동 (ref 사용)
+                    passwordInputRef.current?.focus();
+                  }}
                 />
               </View>
               <View style={[
@@ -102,6 +147,7 @@ export default function LoginScreen() {
                   />
                 </View>
                 <TextInput
+                  ref={passwordInputRef}
                   style={LoginScreenStyles.input}
                   placeholder="비밀번호를 입력해주세요."
                   placeholderTextColor={Colors.textFourth}

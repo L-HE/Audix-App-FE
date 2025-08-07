@@ -14,6 +14,7 @@ export const Colors = {
   backgroundSecondary: '#f2f2f2',
   backgroundInput: '#e0e0e0',
   backgroundSafetyAlarm: 'rgba(255, 255, 255, 0.1)',
+  backgroundIcon: '#E8E8E8',
 
   // icon Colors
   menuIcon: '#2c4d6b',
