@@ -13,6 +13,7 @@ export const Colors = {
   background: '#fff',
   backgroundSecondary: '#f2f2f2',
   backgroundInput: '#e0e0e0',
+  backgroundSafetyAlarm: 'rgba(255, 255, 255, 0.1)',
 
   // icon Colors
   menuIcon: '#2c4d6b',

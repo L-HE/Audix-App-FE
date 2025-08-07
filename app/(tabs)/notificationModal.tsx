@@ -12,7 +12,7 @@ import { NotificationModalStyles } from '../../shared/styles/screens';
 const NotificationModal: React.FC = () => {
   const { modalVisible, modalData, hideModal } = useModal();
 
-  // ✅ Hook을 먼저 모두 호출
+  // Hook을 먼저 모두 호출
   const displayTitle = React.useMemo(() => {
     // modalData가 없으면 기본값 반환
     if (!modalData) return '';
@@ -100,7 +100,7 @@ const NotificationModal: React.FC = () => {
             <View style={[
               NotificationModalStyles.messageBox, 
               // safety 타입일 때 메시지 박스 배경색도 조정
-              { backgroundColor: isSafetyAlarm ? 'rgba(255, 255, 255, 0.1)' : Colors.backgroundSecondary }
+              { backgroundColor: isSafetyAlarm ? Colors.backgroundSafetyAlarm : Colors.backgroundSecondary }
             ]}>
               <Text style={[
                 NotificationModalStyles.messageText,
