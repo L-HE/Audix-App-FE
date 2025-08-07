@@ -1,7 +1,7 @@
 // app/(tabs)/_layout.tsx
-import { Slot, useSegments, usePathname } from 'expo-router';
+import { Slot, usePathname, useSegments } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import AppBar from '../../components/common/appBar';
@@ -9,7 +9,7 @@ import BottomNav from '../../components/common/bottomNav';
 import Header from '../../components/common/header';
 import LoadingScreen from '../../components/common/loadingScreen';
 import { useLoadingStore } from '../../shared/store/loadingStore';
-import { Colors } from '../../shared/styles/global';
+import { TabsLayoutStyles } from '../../shared/styles/screens';
 import NotificationModal from './notificationModal';
 
 function TabsLayoutContent() {
@@ -36,12 +36,12 @@ function TabsLayoutContent() {
   const currentId = getCurrentId();
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
-      <View style={styles.background}>
+    <SafeAreaView style={TabsLayoutStyles.safeArea} edges={['top', 'bottom']}>
+      <View style={TabsLayoutStyles.background}>
         <Header />
         <AppBar currentId={currentId} />
         
-        <View style={styles.slot}>
+        <View style={TabsLayoutStyles.slot}>
           <Slot />
         </View>
 
@@ -57,24 +57,3 @@ function TabsLayoutContent() {
 export default function TabsLayout() {
   return <TabsLayoutContent />;
 }
-
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  slot: {
-    flex: 1,
-    position: 'relative',
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: Colors.backgroundSecondary || '#2a2a2a',
-  },
-  background: {
-    flex: 1,
-    backgroundColor: Colors.backgroundSecondary || '#2a2a2a',
-  },
-});
