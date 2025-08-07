@@ -29,6 +29,7 @@ export const Colors = {
 
   // Border Colors
   border: '#656565',
+  borderLight: '#BFBFBF',
 
   // Gray Colors
   gray100: '#F2F2F2',
