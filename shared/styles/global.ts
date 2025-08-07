@@ -17,11 +17,13 @@ export const Colors = {
 
   // icon Colors
   menuIcon: '#2c4d6b',
+  loginIcon: '#999', // 회색 아이콘
 
   // Text Colors
   textPrimary: '#000',
   textSecondary: '#666',
   textTertiary: '#777',
+  textFourth: '#888',
   textWhite: '#fff',
 
   // Button Colors

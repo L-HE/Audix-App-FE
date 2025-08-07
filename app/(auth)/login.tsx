@@ -57,13 +57,13 @@ export default function LoginScreen() {
                 <Ionicons 
                   name="person-circle-outline" 
                   size={35} 
-                  color={userIdFocused ? Colors.navy400 : "#999"} // 포커스 시 색상 변경
+                  color={userIdFocused ? Colors.navy400 : Colors.loginIcon} // 포커스 시 색상 변경
                 />
               </View>
               <TextInput
                 style={LoginScreenStyles.input}
                 placeholder="사원번호를 입력해주세요."
-                placeholderTextColor="#999"
+                placeholderTextColor={Colors.textFourth}
                 value={userId}
                 onChangeText={setUserId}
                 keyboardType="default"
@@ -75,7 +75,7 @@ export default function LoginScreen() {
             </View>
             <View style={[
               LoginScreenStyles.inputDivider,
-              { backgroundColor: userIdFocused ? Colors.navy400 : '#E0E0E0' } // 포커스 시 구분선 색상 변경
+              { backgroundColor: userIdFocused ? Colors.navy400 : Colors.backgroundInput } // 포커스 시 구분선 색상 변경
             ]} />
           </View>
 
@@ -85,13 +85,13 @@ export default function LoginScreen() {
                 <Ionicons 
                   name="lock-closed-outline" 
                   size={35} 
-                  color={passwordFocused ? Colors.navy400 : "#999"} // 포커스 시 색상 변경
+                  color={passwordFocused ? Colors.navy400 : Colors.loginIcon} // 포커스 시 색상 변경
                 />
               </View>
               <TextInput
                 style={LoginScreenStyles.input}
                 placeholder="비밀번호를 입력해주세요."
-                placeholderTextColor="#999"
+                placeholderTextColor={Colors.textFourth}
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry
@@ -102,7 +102,7 @@ export default function LoginScreen() {
             </View>
             <View style={[
               LoginScreenStyles.inputDivider,
-              { backgroundColor: passwordFocused ? Colors.navy400 : '#E0E0E0' } // 포커스 시 구분선 색상 변경
+              { backgroundColor: passwordFocused ? Colors.navy400 : Colors.backgroundInput } // 포커스 시 구분선 색상 변경
             ]} />
             
             {showPasswordError && (
