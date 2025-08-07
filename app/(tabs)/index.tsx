@@ -1,7 +1,7 @@
 // app/index.tsx
 import { useRouter } from 'expo-router';
 import React, { useEffect, useMemo, useState } from 'react';
-import { Dimensions, ScrollView, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
 
 import { Area, getAreaData } from '../../assets/data/areaData';
@@ -10,8 +10,6 @@ import { useRefreshStore } from '../../shared/store/refreshStore';
 import { AreaScreenStyles } from '../../shared/styles/screens';
 import { webSocketClient } from '../../shared/websocket/client';
 export const headerShown = false;
-
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 const STATE_ORDER_MAP = { danger: 0, warning: 1, normal: 2, fixing: 3, mic_issue: 4 } as const;
 
@@ -56,7 +54,7 @@ const AreaScreen: React.FC = () => {
     }
   }, [refreshTrigger]);
 
-  // 2) useMemo 로 정렬된 배열 생성 (매 렌더링마다 불필요한 sort 방지)
+  // useMemo 로 정렬된 배열 생성 (매 렌더링마다 불필요한 sort 방지)
   const sortedCards = useMemo(() => {
     if (areas.length === 0) return [];
     return areas.slice().sort(
@@ -72,7 +70,7 @@ const AreaScreen: React.FC = () => {
         {loading ? (
           <Animated.Text
             entering={FadeIn.duration(300)}
-            style={{ color: '#666', textAlign: 'center', marginTop: 50 }}
+            style={AreaScreenStyles.loadingText}
           >
             구역 정보를 불러오는 중...
           </Animated.Text>

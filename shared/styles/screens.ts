@@ -146,6 +146,11 @@ export const AreaScreenStyles = StyleSheet.create({
     flexGrow: 1,
     padding: 16,
   },
+  loadingText: {
+    color: Colors.textSecondary,
+    textAlign: 'center',
+    marginTop: 50
+  },
 });
 
 export const AlarmsScreenStyles = StyleSheet.create({
