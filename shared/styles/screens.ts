@@ -117,67 +117,101 @@ export const LoginScreenStyles = StyleSheet.create({
 // =====================================
 // Tab Screens Styles
 // =====================================
-export const AreaScreenStyles = StyleSheet.create({
-  container: {
+export const TabsLayoutStyles = StyleSheet.create({
+  safeArea: {
     flex: 1,
     backgroundColor: Colors.background,
   },
+  slot: {
+    flex: 1,
+    position: 'relative',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: Colors.backgroundSecondary || '#2a2a2a',
+  },
+  background: {
+    flex: 1,
+    backgroundColor: Colors.backgroundSecondary || '#2a2a2a',
+  },
+});
+
+export const AreaScreenStyles = StyleSheet.create({
+  container: {
+    flex: 1
+  },
   body: {
-    paddingHorizontal: 16,
-    paddingTop: 16,
+    flexGrow: 1,
+    padding: 16,
   },
 });
 
 export const AlarmsScreenStyles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: Colors.backgroundSecondary,
   },
-  scrollView: {
+  flatList: {
     flex: 1,
   },
-  content: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+  contentContainer: {
+    paddingTop: 12,
+    paddingBottom: 20,
   },
 });
 
 export const MenuScreenStyles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: '#f5f5f5',
   },
-  content: {
+  scrollView: {
     flex: 1,
-    paddingHorizontal: 16,
-    paddingTop: 16,
+  },
+  section: {
+    backgroundColor: '#ffffff',
+    marginTop: 20,
+    marginHorizontal: 16,
+    borderRadius: 12,
+    overflow: 'hidden',
   },
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 16,
-    paddingHorizontal: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
+    padding: 16,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: '#E5E5EA',
   },
   menuIcon: {
-    marginRight: 16,
+    marginRight: 12,
   },
-  menuContent: {
+  menuText: {
     flex: 1,
   },
   menuTitle: {
     fontSize: 16,
-    fontWeight: '600',
-    color: Colors.textPrimary,
-    marginBottom: 4,
+    fontWeight: '500',
+    color: '#000000',
   },
   menuSubtitle: {
     fontSize: 14,
-    color: Colors.textSecondary,
+    color: '#8E8E93',
+    marginTop: 2,
   },
-  menuArrow: {
-    marginLeft: 8,
+});
+
+// =====================================
+// Stack Screens Styles
+// =====================================
+export const DetailScreenStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: Colors.backgroundSecondary,
+  },
+  content: {
+    padding: 16
   },
 });
 
@@ -185,18 +219,11 @@ export const MenuScreenStyles = StyleSheet.create({
 // Modal Styles
 // =====================================
 export const NotificationModalStyles = StyleSheet.create({
-  modal: {
-    margin: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   container: {
     borderRadius: 10,
     overflow: 'hidden',
     zIndex: 9999,
     elevation: 1000,
-    maxHeight: '80%',
-    width: '90%',
   },
   header: {
     paddingVertical: 16,
@@ -235,7 +262,7 @@ export const NotificationModalStyles = StyleSheet.create({
     marginBottom: 16,
   },
   messageBox: {
-    width: '100%',
+    width: '80%',
     padding: 12,
     borderRadius: 6,
     marginTop: 10,
@@ -258,53 +285,3 @@ export const NotificationModalStyles = StyleSheet.create({
   },
 });
 
-// =====================================
-// Component Styles
-// =====================================
-export const SearchInputStyles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Colors.backgroundSecondary,
-    borderRadius: 25,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderWidth: 1,
-    borderColor: Colors.border,
-  },
-  icon: {
-    marginRight: 8,
-  },
-  input: {
-    flex: 1,
-    fontSize: 16,
-    color: Colors.textPrimary,
-    paddingVertical: 0,
-  },
-});
-
-export const BottomNavStyles = StyleSheet.create({
-  tabBar: {
-    flexDirection: 'row',
-    borderTopWidth: 1,
-    borderColor: '#e0e0e0',
-    backgroundColor: '#fff',
-  },
-  tabItem: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 8,
-  },
-  areaIconContainer: {
-    borderRadius: 999,
-    backgroundColor: Colors.menuIcon,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  tabText: {
-    color: Colors.textPrimary,
-    fontSize: 12,
-    marginTop: 4,
-  },
-});

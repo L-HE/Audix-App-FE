@@ -1,8 +1,8 @@
 // app/(tabs)/alarms/index.tsx
 import React, { useCallback, useMemo, useState } from 'react';
-import { FlatList, ListRenderItem, StyleSheet, View } from 'react-native';
+import { FlatList, ListRenderItem, View } from 'react-native';
 
-import { Colors } from '@/shared/styles/global';
+import { AlarmsScreenStyles } from '@/shared/styles/screens';
 import { AlarmData, alarmData } from '../../../assets/data/alarmData';
 import AlarmCard from '../../../components/screens/alarmCard';
 import { useModal } from '../../../shared/api/modalContextApi';
@@ -53,14 +53,14 @@ const AlarmScreen: React.FC = () => {
   }, [paginatedData.length]);
 
   return (
-    <View style={styles.container}>
+    <View style={AlarmsScreenStyles.container}>
       {/* FlatList 타입 명시 */}
       <FlatList<AlarmData>
         data={paginatedData}
         renderItem={renderAlarmCard}
         keyExtractor={keyExtractor}
-        style={styles.flatList}
-        contentContainerStyle={styles.contentContainer}
+        style={AlarmsScreenStyles.flatList}
+        contentContainerStyle={AlarmsScreenStyles.contentContainer}
         showsVerticalScrollIndicator={false}
         onEndReached={loadMore}
         onEndReachedThreshold={0.5}
@@ -77,19 +77,5 @@ const AlarmScreen: React.FC = () => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.backgroundSecondary,
-  },
-  flatList: {
-    flex: 1,
-  },
-  contentContainer: {
-    paddingTop: 12,
-    paddingBottom: 20,
-  },
-});
 
 export default AlarmScreen;
