@@ -1,12 +1,13 @@
 // app/index.tsx
 import { useRouter } from 'expo-router';
 import React, { useEffect, useMemo, useState } from 'react';
-import { Dimensions, ScrollView, StyleSheet, View } from 'react-native';
+import { Dimensions, ScrollView, View } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
 
 import { Area, getAreaData } from '../../assets/data/areaData';
 import AreaCard from '../../components/screens/areaCard';
 import { useRefreshStore } from '../../shared/store/refreshStore';
+import { AreaScreenStyles } from '../../shared/styles/screens';
 import { webSocketClient } from '../../shared/websocket/client';
 export const headerShown = false;
 
@@ -66,8 +67,8 @@ const AreaScreen: React.FC = () => {
   }, [areas]);
 
   return (
-    <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.body}>
+    <View style={AreaScreenStyles.container}>
+      <ScrollView contentContainerStyle={AreaScreenStyles.body}>
         {loading ? (
           <Animated.Text
             entering={FadeIn.duration(300)}
@@ -96,13 +97,3 @@ const AreaScreen: React.FC = () => {
 };
 
 export default AreaScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  },
-  body: {
-    flexGrow: 1,
-    padding: 16,
-  },
-});

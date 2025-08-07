@@ -1,12 +1,13 @@
 // app/(tabs)/notificationModal.tsx
 import { CardState } from '@/assets/data/areaData';
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 import RNModal from 'react-native-modal';
 import { Portal } from 'react-native-portalize';
 import { AlarmType } from '../../assets/data/alarmData';
 import { useModal } from '../../shared/api/modalContextApi';
 import { Colors } from '../../shared/styles/global';
+import { NotificationModalStyles } from '../../shared/styles/screens';
 
 const NotificationModal: React.FC = () => {
   const { modalVisible, modalData, hideModal } = useModal();
@@ -78,31 +79,31 @@ const NotificationModal: React.FC = () => {
         onBackButtonPress={hideModal}
         style={{ zIndex: 10000 }}
       >
-        <View style={[styles.container, { backgroundColor: bodyBackgroundColor }]}>
+        <View style={[NotificationModalStyles.container, { backgroundColor: bodyBackgroundColor }]}>
           {/* 상단 컬러 헤더 */}
-          <View style={[styles.header, { backgroundColor: topColor }]}>
-            <Text style={styles.headerTitle}>{alarmType}</Text>
-            <Text style={styles.headerStatus}>{statusLabel}</Text>
+          <View style={[NotificationModalStyles.header, { backgroundColor: topColor }]}>
+            <Text style={NotificationModalStyles.headerTitle}>{alarmType}</Text>
+            <Text style={NotificationModalStyles.headerStatus}>{statusLabel}</Text>
           </View>
 
           {/* 본문 */}
-          <View style={[styles.body, { backgroundColor: bodyBackgroundColor }]}>
-            <Text style={styles.alarmTitle}>{modalData.regionName}</Text>
-            <Text style={styles.alarmSubtitle}>{modalData.regionLocation}</Text>
+          <View style={[NotificationModalStyles.body, { backgroundColor: bodyBackgroundColor }]}>
+            <Text style={NotificationModalStyles.alarmTitle}>{modalData.regionName}</Text>
+            <Text style={NotificationModalStyles.alarmSubtitle}>{modalData.regionLocation}</Text>
             
             {/* safety 타입이 아닐 때만 model 출력 */}
             {!isSafetyAlarm && (
-              <Text style={styles.alarmSubtitle}>{modalData.model}</Text>
+              <Text style={NotificationModalStyles.alarmSubtitle}>{modalData.model}</Text>
             )}
 
             {/* LLM message box */}
             <View style={[
-              styles.messageBox, 
+              NotificationModalStyles.messageBox, 
               // safety 타입일 때 메시지 박스 배경색도 조정
               { backgroundColor: isSafetyAlarm ? 'rgba(255, 255, 255, 0.1)' : Colors.backgroundSecondary }
             ]}>
               <Text style={[
-                styles.messageText,
+                NotificationModalStyles.messageText,
                 // safety 타입일 때 텍스트 색상도 흰색으로 변경
                 { color: isSafetyAlarm ? Colors.textPrimary : Colors.textPrimary }
               ]}>
@@ -112,11 +113,11 @@ const NotificationModal: React.FC = () => {
 
             {/* 닫기 버튼 */}
             <TouchableOpacity 
-              style={styles.closeButton} 
+              style={NotificationModalStyles.closeButton} 
               onPress={hideModal}
             >
               <Text style={[
-                styles.closeButtonText,
+                NotificationModalStyles.closeButtonText,
                 // safety 타입일 때 버튼 텍스트 색상 조정
                 { color: isSafetyAlarm ? Colors.textPrimary : Colors.textPrimary }
               ]}>
@@ -129,72 +130,5 @@ const NotificationModal: React.FC = () => {
     </Portal>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    borderRadius: 10,
-    overflow: 'hidden',
-    zIndex: 9999,
-    elevation: 1000,
-  },
-  header: {
-    paddingVertical: 16,
-    alignItems: 'center',
-  },
-  headerTitle: {
-    fontSize: 16,
-    color: Colors.textPrimary,
-    marginBottom: 4,
-  },
-  headerStatus: {
-    fontSize: 30,
-    color: Colors.textPrimary,
-    fontWeight: '700',
-  },
-  body: {
-    padding: 20,
-    alignItems: 'center',
-  },
-  alarmTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    marginBottom: 4,
-    color: Colors.textPrimary,
-  },
-  alarmSubtitle: {
-    fontSize: 14,
-    color: Colors.textPrimary,
-    marginBottom: 8,
-    textAlign: 'center',
-    lineHeight: 20,
-  },
-  timestamp: {
-    fontSize: 12,
-    color: Colors.textSecondary,
-    marginBottom: 16,
-  },
-  messageBox: {
-    width: '80%',
-    padding: 12,
-    borderRadius: 6,
-    marginTop: 10,
-    marginBottom: 20,
-  },
-  messageText: {
-    fontSize: 14,
-    textAlign: 'center',
-    lineHeight: 20,
-  },
-  closeButton: {
-    width: '100%',
-    paddingVertical: 12,
-    borderRadius: 6,
-    alignItems: 'center',
-  },
-  closeButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-});
 
 export default NotificationModal;

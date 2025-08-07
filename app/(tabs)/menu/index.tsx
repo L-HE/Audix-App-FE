@@ -1,9 +1,10 @@
 // app/(tabs)/menu/index.tsx
 import { Colors } from '@/shared/styles/global';
+import { MenuScreenStyles } from '@/shared/styles/screens';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import LogoutModal from '../../../components/screens/logoutModal';
 
 export const headerShown = false;
@@ -16,13 +17,13 @@ interface MenuItemProps {
 }
 
 const MenuItem: React.FC<MenuItemProps> = ({ icon, title, subtitle, onPress }) => (
-  <TouchableOpacity style={styles.menuItem} onPress={onPress}>
-    <View style={styles.menuIcon}>
+  <TouchableOpacity style={MenuScreenStyles.menuItem} onPress={onPress}>
+    <View style={MenuScreenStyles.menuIcon}>
       <Ionicons name={icon} size={24} color={Colors.menuIcon} />
     </View>
-    <View style={styles.menuText}>
-      <Text style={styles.menuTitle}>{title}</Text>
-      {subtitle && <Text style={styles.menuSubtitle}>{subtitle}</Text>}
+    <View style={MenuScreenStyles.menuText}>
+      <Text style={MenuScreenStyles.menuTitle}>{title}</Text>
+      {subtitle && <Text style={MenuScreenStyles.menuSubtitle}>{subtitle}</Text>}
     </View>
     <Ionicons name="chevron-forward" size={20} color="#C7C7CC" />
   </TouchableOpacity>
@@ -84,9 +85,9 @@ const MenuScreen: React.FC = () => {
   ];
 
   return (
-    <View style={styles.container}>
-      <ScrollView style={styles.scrollView}>
-        <View style={styles.section}>
+    <View style={MenuScreenStyles.container}>
+      <ScrollView style={MenuScreenStyles.scrollView}>
+        <View style={MenuScreenStyles.section}>
           {menuItems.map((item, index) => (
             <MenuItem
               key={index}
@@ -108,45 +109,5 @@ const MenuScreen: React.FC = () => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  scrollView: {
-    flex: 1,
-  },
-  section: {
-    backgroundColor: '#ffffff',
-    marginTop: 20,
-    marginHorizontal: 16,
-    borderRadius: 12,
-    overflow: 'hidden',
-  },
-  menuItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#E5E5EA',
-  },
-  menuIcon: {
-    marginRight: 12,
-  },
-  menuText: {
-    flex: 1,
-  },
-  menuTitle: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#000000',
-  },
-  menuSubtitle: {
-    fontSize: 14,
-    color: '#8E8E93',
-    marginTop: 2,
-  },
-});
 
 export default MenuScreen;
