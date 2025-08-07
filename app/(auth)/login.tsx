@@ -75,15 +75,6 @@ export default function LoginScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
     >
-      {/* 배경 도형들을 스크롤 밖으로 이동 */}
-      <View style={LoginScreenStyles.backgroundShapes}>
-        <View style={LoginScreenStyles.circle} />
-        <Image
-          source={require('../../assets/images/pictures/login_left.png')}
-          style={LoginScreenStyles.triangleLeft}
-        />
-      </View>
-
       <ScrollView 
         ref={scrollViewRef}
         style={LoginScreenStyles.scrollView}
@@ -93,8 +84,17 @@ export default function LoginScreen() {
         bounces={false} // 바운스 효과 비활성화
       >
         <View style={LoginScreenStyles.content}>
-          {/* 로고 영역 */}
+          {/* 로고 영역 - 배경 도형들을 포함 */}
           <View style={LoginScreenStyles.logoContainer}>
+            {/* 배경 도형들을 로고 영역 안으로 이동 */}
+            <View style={LoginScreenStyles.backgroundShapes}>
+              <View style={LoginScreenStyles.circle} />
+              <Image
+                source={require('../../assets/images/pictures/login_left.png')}
+                style={LoginScreenStyles.triangleLeft}
+              />
+            </View>
+            
             <Image
               source={require('../../assets/images/logos/AudixLogoNavy.png')}
               style={LoginScreenStyles.logo}
@@ -122,11 +122,10 @@ export default function LoginScreen() {
                   keyboardType="default"
                   autoCapitalize="none"
                   returnKeyType="next"
-                  autoFocus={true} // 자동 포커스 활성화
+                  autoFocus={true}
                   onFocus={() => setUserIdFocused(true)}
                   onBlur={() => setUserIdFocused(false)}
                   onSubmitEditing={() => {
-                    // 다음 TextInput으로 포커스 이동 (ref 사용)
                     passwordInputRef.current?.focus();
                   }}
                 />
