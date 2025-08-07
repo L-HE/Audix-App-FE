@@ -1,7 +1,7 @@
 // app/detail/[id].tsx - Redis API 버전
 import { useLocalSearchParams } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { FlatList, StyleSheet } from 'react-native';
+import { FlatList } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -11,7 +11,7 @@ import { Machine, getMachineDataByAreaId } from '../../../assets/data/machineDat
 import MachineCard from '../../../components/screens/machineCard';
 import { useLoadingStore } from '../../../shared/store/loadingStore';
 import { useRefreshStore } from '../../../shared/store/refreshStore';
-import { Colors } from '../../../shared/styles/global';
+import { DetailScreenStyles } from '../../../shared/styles/screens';
 
 type Params = { id: string };
 
@@ -84,12 +84,12 @@ const DetailScreen: React.FC = () => {
   }));
 
   return (
-    <Animated.View style={[styles.container, animatedStyle]}>
+    <Animated.View style={[DetailScreenStyles.container, animatedStyle]}>
       <FlatList
         data={sortedMachines}
         renderItem={renderMachine}
         keyExtractor={keyExtractor}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={DetailScreenStyles.content}
         maxToRenderPerBatch={10}
         windowSize={20}
         initialNumToRender={8}
@@ -100,13 +100,3 @@ const DetailScreen: React.FC = () => {
 };
 
 export default DetailScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.backgroundSecondary,
-  },
-  content: {
-    padding: 16
-  },
-});
