@@ -74,6 +74,7 @@ const NotificationModal: React.FC = () => {
         animationInTiming={400}
         animationOut="zoomOutDown"
         animationOutTiming={300}
+        statusBarTranslucent
         useNativeDriver
         onBackdropPress={hideModal}
         onBackButtonPress={hideModal}
