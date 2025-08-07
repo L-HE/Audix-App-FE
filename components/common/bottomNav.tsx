@@ -1,11 +1,10 @@
 // components/common/bottomNav.tsx
-import { Colors } from '@/shared/styles/global';
+import { BottomNavStyles } from '@/shared/styles/components';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useMemo } from 'react';
 import {
   Dimensions,
-  StyleSheet,
   Text,
   TouchableOpacity,
   View,
@@ -72,16 +71,16 @@ const BottomNavComponent: React.FC<BottomNavProps> = ({ tabs }) => {
   const items = tabs ?? defaultTabs;
 
   return (
-    <View style={styles.tabBar}>
+    <View style={BottomNavStyles.tabBar}>
       {items.map(({ icon, label, action }) => (
         <TouchableOpacity
           key={label}
-          style={styles.tabItem}
+          style={BottomNavStyles.tabItem}
           onPress={action}
           activeOpacity={0.7}
         >
           {label === 'Area' ? (
-            <View style={styles.areaIconContainer}>
+            <View style={BottomNavStyles.areaIconContainer}>
               <Ionicons
                 name={icon}
                 size={AREA_ICON_SIZE}
@@ -95,7 +94,7 @@ const BottomNavComponent: React.FC<BottomNavProps> = ({ tabs }) => {
               color="#656565"
             />
           )}
-          <Text style={styles.tabText}>{label}</Text>
+          <Text style={BottomNavStyles.tabText}>{label}</Text>
         </TouchableOpacity>
       ))}
     </View>
@@ -105,35 +104,6 @@ const BottomNavComponent: React.FC<BottomNavProps> = ({ tabs }) => {
 // React.memo로 감싸고 displayName 설정
 const BottomNav = React.memo(BottomNavComponent);
 BottomNav.displayName = 'BottomNav';
-
-// 스타일을 컴포넌트 뒤에 정의
-const styles = StyleSheet.create({
-  tabBar: {
-    height: TAB_BAR_HEIGHT,
-    flexDirection: 'row',
-    borderTopWidth: 1,
-    borderColor: '#e0e0e0',
-    backgroundColor: '#fff',
-  },
-  tabItem: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  areaIconContainer: {
-    width: AREA_ICON_CONTAINER_SIZE,
-    height: AREA_ICON_CONTAINER_SIZE,
-    borderRadius: AREA_ICON_CONTAINER_SIZE / 2,
-    backgroundColor: Colors.menuIcon,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  tabText: {
-    color: '#333',
-    fontSize: FONT_SIZE,
-    marginTop: LABEL_MARGIN,
-  },
-});
 
 // default export
 export default BottomNav;

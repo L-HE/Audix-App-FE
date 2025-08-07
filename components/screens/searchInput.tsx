@@ -1,7 +1,8 @@
 // ./components/screens/SearchInput.tsx
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { Dimensions, StyleSheet, TextInput, View } from 'react-native';
+import { Dimensions, TextInput, View } from 'react-native';
+import { SearchInputStyles } from '../../shared/styles/components';
 import { Colors } from '../../shared/styles/global';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -23,41 +24,19 @@ interface SearchInputProps {
 }
 
 const SearchInput: React.FC<SearchInputProps> = ({ placeholder }) => (
-  <View style={styles.container}>
+  <View style={SearchInputStyles.container}>
     <Ionicons 
       name="search" 
       size={ICON_SIZE} 
       color={Colors.textSecondary} 
-      style={styles.icon}
+      style={SearchInputStyles.icon}
     />
     <TextInput
       placeholder={placeholder}
-      style={styles.input}
+      style={SearchInputStyles.input}
       placeholderTextColor={Colors.textSecondary}
     />
   </View>
 );
 
 export default SearchInput;
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: SEARCH_WIDTH,
-    height: SEARCH_HEIGHT,
-    backgroundColor: Colors.background,
-    borderRadius: SEARCH_HEIGHT * 0.5,
-    paddingHorizontal: HORIZONTAL_PADDING,
-    borderWidth: 1,
-    borderColor: Colors.border,
-  },
-  icon: {
-    marginRight: 8,
-  },
-  input: {
-    flex: 1,
-    fontSize: PLACEHOLDER_FONT_SIZE, // 반응형 폰트 사이즈
-    color: Colors.textPrimary,
-  },
-});
