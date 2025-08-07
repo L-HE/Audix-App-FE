@@ -71,7 +71,7 @@ const AreaScreen: React.FC = () => {
         {loading ? (
           <Animated.Text
             entering={FadeIn.duration(300)}
-            style={{ color: '#fff', textAlign: 'center', marginTop: 50 }}
+            style={{ color: '#666', textAlign: 'center', marginTop: 50 }}
           >
             구역 정보를 불러오는 중...
           </Animated.Text>
