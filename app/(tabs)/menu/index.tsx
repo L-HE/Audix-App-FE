@@ -19,13 +19,13 @@ interface MenuItemProps {
 const MenuItem: React.FC<MenuItemProps> = ({ icon, title, subtitle, onPress }) => (
   <TouchableOpacity style={MenuScreenStyles.menuItem} onPress={onPress}>
     <View style={MenuScreenStyles.menuIcon}>
-      <Ionicons name={icon} size={24} color={Colors.menuIcon} />
+      <Ionicons name={icon} size={28} color={Colors.menuIcon} />
     </View>
     <View style={MenuScreenStyles.menuText}>
       <Text style={MenuScreenStyles.menuTitle}>{title}</Text>
       {subtitle && <Text style={MenuScreenStyles.menuSubtitle}>{subtitle}</Text>}
     </View>
-    <Ionicons name="chevron-forward" size={20} color="#C7C7CC" />
+    <Ionicons name="chevron-forward" size={20} color={Colors.buttonForward} />
   </TouchableOpacity>
 );
 
@@ -69,12 +69,6 @@ const MenuScreen: React.FC = () => {
       icon: 'chatbubble-ellipses-outline' as const,
       title: '문의하기',
       subtitle: '앱 관련 문의',
-      onPress: () => router.push('/'),
-    },
-    {
-      icon: 'help-circle-outline' as const,
-      title: '도움말',
-      subtitle: '사용 가이드 및 FAQ',
       onPress: () => router.push('/'),
     },
     {

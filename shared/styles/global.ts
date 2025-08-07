@@ -27,10 +27,12 @@ export const Colors = {
   // Button Colors
   buttonPrimary: '#000', // 검정색 버튼
   buttonDisabled: '#999', // 회색 버튼
+  buttonForward: "#C7C7CC", // 버튼 화살표 색상
 
   // Border Colors
   border: '#656565',
   borderLight: '#BFBFBF',
+  borderBottom: '#E5E5EA',
 
   // Gray Colors
   gray100: '#F2F2F2',

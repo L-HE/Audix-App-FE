@@ -170,13 +170,12 @@ export const AlarmsScreenStyles = StyleSheet.create({
 export const MenuScreenStyles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
   },
   scrollView: {
     flex: 1,
   },
   section: {
-    backgroundColor: '#ffffff',
+    backgroundColor: Colors.background,
     marginTop: 20,
     marginHorizontal: 16,
     borderRadius: 12,
@@ -187,10 +186,10 @@ export const MenuScreenStyles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#E5E5EA',
+    borderBottomColor: Colors.borderBottom,
   },
   menuIcon: {
-    marginRight: 12,
+    marginRight: 16,
   },
   menuText: {
     flex: 1,
@@ -198,11 +197,11 @@ export const MenuScreenStyles = StyleSheet.create({
   menuTitle: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#000000',
+    color: Colors.textPrimary,
   },
   menuSubtitle: {
     fontSize: 14,
-    color: '#8E8E93',
+    color: Colors.textSecondary,
     marginTop: 2,
   },
 });
