@@ -262,7 +262,7 @@ export const AlarmCardStyles = StyleSheet.create({
     borderRadius: 12,
     marginHorizontal: 16,
     marginVertical: 6,
-    shadowColor: '#000',
+    shadowColor: Colors.shadow,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -290,29 +290,12 @@ export const AlarmCardStyles = StyleSheet.create({
   subtitle: {
     fontSize: 14,
     color: Colors.textSecondary,
-    marginBottom: 2,
+    lineHeight: 20,
   },
   timestamp: {
     fontSize: 12,
     color: Colors.textTertiary,
-  },
-  statusContainer: {
-    alignItems: 'flex-end',
-  },
-  statusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    marginBottom: 4,
-  },
-  statusText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: Colors.textWhite,
-  },
-  priority: {
-    fontSize: 12,
-    fontWeight: '500',
+    marginTop: 2,
   },
 });
 
