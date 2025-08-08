@@ -4,10 +4,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useMemo } from 'react';
 import {
-  Dimensions,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 
 type IconName = React.ComponentProps<typeof Ionicons>['name'];
@@ -17,22 +16,6 @@ export interface NavItem {
   label: string;
   action: () => void;
 }
-
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
-
-// 비율 상수를 컴포넌트 외부로 이동
-const TAB_BAR_HEIGHT_RATIO = 0.1;
-const ICON_RATIO = 0.07;
-const TEXT_RATIO = 0.03;
-const LABEL_MARGIN_RATIO = 0.005;
-
-const TAB_BAR_HEIGHT = SCREEN_HEIGHT * TAB_BAR_HEIGHT_RATIO;
-const ICON_SIZE = SCREEN_WIDTH * ICON_RATIO;
-const AREA_CONTAINER_MULTIPLIER = 1.4;
-const AREA_ICON_CONTAINER_SIZE = ICON_SIZE * AREA_CONTAINER_MULTIPLIER;
-const AREA_ICON_SIZE = ICON_SIZE * 0.8;
-const FONT_SIZE = SCREEN_WIDTH * TEXT_RATIO;
-const LABEL_MARGIN = SCREEN_WIDTH * LABEL_MARGIN_RATIO;
 
 interface BottomNavProps {
   tabs?: NavItem[];
@@ -83,15 +66,15 @@ const BottomNavComponent: React.FC<BottomNavProps> = ({ tabs }) => {
             <View style={BottomNavStyles.areaIconContainer}>
               <Ionicons
                 name={icon}
-                size={AREA_ICON_SIZE}
-                color="#fff"
+                size={30}
+                style={BottomNavStyles.areaIcon}
               />
             </View>
           ) : (
             <Ionicons
               name={icon}
-              size={ICON_SIZE}
-              color="#656565"
+              size={35}
+              style={BottomNavStyles.tabIcon}
             />
           )}
           <Text style={BottomNavStyles.tabText}>{label}</Text>
@@ -105,5 +88,4 @@ const BottomNavComponent: React.FC<BottomNavProps> = ({ tabs }) => {
 const BottomNav = React.memo(BottomNavComponent);
 BottomNav.displayName = 'BottomNav';
 
-// default export
 export default BottomNav;

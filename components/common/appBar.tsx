@@ -1,22 +1,14 @@
 // ./components/common/appBar.tsx
 import { useSegments } from 'expo-router';
 import React from 'react';
-import { Dimensions, StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { areaData } from '../../assets/data/areaData';
-import { Colors } from '../../shared/styles/global';
+import { AppBarStyles } from '../../shared/styles/components';
 import SearchInput from '../screens/searchInput';
 
-const { height: SCREEN_HEIGHT } = Dimensions.get('window');
-const APPBAR_HEIGHT_RATIO = 0.13; // 화면 높이의 13%
-const MARGIN_BOTTOM_RATIO = 0.015; // 화면 높이의 1.5%
-const TITLE_FONT_RATIO = 0.025; // 화면 높이의 2.5%
-
-const APPBAR_HEIGHT = SCREEN_HEIGHT * APPBAR_HEIGHT_RATIO;
-const MARGIN_BOTTOM = SCREEN_HEIGHT * MARGIN_BOTTOM_RATIO;
-const TITLE_FONT_SIZE = SCREEN_HEIGHT * TITLE_FONT_RATIO;
-
+// _layout.tsx에서 전달받는 id
 interface AppBarProps {
-  currentId?: string; // _layout.tsx에서 전달받는 id
+  currentId?: string; 
 }
 
 const AppBar: React.FC<AppBarProps> = ({ currentId }) => {
@@ -56,12 +48,12 @@ const AppBar: React.FC<AppBarProps> = ({ currentId }) => {
   
   return (
     <View style={[
-      styles.appBar, 
-      !config.showSearch && styles.appBarCompact
+      AppBarStyles.appBar, 
+      !config.showSearch && AppBarStyles.appBarCompact
     ]}>
       <Text style={[
-        styles.title,
-        !config.showSearch && styles.titleCentered
+        AppBarStyles.title,
+        !config.showSearch && AppBarStyles.titleCentered
       ]}>
         {config.title}
       </Text>
@@ -73,26 +65,3 @@ const AppBar: React.FC<AppBarProps> = ({ currentId }) => {
 };
 
 export default AppBar;
-
-const styles = StyleSheet.create({
-  appBar: {
-    height: APPBAR_HEIGHT,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: Colors.background,
-    marginBottom: MARGIN_BOTTOM,
-    paddingHorizontal: 16,
-  },
-  appBarCompact: {
-    height: APPBAR_HEIGHT * 0.6,
-  },
-  title: {
-    marginBottom: 12,
-    fontSize: TITLE_FONT_SIZE,
-    fontWeight: '600',
-    color: Colors.textPrimary,
-  },
-  titleCentered: {
-    marginBottom: 0, // 검색이 없을 때 하단 마진 제거
-  },
-});

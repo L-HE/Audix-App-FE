@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { Dimensions, StyleSheet } from 'react-native';
 import { Colors } from './global';
 
 // =====================================
@@ -6,65 +6,89 @@ import { Colors } from './global';
 // =====================================
 
 // AppBar Styles
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+const APPBAR_HEIGHT_RATIO = 0.13;
+const MARGIN_BOTTOM_RATIO = 0.015;
+const TITLE_FONT_RATIO = 0.025;
+
+const APPBAR_HEIGHT = SCREEN_HEIGHT * APPBAR_HEIGHT_RATIO;
+const MARGIN_BOTTOM = SCREEN_HEIGHT * MARGIN_BOTTOM_RATIO;
+const TITLE_FONT_SIZE = SCREEN_HEIGHT * TITLE_FONT_RATIO;
+
 export const AppBarStyles = StyleSheet.create({
   appBar: {
-    height: 60,
+    height: APPBAR_HEIGHT,
+    justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: Colors.background,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    marginBottom: MARGIN_BOTTOM,
     paddingHorizontal: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.borderLight,
   },
-  leftSection: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
+  appBarCompact: {
+    height: APPBAR_HEIGHT * 0.6,
   },
-  centerSection: {
-    flex: 2,
-    alignItems: 'center',
+  title: {
+    marginBottom: 12,
+    fontSize: TITLE_FONT_SIZE,
+    fontWeight: '600',
+    color: Colors.textPrimary,
   },
-  rightSection: {
-    flex: 1,
-    alignItems: 'flex-end',
-  },
-  backButton: {
-    marginRight: 8,
-  },
-  icon: {
-    marginHorizontal: 4,
+  titleCentered: {
+    marginBottom: 0,
   },
 });
 
 // BottomNav Styles
+const TAB_BAR_HEIGHT_RATIO = 0.1;
+const ICON_RATIO = 0.085;
+const TEXT_RATIO = 0.03;
+const LABEL_MARGIN_RATIO = 0.005;
+
+const TAB_BAR_HEIGHT = SCREEN_HEIGHT * TAB_BAR_HEIGHT_RATIO;
+const ICON_SIZE = SCREEN_WIDTH * ICON_RATIO;
+const AREA_CONTAINER_MULTIPLIER = 1.4;
+const AREA_ICON_CONTAINER_SIZE = ICON_SIZE * AREA_CONTAINER_MULTIPLIER;
+const AREA_ICON_SIZE = ICON_SIZE * 0.87;
+const FONT_SIZE = SCREEN_WIDTH * TEXT_RATIO;
+const LABEL_MARGIN = SCREEN_WIDTH * LABEL_MARGIN_RATIO;
 export const BottomNavStyles = StyleSheet.create({
   tabBar: {
-    height: 80,
+    height: TAB_BAR_HEIGHT,
     flexDirection: 'row',
+    justifyContent: 'center',
+    alignContent: 'center',
     borderTopWidth: 1,
-    borderColor: '#e0e0e0',
-    backgroundColor: '#fff',
+    borderColor: Colors.borderBottom,
+    backgroundColor: Colors.background,
   },
   tabItem: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    flexDirection: 'column',
   },
   areaIconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: AREA_ICON_CONTAINER_SIZE,
+    height: AREA_ICON_CONTAINER_SIZE,
+    borderRadius: AREA_ICON_CONTAINER_SIZE / 2,
     backgroundColor: Colors.menuIcon,
     justifyContent: 'center',
     alignItems: 'center',
   },
+  areaIcon: {
+    width: AREA_ICON_SIZE,
+    height: AREA_ICON_SIZE,
+    color: Colors.iconWhite,
+  },
+  tabIcon: {
+    width: ICON_SIZE,
+    height: ICON_SIZE,
+    color: Colors.tabIcon,
+  },
   tabText: {
-    color: '#333',
-    fontSize: 12,
-    marginTop: 4,
+    color: Colors.textSecondary,
+    fontSize: FONT_SIZE,
+    marginTop: LABEL_MARGIN,
   },
 });
 
