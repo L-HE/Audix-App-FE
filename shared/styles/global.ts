@@ -15,6 +15,7 @@ export const Colors = {
   backgroundInput: '#e0e0e0',
   backgroundSafetyAlarm: 'rgba(255, 255, 255, 0.1)',
   backgroundIcon: '#E8E8E8',
+  backgroundModal: 'rgba(0, 0, 0, 0.5)',
 
   // shadow Colors
   shadow: '#000',

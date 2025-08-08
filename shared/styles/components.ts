@@ -310,7 +310,7 @@ export const AreaCardStyles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 2,
     overflow: 'hidden',
-    shadowColor: '#000',
+    shadowColor: Colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
@@ -341,54 +341,54 @@ export const AreaCardStyles = StyleSheet.create({
 export const LogoutModalStyles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: Colors.backgroundModal,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingHorizontal: 20,
   },
   modal: {
     backgroundColor: Colors.background,
     borderRadius: 12,
-    padding: 24,
-    width: '80%',
+    padding: 36,
+    width: '100%',
     maxWidth: 300,
+    alignItems: 'center',
   },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
+  modalTitle: {
+    fontSize: 16,
+    fontWeight: '500',
     color: Colors.textPrimary,
     textAlign: 'center',
-    marginBottom: 16,
-  },
-  message: {
-    fontSize: 14,
-    color: Colors.textSecondary,
-    textAlign: 'center',
-    marginBottom: 24,
+    marginTop: 16,
+    marginBottom: 46,
+    lineHeight: 22,
   },
   buttonContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    gap: 24,
+    width: '100%',
   },
   button: {
     flex: 1,
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: 'center',
-    marginHorizontal: 6,
   },
   cancelButton: {
     backgroundColor: Colors.backgroundSecondary,
   },
   confirmButton: {
-    backgroundColor: Colors.danger,
+    backgroundColor: Colors.buttonPrimary,
   },
-  cancelButtonText: {
+  cancelText: {
+    fontSize: 16,
+    fontWeight: '500',
     color: Colors.textPrimary,
-    fontWeight: '600',
   },
-  confirmButtonText: {
+  confirmText: {
+    fontSize: 16,
+    fontWeight: '500',
     color: Colors.textWhite,
-    fontWeight: '600',
   },
 });
 
