@@ -204,23 +204,50 @@ export const SplashScreenStyles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.background,
+  },
+  backgroundShapes: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 1,
+  },
+  shape: {
+    position: 'absolute',
+  },
+  topShape: {
+    top: 0,
+    left: 0,
+  },
+  bottomShape: {
+    bottom: 0,
+    right: 0,
+  },
+  content: {
+    flex: 1,
+    flexDirection: 'column',
+    gap: 20,
     justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 2,
+  },
+  logoContainer: {
     alignItems: 'center',
   },
   logo: {
-    width: 200,
-    height: 200,
-    marginBottom: 24,
+    width: 250,
+    height: 80,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: Colors.textPrimary,
-    marginBottom: 8,
+  textContainer: {
+    alignItems: 'center',
   },
   subtitle: {
     fontSize: 16,
     color: Colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 24,
+    fontWeight: '400',
   },
 });
 
