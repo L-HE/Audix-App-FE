@@ -15,15 +15,23 @@ import NotificationModal from './notificationModal';
 function TabsLayoutContent() {
   const segments = useSegments();
   const pathname = usePathname();
-  const { isLoading, loadingMessage } = useLoadingStore();
+  const { isLoading, loadingMessage, hideLoading } = useLoadingStore(); // ✅ hideLoading 추가
   const [currentPath, setCurrentPath] = useState(pathname);
 
-  // 단순한 경로 동기화
+  // ✅ 경로 변경 시 로딩 상태 초기화
   useEffect(() => {
     if (pathname !== currentPath) {
+      // 이전 경로가 [id] 스크린이었고, 현재 경로가 다르면 로딩 숨기기
+      const wasDetailScreen = currentPath.includes('/detail/');
+      const isNowDetailScreen = pathname.includes('/detail/');
+
+      if (wasDetailScreen && !isNowDetailScreen && isLoading) {
+        hideLoading(); // 로딩 상태 초기화
+      }
+
       setCurrentPath(pathname);
     }
-  }, [pathname, currentPath]);
+  }, [pathname, currentPath, isLoading, hideLoading]);
 
   // pathname에서 id 추출
   const getCurrentId = useCallback(() => {
@@ -40,14 +48,14 @@ function TabsLayoutContent() {
       <View style={TabsLayoutStyles.background}>
         <Header />
         <AppBar currentId={currentId} />
-        
+
         <View style={TabsLayoutStyles.slot}>
           <Slot />
         </View>
 
         <BottomNav />
         <NotificationModal />
-        
+
         {isLoading && <LoadingScreen message={loadingMessage} />}
       </View>
     </SafeAreaView>
