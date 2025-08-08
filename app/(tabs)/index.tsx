@@ -7,7 +7,7 @@ import Animated, { FadeIn } from 'react-native-reanimated';
 import { Area, getAreaData } from '../../assets/data/areaData';
 import AreaCard from '../../components/screens/areaCard';
 import { useRefreshStore } from '../../shared/store/refreshStore';
-import { AreaScreenStyles } from '../../shared/styles/screens';
+import { AreaScreenStyles as style } from '../../shared/styles/screens';
 import { webSocketClient } from '../../shared/websocket/client';
 export const headerShown = false;
 
@@ -65,12 +65,12 @@ const AreaScreen: React.FC = () => {
   }, [areas]);
 
   return (
-    <View style={AreaScreenStyles.container}>
-      <ScrollView contentContainerStyle={AreaScreenStyles.body}>
+    <View style={style.container}>
+      <ScrollView contentContainerStyle={style.body}>
         {loading ? (
           <Animated.Text
             entering={FadeIn.duration(300)}
-            style={AreaScreenStyles.loadingText}
+            style={style.loadingText}
           >
             구역 정보를 불러오는 중...
           </Animated.Text>

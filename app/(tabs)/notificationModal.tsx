@@ -7,7 +7,7 @@ import { Portal } from 'react-native-portalize';
 import { AlarmType } from '../../assets/data/alarmData';
 import { useModal } from '../../shared/api/modalContextApi';
 import { Colors } from '../../shared/styles/global';
-import { NotificationModalStyles } from '../../shared/styles/screens';
+import { NotificationModalStyles as style } from '../../shared/styles/screens';
 
 const NotificationModal: React.FC = () => {
   const { modalVisible, modalData, hideModal } = useModal();
@@ -80,31 +80,31 @@ const NotificationModal: React.FC = () => {
         onBackButtonPress={hideModal}
         style={{ zIndex: 10000 }}
       >
-        <View style={[NotificationModalStyles.container, { backgroundColor: bodyBackgroundColor }]}>
+        <View style={[style.container, { backgroundColor: bodyBackgroundColor }]}>
           {/* 상단 컬러 헤더 */}
-          <View style={[NotificationModalStyles.header, { backgroundColor: topColor }]}>
-            <Text style={NotificationModalStyles.headerTitle}>{alarmType}</Text>
-            <Text style={NotificationModalStyles.headerStatus}>{statusLabel}</Text>
+          <View style={[style.header, { backgroundColor: topColor }]}>
+            <Text style={style.headerTitle}>{alarmType}</Text>
+            <Text style={style.headerStatus}>{statusLabel}</Text>
           </View>
 
           {/* 본문 */}
-          <View style={[NotificationModalStyles.body, { backgroundColor: bodyBackgroundColor }]}>
-            <Text style={NotificationModalStyles.alarmTitle}>{modalData.regionName}</Text>
-            <Text style={NotificationModalStyles.alarmSubtitle}>{modalData.regionLocation}</Text>
+          <View style={[style.body, { backgroundColor: bodyBackgroundColor }]}>
+            <Text style={style.alarmTitle}>{modalData.regionName}</Text>
+            <Text style={style.alarmSubtitle}>{modalData.regionLocation}</Text>
             
             {/* safety 타입이 아닐 때만 model 출력 */}
             {!isSafetyAlarm && (
-              <Text style={NotificationModalStyles.alarmSubtitle}>{modalData.model}</Text>
+              <Text style={style.alarmSubtitle}>{modalData.model}</Text>
             )}
 
             {/* LLM message box */}
             <View style={[
-              NotificationModalStyles.messageBox, 
+              style.messageBox, 
               // safety 타입일 때 메시지 박스 배경색도 조정
               { backgroundColor: isSafetyAlarm ? Colors.backgroundSafetyAlarm : Colors.backgroundSecondary }
             ]}>
               <Text style={[
-                NotificationModalStyles.messageText,
+                style.messageText,
                 // safety 타입일 때 텍스트 색상도 흰색으로 변경
                 { color: isSafetyAlarm ? Colors.textPrimary : Colors.textPrimary }
               ]}>
@@ -114,11 +114,11 @@ const NotificationModal: React.FC = () => {
 
             {/* 닫기 버튼 */}
             <TouchableOpacity 
-              style={NotificationModalStyles.closeButton} 
+              style={style.closeButton} 
               onPress={hideModal}
             >
               <Text style={[
-                NotificationModalStyles.closeButtonText,
+                style.closeButtonText,
                 // safety 타입일 때 버튼 텍스트 색상 조정
                 { color: isSafetyAlarm ? Colors.textPrimary : Colors.textPrimary }
               ]}>

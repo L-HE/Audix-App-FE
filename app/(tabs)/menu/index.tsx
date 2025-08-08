@@ -1,6 +1,6 @@
 // app/(tabs)/menu/index.tsx
 import { Colors } from '@/shared/styles/global';
-import { MenuScreenStyles } from '@/shared/styles/screens';
+import { MenuScreenStyles as style } from '@/shared/styles/screens';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
@@ -17,13 +17,13 @@ interface MenuItemProps {
 }
 
 const MenuItem: React.FC<MenuItemProps> = ({ icon, title, subtitle, onPress }) => (
-  <TouchableOpacity style={MenuScreenStyles.menuItem} onPress={onPress}>
-    <View style={MenuScreenStyles.menuIcon}>
+  <TouchableOpacity style={style.menuItem} onPress={onPress}>
+    <View style={style.menuIcon}>
       <Ionicons name={icon} size={28} color={Colors.menuIcon} />
     </View>
-    <View style={MenuScreenStyles.menuText}>
-      <Text style={MenuScreenStyles.menuTitle}>{title}</Text>
-      {subtitle && <Text style={MenuScreenStyles.menuSubtitle}>{subtitle}</Text>}
+    <View style={style.menuText}>
+      <Text style={style.menuTitle}>{title}</Text>
+      {subtitle && <Text style={style.menuSubtitle}>{subtitle}</Text>}
     </View>
     <Ionicons name="chevron-forward" size={20} color={Colors.buttonForward} />
   </TouchableOpacity>
@@ -79,9 +79,9 @@ const MenuScreen: React.FC = () => {
   ];
 
   return (
-    <View style={MenuScreenStyles.container}>
-      <ScrollView style={MenuScreenStyles.scrollView}>
-        <View style={MenuScreenStyles.section}>
+    <View style={style.container}>
+      <ScrollView style={style.scrollView}>
+        <View style={style.section}>
           {menuItems.map((item, index) => (
             <MenuItem
               key={index}

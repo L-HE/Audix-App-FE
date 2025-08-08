@@ -14,7 +14,7 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import { LoginScreenStyles } from '../../shared/styles/screens';
+import { LoginScreenStyles as style } from '../../shared/styles/screens';
 
 export default function LoginScreen() {
   const [userId, setUserId] = useState('');
@@ -71,40 +71,40 @@ export default function LoginScreen() {
 
   return (
     <KeyboardAvoidingView 
-      style={LoginScreenStyles.container}
+      style={style.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView 
         ref={scrollViewRef}
-        style={LoginScreenStyles.scrollView}
-        contentContainerStyle={LoginScreenStyles.scrollContent}
+        style={style.scrollView}
+        contentContainerStyle={style.scrollContent}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
         bounces={false}
       >
-        <View style={LoginScreenStyles.content}>
+        <View style={style.content}>
           {/* 로고 영역 - 배경 도형들 포함 */}
-          <View style={LoginScreenStyles.logoContainer}>
-            <View style={LoginScreenStyles.backgroundShapes}>
-              <View style={LoginScreenStyles.circle} />
+          <View style={style.logoContainer}>
+            <View style={style.backgroundShapes}>
+              <View style={style.circle} />
               <Image
                 source={require('../../assets/images/pictures/login_left.png')}
-                style={LoginScreenStyles.triangleLeft}
+                style={style.triangleLeft}
               />
             </View>
             
             <Image
               source={require('../../assets/images/logos/AudixLogoNavy.png')}
-              style={LoginScreenStyles.logo}
+              style={style.logo}
               resizeMode="contain"
             />
           </View>
 
           {/* 입력 폼 */}
-          <View style={LoginScreenStyles.form}>
-            <View style={LoginScreenStyles.inputContainer}>
-              <View style={LoginScreenStyles.inputWrapper}>
-                <View style={LoginScreenStyles.inputIcon}>
+          <View style={style.form}>
+            <View style={style.inputContainer}>
+              <View style={style.inputWrapper}>
+                <View style={style.inputIcon}>
                   <Ionicons 
                     name="person-circle-outline" 
                     size={35} 
@@ -112,7 +112,7 @@ export default function LoginScreen() {
                   />
                 </View>
                 <TextInput
-                  style={LoginScreenStyles.input}
+                  style={style.input}
                   placeholder="사원번호를 입력해주세요."
                   placeholderTextColor={Colors.textFourth}
                   value={userId}
@@ -129,14 +129,14 @@ export default function LoginScreen() {
                 />
               </View>
               <View style={[
-                LoginScreenStyles.inputDivider,
+                style.inputDivider,
                 { backgroundColor: userIdFocused ? Colors.navy400 : Colors.backgroundInput }
               ]} />
             </View>
 
-            <View style={LoginScreenStyles.inputContainer}>
-              <View style={LoginScreenStyles.inputWrapper}>
-                <View style={LoginScreenStyles.inputIcon}>
+            <View style={style.inputContainer}>
+              <View style={style.inputWrapper}>
+                <View style={style.inputIcon}>
                   <Ionicons 
                     name="lock-closed-outline" 
                     size={35} 
@@ -145,7 +145,7 @@ export default function LoginScreen() {
                 </View>
                 <TextInput
                   ref={passwordInputRef}
-                  style={LoginScreenStyles.input}
+                  style={style.input}
                   placeholder="비밀번호를 입력해주세요."
                   placeholderTextColor={Colors.textFourth}
                   value={password}
@@ -158,12 +158,12 @@ export default function LoginScreen() {
                 />
               </View>
               <View style={[
-                LoginScreenStyles.inputDivider,
+                style.inputDivider,
                 { backgroundColor: passwordFocused ? Colors.navy400 : Colors.backgroundInput }
               ]} />
               
               {showPasswordError && (
-                <Text style={LoginScreenStyles.errorText}>
+                <Text style={style.errorText}>
                   아이디 또는 비밀번호를 다시 확인해주세요.
                 </Text>
               )}
@@ -172,15 +172,15 @@ export default function LoginScreen() {
             <TouchableOpacity
               onPress={handleLogin}
               disabled={isLoading}
-              style={[LoginScreenStyles.loginButton, isLoading && LoginScreenStyles.buttonDisabled]}
+              style={[style.loginButton, isLoading && style.buttonDisabled]}
             >
-              <Text style={LoginScreenStyles.loginButtonText}>
+              <Text style={style.loginButtonText}>
                 {isLoading ? '로그인 중...' : 'LOGIN'}
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity>
-              <Text style={LoginScreenStyles.forgotPassword}>비밀번호 변경</Text>
+              <Text style={style.forgotPassword}>비밀번호 변경</Text>
             </TouchableOpacity>
           </View>
         </View>

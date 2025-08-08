@@ -2,7 +2,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { FlatList, ListRenderItem, View } from 'react-native';
 
-import { AlarmsScreenStyles } from '@/shared/styles/screens';
+import { AlarmsScreenStyles as style } from '@/shared/styles/screens';
 import { AlarmData, alarmData } from '../../../assets/data/alarmData';
 import AlarmCard from '../../../components/screens/alarmCard';
 import { useModal } from '../../../shared/api/modalContextApi';
@@ -53,14 +53,14 @@ const AlarmScreen: React.FC = () => {
   }, [paginatedData.length]);
 
   return (
-    <View style={AlarmsScreenStyles.container}>
+    <View style={style.container}>
       {/* FlatList 타입 명시 */}
       <FlatList<AlarmData>
         data={paginatedData}
         renderItem={renderAlarmCard}
         keyExtractor={keyExtractor}
-        style={AlarmsScreenStyles.flatList}
-        contentContainerStyle={AlarmsScreenStyles.contentContainer}
+        style={style.flatList}
+        contentContainerStyle={style.contentContainer}
         showsVerticalScrollIndicator={false}
         onEndReached={loadMore}
         onEndReachedThreshold={0.5}

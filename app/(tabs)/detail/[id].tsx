@@ -11,7 +11,7 @@ import { Machine, getMachineDataByAreaId } from '../../../assets/data/machineDat
 import MachineCard from '../../../components/screens/machineCard';
 import { useLoadingStore } from '../../../shared/store/loadingStore';
 import { useRefreshStore } from '../../../shared/store/refreshStore';
-import { DetailScreenStyles } from '../../../shared/styles/screens';
+import { DetailScreenStyles as style } from '../../../shared/styles/screens';
 
 type Params = { id: string };
 
@@ -84,12 +84,12 @@ const DetailScreen: React.FC = () => {
   }));
 
   return (
-    <Animated.View style={[DetailScreenStyles.container, animatedStyle]}>
+    <Animated.View style={[style.container, animatedStyle]}>
       <FlatList
         data={sortedMachines}
         renderItem={renderMachine}
         keyExtractor={keyExtractor}
-        contentContainerStyle={DetailScreenStyles.content}
+        contentContainerStyle={style.content}
         maxToRenderPerBatch={10}
         windowSize={20}
         initialNumToRender={8}

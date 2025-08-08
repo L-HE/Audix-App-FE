@@ -9,7 +9,7 @@ import BottomNav from '../../components/common/bottomNav';
 import Header from '../../components/common/header';
 import LoadingScreen from '../../components/common/loadingScreen';
 import { useLoadingStore } from '../../shared/store/loadingStore';
-import { TabsLayoutStyles } from '../../shared/styles/screens';
+import { TabsLayoutStyles as style } from '../../shared/styles/screens';
 import NotificationModal from './notificationModal';
 
 function TabsLayoutContent() {
@@ -44,12 +44,12 @@ function TabsLayoutContent() {
   const currentId = getCurrentId();
 
   return (
-    <SafeAreaView style={TabsLayoutStyles.safeArea} edges={['top', 'bottom']}>
-      <View style={TabsLayoutStyles.background}>
+    <SafeAreaView style={style.safeArea} edges={['top', 'bottom']}>
+      <View style={style.background}>
         <Header />
         <AppBar currentId={currentId} />
 
-        <View style={TabsLayoutStyles.slot}>
+        <View style={style.slot}>
           <Slot />
         </View>
 

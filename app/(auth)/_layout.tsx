@@ -3,12 +3,12 @@ import { Stack } from 'expo-router';
 import React from 'react';
 import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { AuthLayoutStyles } from '../../shared/styles/screens';
+import { AuthLayoutStyles as style } from '../../shared/styles/screens';
 
 export default function AuthLayout() {
   return (
-    <SafeAreaView style={AuthLayoutStyles.container} edges={['top', 'bottom']}>
-      <View style={AuthLayoutStyles.content}>
+    <SafeAreaView style={style.container} edges={['top', 'bottom']}>
+      <View style={style.content}>
         <Stack
           screenOptions={{
             headerShown: false,
