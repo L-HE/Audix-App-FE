@@ -174,13 +174,28 @@ export const LoadingScreenStyles = StyleSheet.create({
 // SkeletonLoader Styles
 export const SkeletonLoaderStyles = StyleSheet.create({
   container: {
-    backgroundColor: Colors.backgroundSecondary,
-    borderRadius: 8,
-    overflow: 'hidden',
+    flex: 1,
+    padding: 16,
   },
-  shimmer: {
-    height: '100%',
-    width: '100%',
+  skeletonCard: {
+    backgroundColor: Colors.backgroundInput,
+    borderRadius: 12,
+    padding: 16,
+    marginVertical: 6,
+    height: 80,
+  },
+  skeletonLine: {
+    height: 16,
+    backgroundColor: Colors.gray300,
+    borderRadius: 4,
+    marginBottom: 8,
+    width: '80%',
+  },
+  skeletonLineShort: {
+    height: 12,
+    backgroundColor: Colors.gray300,
+    borderRadius: 4,
+    width: '60%',
   },
 });
 
