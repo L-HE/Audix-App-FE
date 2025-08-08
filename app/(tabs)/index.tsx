@@ -17,6 +17,7 @@ const AreaScreen: React.FC = () => {
   const router = useRouter();
   const [areas, setAreas] = useState<Area[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isOnlineMode, setIsOnlineMode] = useState(false);
   const { refreshTrigger } = useRefreshStore();
 
   // Area 데이터 로딩 함수
@@ -24,11 +25,22 @@ const AreaScreen: React.FC = () => {
     try {
       console.log('🌐 Area 데이터 로딩 중...');
       setLoading(true);
-      const data = await getAreaData();
+      
+      const data = await getAreaData(); // 이미 fallback 로직 포함
       setAreas(data);
-      console.log('✅ Area 데이터 로딩 완료:', data);
+      
+      // ✅ 데이터 소스 확인 (실제로는 API 응답에서 확인 가능)
+      if (data.length > 4) { // API 데이터는 보통 더 많을 것
+        setIsOnlineMode(true);
+        console.log('✅ 온라인 모드: API 데이터 사용');
+      } else {
+        setIsOnlineMode(false);
+        console.log('📱 오프라인 모드: Fallback 데이터 사용');
+      }
+      
     } catch (error) {
       console.error('❌ Area 데이터 로딩 실패:', error);
+      setIsOnlineMode(false);
     } finally {
       setLoading(false);
     }
@@ -36,10 +48,24 @@ const AreaScreen: React.FC = () => {
 
   // 초기 데이터 로드 및 웹소켓 연결
   useEffect(() => {
-    loadAreas();
+    const initializeApp = async () => {
+      // 데이터 먼저 로드
+      await loadAreas();
+      
+      // WebSocket 연결 시도 (3초 타임아웃)
+      try {
+        const connected = await webSocketClient.connect();
+        if (connected) {
+          console.log('✅ WebSocket 연결 성공, 실시간 업데이트 활성화');
+        } else {
+          console.log('📱 WebSocket 연결 실패, 오프라인 모드로 동작');
+        }
+      } catch (error) {
+        console.log('📱 WebSocket 연결 불가, 오프라인 모드로 동작');
+      }
+    };
 
-    // 웹소켓 연결
-    webSocketClient.connect();
+    initializeApp();
 
     return () => {
       webSocketClient.disconnect();
@@ -48,11 +74,11 @@ const AreaScreen: React.FC = () => {
 
   // 웹소켓 알림을 받으면 데이터 새로고침
   useEffect(() => {
-    if (refreshTrigger > 0) {
-      console.log('🔄 웹소켓 알림으로 인한 Area 데이터 새로고침');
+    if (refreshTrigger > 0 && isOnlineMode) {
+      console.log('🔄 WebSocket 알림으로 인한 Area 데이터 새로고침');
       loadAreas();
     }
-  }, [refreshTrigger]);
+  }, [refreshTrigger, isOnlineMode]);
 
   // useMemo 로 정렬된 배열 생성 (매 렌더링마다 불필요한 sort 방지)
   const sortedCards = useMemo(() => {

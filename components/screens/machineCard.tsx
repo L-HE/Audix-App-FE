@@ -18,10 +18,17 @@ const MachineCard: React.FC<Machine> = React.memo(({
   normalScore
 }) => {
   const borderColor = React.useMemo(() => getBorderColor(status as CardState), [status]);
-  const imageSource = React.useMemo(() => 
-    image ? { uri: image } : require('../../assets/images/logos/AudixLogoNavy.png'), 
-    [image]
-  );
+  const imageSource = React.useMemo(() => {
+  if (!image) {
+    return require('../../assets/images/logos/AudixLogoNavy.png');
+  }
+  // 원격 URL 문자열일 때만 { uri: string } 으로 감싸기
+  if (typeof image === 'string') {
+    return { uri: image };
+  }
+  // require() 로 받은 숫자(module id) 또는 이미 { uri } 형태인 경우 그대로
+  return image;
+}, [image]);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>

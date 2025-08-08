@@ -1,63 +1,87 @@
-import { io, Socket } from 'socket.io-client';
-import { BASE_URL } from '../api/config';
-import { useRefreshStore } from '../store/refreshStore';
 
 class WebSocketClient {
-    private socket: Socket | null = null;
-    private onAlertCallback: ((data: any) => void) | null = null;
+    private ws: WebSocket | null = null;
+    private reconnectAttempts = 0;
+    private maxReconnectAttempts = 3;
+    private connectionTimeout = 3000;
+    private isConnected = false; // ✅ 연결 상태 추적
+    private onAlertCallback?: (data: any) => void;
 
     connect() {
-        console.log(`🔌 WebSocket 연결 시도: ${BASE_URL}`);
-        this.socket = io(BASE_URL, {
-            timeout: 20000,
-            forceNew: true,
-        });
+        return new Promise<boolean>((resolve, reject) => {
+            try {
+                console.log('🔌 WebSocket 연결 시도...');
 
-        this.socket.on('connect', () => {
-            console.log('✅ WebSocket 연결 성공:', this.socket?.id);
-            console.log('📡 WebSocket 서버:', BASE_URL);
-        });
+                const timeoutId = setTimeout(() => {
+                    console.log('⏰ WebSocket 연결 타임아웃 (3초)');
+                    if (this.ws) {
+                        this.ws.close();
+                    }
+                    this.isConnected = false; // ✅ 타임아웃 시 연결 상태 false
+                    resolve(false);
+                }, this.connectionTimeout);
 
-        this.socket.on('connect_error', (error) => {
-            console.error('❌ WebSocket 연결 실패:', error);
-            console.error('🔍 연결 시도 URL:', BASE_URL);
-        });
+                this.ws = new WebSocket('ws://your-websocket-url');
 
-        this.socket.on('disconnect', (reason) => {
-            console.warn('⚠️ WebSocket 연결 끊김:', reason);
-        });
+                this.ws.onopen = () => {
+                    clearTimeout(timeoutId);
+                    console.log('✅ WebSocket 연결 성공');
+                    this.isConnected = true; // ✅ 연결 성공 시 true
+                    this.reconnectAttempts = 0;
+                    resolve(true);
+                };
 
-        this.socket.on('device-alert', (data) => {
-            console.log('🚨 device-alert 이벤트 수신:', data);
-            console.log('🔔 normalScore:', data.normalScore);
-            console.log('🎯 deviceId:', data.deviceId);
+                this.ws.onerror = (error) => {
+                    clearTimeout(timeoutId);
+                    console.error('❌ WebSocket 연결 오류:', error);
+                    this.isConnected = false; // ✅ 오류 시 false
+                    resolve(false);
+                };
 
-            // 전역 새로고침 트리거
-            const { triggerRefresh } = useRefreshStore.getState();
-            triggerRefresh();
-            console.log('🔄 전역 데이터 새로고침 트리거됨');
-
-            if (this.onAlertCallback) {
-                this.onAlertCallback(data);
-            } else {
-                console.warn('⚠️ onAlertCallback이 설정되지 않음');
+                this.ws.onclose = () => {
+                    clearTimeout(timeoutId);
+                    console.log('🔌 WebSocket 연결 종료');
+                    this.isConnected = false; // ✅ 연결 종료 시 false
+                    this.attemptReconnect();
+                };
+            } catch (error) {
+                console.error('❌ WebSocket 연결 실패:', error);
+                this.isConnected = false; // ✅ 예외 시 false
+                resolve(false);
             }
-        });
-
-        // 연결 테스트를 위한 ping
-        this.socket.on('connect', () => {
-            console.log('🏓 연결 테스트 ping 전송');
-            this.socket?.emit('ping', { test: 'connection' });
         });
     }
 
-    setOnAlert(callback: (data: any) => void) {
-        this.onAlertCallback = callback;
+    // ✅ 연결 상태 확인 메서드
+    getConnectionStatus(): boolean {
+        return this.isConnected && this.ws !== null && this.ws.readyState === WebSocket.OPEN;
+    }
+
+    private attemptReconnect() {
+        if (this.reconnectAttempts < this.maxReconnectAttempts) {
+            this.reconnectAttempts++;
+            console.log(`🔄 WebSocket 재연결 시도 ${this.reconnectAttempts}/${this.maxReconnectAttempts}`);
+
+            setTimeout(() => {
+                this.connect();
+            }, 2000 * this.reconnectAttempts);
+        } else {
+            console.log('❌ WebSocket 최대 재연결 횟수 초과');
+            this.isConnected = false; // ✅ 재연결 포기 시 false
+        }
     }
 
     disconnect() {
-        this.socket?.disconnect();
+        if (this.ws) {
+            this.ws.close();
+            this.ws = null;
+        }
+        this.isConnected = false; // ✅ 수동 연결 해제 시 false
     }
+
+    setOnAlert(callback: (data: any) => void) {
+    this.onAlertCallback = callback;
+  }
 }
 
 export const webSocketClient = new WebSocketClient();

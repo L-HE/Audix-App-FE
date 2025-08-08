@@ -434,6 +434,10 @@ export const MachineCardStyles = StyleSheet.create({
     color: Colors.textTertiary,
     marginTop: 2
   },
+  machineImage: { 
+    width: 60,
+    height: 60,
+  },
 });
 
 // SearchInput Styles

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { SafeAreaView, View } from 'react-native';
-import Animated, {
+import { SafeAreaView, Text, View } from 'react-native';
+import {
   cancelAnimation,
   useAnimatedStyle,
   useSharedValue,
@@ -120,14 +120,9 @@ const VDonutChart: React.FC<Props> = ({ deviceId, normalScore, status, name }) =
 
         {/* 중심에 퍼센트 표시 - ZoomIn 애니메이션 */}
         <View style={styles.centerContent}>
-          <Animated.Text
-            style={[
-              styles.percentText,
-              animatedTextStyle
-            ]}
-          >
+          <Text style={styles.percentText}>
             {Math.round(used)}%
-          </Animated.Text>
+          </Text>
         </View>
       </View>
     </SafeAreaView>
