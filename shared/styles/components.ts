@@ -51,6 +51,7 @@ const AREA_ICON_CONTAINER_SIZE = ICON_SIZE * AREA_CONTAINER_MULTIPLIER;
 const AREA_ICON_SIZE = ICON_SIZE * 0.87;
 const FONT_SIZE = SCREEN_WIDTH * TEXT_RATIO;
 const LABEL_MARGIN = SCREEN_WIDTH * LABEL_MARGIN_RATIO;
+
 export const BottomNavStyles = StyleSheet.create({
   tabBar: {
     height: TAB_BAR_HEIGHT,
@@ -93,27 +94,45 @@ export const BottomNavStyles = StyleSheet.create({
 });
 
 // Header Styles
+const HEADER_HEIGHT_RATIO = 0.05;
+const LOGO_RATIO = 0.4;
+const PADDING_TOP_RATIO = 0.35;
+const BACK_ICON_RATIO = 0.06;
+const ICON_HORIZONTAL_PADDING_RATIO = 0.02;
+
+const HEADER_HEIGHT = SCREEN_HEIGHT * HEADER_HEIGHT_RATIO;
+const LOGO_SIZE    = SCREEN_WIDTH * LOGO_RATIO;
+const BACK_ICON_SIZE    = SCREEN_WIDTH * BACK_ICON_RATIO;
+const ICON_BTN_W   = BACK_ICON_SIZE + SCREEN_WIDTH * ICON_HORIZONTAL_PADDING_RATIO * 2;
+
 export const HeaderStyles = StyleSheet.create({
   header: {
-    height: 60,
-    backgroundColor: Colors.background,
+    height: HEADER_HEIGHT,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.borderLight,
+    paddingTop: HEADER_HEIGHT * PADDING_TOP_RATIO,
+    paddingHorizontal: SCREEN_WIDTH * 0.05,
+    backgroundColor: Colors.background,
+  },
+  spacer: {
+    width: ICON_BTN_W,
   },
   logo: {
-    height: 30,
-    width: 120,
-  },
-  iconContainer: {
-    flexDirection: 'row',
+    width: LOGO_SIZE,
+    height: LOGO_SIZE,
     alignItems: 'center',
   },
-  icon: {
-    marginLeft: 16,
+  iconButton: {
+    width: ICON_BTN_W,
+    height: ICON_BTN_W,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  backIcon: {
+    width: BACK_ICON_SIZE,
+    height: BACK_ICON_SIZE,
+    color: Colors.tabIcon,
   },
 });
 
