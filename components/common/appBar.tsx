@@ -3,7 +3,7 @@ import { useSegments } from 'expo-router';
 import React from 'react';
 import { Text, View } from 'react-native';
 import { areaData } from '../../assets/data/areaData';
-import { AppBarStyles } from '../../shared/styles/components';
+import { AppBarStyles as style } from '../../shared/styles/components';
 import SearchInput from '../screens/searchInput';
 
 // _layout.tsx에서 전달받는 id
@@ -48,12 +48,12 @@ const AppBar: React.FC<AppBarProps> = ({ currentId }) => {
   
   return (
     <View style={[
-      AppBarStyles.appBar, 
-      !config.showSearch && AppBarStyles.appBarCompact
+      style.appBar, 
+      !config.showSearch && style.appBarCompact
     ]}>
       <Text style={[
-        AppBarStyles.title,
-        !config.showSearch && AppBarStyles.titleCentered
+        style.title,
+        !config.showSearch && style.titleCentered
       ]}>
         {config.title}
       </Text>

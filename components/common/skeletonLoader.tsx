@@ -1,5 +1,5 @@
 // components/common/skeletonLoader.tsx
-import { SkeletonLoaderStyles } from '@/shared/styles/components';
+import { SkeletonLoaderStyles as style } from '@/shared/styles/components';
 import React from 'react';
 import { View } from 'react-native';
 import Animated, {
@@ -26,14 +26,14 @@ const SkeletonLoader: React.FC = () => {
   }));
 
   return (
-    <View style={SkeletonLoaderStyles.container}>
+    <View style={style.container}>
       {[...Array(5)].map((_, index) => (
         <Animated.View
           key={index}
-          style={[SkeletonLoaderStyles.skeletonCard, animatedStyle]}
+          style={[style.skeletonCard, animatedStyle]}
         >
-          <View style={SkeletonLoaderStyles.skeletonLine} />
-          <View style={SkeletonLoaderStyles.skeletonLineShort} />
+          <View style={style.skeletonLine} />
+          <View style={style.skeletonLineShort} />
         </Animated.View>
       ))}
     </View>

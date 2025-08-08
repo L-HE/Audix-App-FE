@@ -1,5 +1,5 @@
 // components/common/bottomNav.tsx
-import { BottomNavStyles } from '@/shared/styles/components';
+import { BottomNavStyles as style } from '@/shared/styles/components';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useMemo } from 'react';
@@ -54,30 +54,30 @@ const BottomNavComponent: React.FC<BottomNavProps> = ({ tabs }) => {
   const items = tabs ?? defaultTabs;
 
   return (
-    <View style={BottomNavStyles.tabBar}>
+    <View style={style.tabBar}>
       {items.map(({ icon, label, action }) => (
         <TouchableOpacity
           key={label}
-          style={BottomNavStyles.tabItem}
+          style={style.tabItem}
           onPress={action}
           activeOpacity={0.7}
         >
           {label === 'Area' ? (
-            <View style={BottomNavStyles.areaIconContainer}>
+            <View style={style.areaIconContainer}>
               <Ionicons
                 name={icon}
                 size={30}
-                style={BottomNavStyles.areaIcon}
+                style={style.areaIcon}
               />
             </View>
           ) : (
             <Ionicons
               name={icon}
               size={35}
-              style={BottomNavStyles.tabIcon}
+              style={style.tabIcon}
             />
           )}
-          <Text style={BottomNavStyles.tabText}>{label}</Text>
+          <Text style={style.tabText}>{label}</Text>
         </TouchableOpacity>
       ))}
     </View>

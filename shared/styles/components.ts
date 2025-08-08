@@ -97,12 +97,12 @@ export const BottomNavStyles = StyleSheet.create({
 const HEADER_HEIGHT_RATIO = 0.05;
 const LOGO_RATIO = 0.4;
 const PADDING_TOP_RATIO = 0.35;
-const BACK_ICON_RATIO = 0.06;
+const BACK_ICON_RATIO = 0.05;
 const ICON_HORIZONTAL_PADDING_RATIO = 0.02;
 
 const HEADER_HEIGHT = SCREEN_HEIGHT * HEADER_HEIGHT_RATIO;
 const LOGO_SIZE    = SCREEN_WIDTH * LOGO_RATIO;
-const BACK_ICON_SIZE    = SCREEN_WIDTH * BACK_ICON_RATIO;
+export const BACK_ICON_SIZE = SCREEN_WIDTH * BACK_ICON_RATIO;
 const ICON_BTN_W   = BACK_ICON_SIZE + SCREEN_WIDTH * ICON_HORIZONTAL_PADDING_RATIO * 2;
 
 export const HeaderStyles = StyleSheet.create({
@@ -396,61 +396,68 @@ export const LogoutModalStyles = StyleSheet.create({
 export const MachineCardStyles = StyleSheet.create({
   card: {
     backgroundColor: Colors.background,
-    borderRadius: 12,
-    margin: 8,
+    borderRadius: 8,
+    marginBottom: 16,
     padding: 16,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    borderWidth: 1,
   },
-  header: {
+  row: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
+    alignItems: 'center'
   },
-  title: {
+  flex1: {
+    flex: 1,
+    flexDirection: 'column'
+  },
+  image: {
+    width: 120,
+    height: 120,
+    marginRight: 12,
+    borderRadius: 8,
+    backgroundColor: Colors.backgroundSecondary,
+  },
+  name: {
     fontSize: 16,
     fontWeight: 'bold',
     color: Colors.textPrimary,
   },
-  status: {
-    fontSize: 12,
-    fontWeight: '600',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    color: Colors.textWhite,
+  subName: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+    marginTop: 4
   },
-  info: {
-    marginBottom: 8,
+  flex3: {
+    marginTop: 12
   },
   infoText: {
     fontSize: 14,
-    color: Colors.textSecondary,
-    marginBottom: 2,
-  },
-  lastUpdate: {
-    fontSize: 12,
     color: Colors.textTertiary,
+    marginTop: 2
   },
 });
 
 // SearchInput Styles
+const SEARCH_WIDTH_RATIO = 0.65;
+const PADDING_RATIO = 0.043;
+const PLACEHOLDER_FONT_RATIO = 0.015;
+const SEARCH_HEIGHT_RATIO = 0.045;
+
+const SEARCH_WIDTH = SCREEN_WIDTH * SEARCH_WIDTH_RATIO;
+const HORIZONTAL_PADDING = SEARCH_WIDTH * PADDING_RATIO;
+const PLACEHOLDER_FONT_SIZE = SCREEN_HEIGHT * PLACEHOLDER_FONT_RATIO;
+const SEARCH_HEIGHT = SCREEN_HEIGHT * SEARCH_HEIGHT_RATIO;
+
+export const SEARCH_ICON_SIZE = SEARCH_HEIGHT * 0.5;
+
 export const SearchInputStyles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    width: 280,
+    width: SEARCH_WIDTH,
     height: 40,
     backgroundColor: Colors.background,
     borderRadius: 20,
-    paddingHorizontal: 16,
+    paddingHorizontal: HORIZONTAL_PADDING,
     borderWidth: 1,
     borderColor: Colors.border,
   },
@@ -459,54 +466,41 @@ export const SearchInputStyles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    fontSize: 14,
+    fontSize: PLACEHOLDER_FONT_SIZE,
     color: Colors.textPrimary,
   },
 });
 
 // VDonutChart Styles
+export const size = SCREEN_WIDTH * 0.4;
+
 export const VDonutChartStyles = StyleSheet.create({
   container: {
-    alignItems: 'center',
     justifyContent: 'center',
+    alignItems: 'center',
+    width: size, 
+    height: size, 
+    zIndex: 1,
   },
-  chart: {
-    marginBottom: 16,
+  chartContainer: {
+    position: 'relative',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1
   },
-  centerText: {
+  centerContent: {
     position: 'absolute',
-    alignItems: 'center',
     justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+    height: '100%',
+    zIndex: 2,
   },
-  centerNumber: {
-    fontSize: 24,
+  percentText: {
     fontWeight: 'bold',
     color: Colors.textPrimary,
-  },
-  centerLabel: {
-    fontSize: 12,
-    color: Colors.textSecondary,
-  },
-  legend: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    marginTop: 16,
-  },
-  legendItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    margin: 4,
-  },
-  legendColor: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    marginRight: 6,
-  },
-  legendText: {
-    fontSize: 12,
-    color: Colors.textSecondary,
+    textAlign: 'center',
+    fontSize: size * 0.12,
   },
 });
 

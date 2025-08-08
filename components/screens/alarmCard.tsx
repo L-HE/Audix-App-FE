@@ -1,7 +1,7 @@
 // components/screens/alarmCard.tsx
 import { AlarmCardProps } from '@/assets/data/alarmData';
 import { CardState } from '@/assets/data/areaData';
-import { AlarmCardStyles } from '@/shared/styles/components';
+import { AlarmCardStyles as style } from '@/shared/styles/components';
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { useTimeStore } from '../../shared/store/timeStore';
@@ -55,16 +55,16 @@ const AlarmCard: React.FC<AlarmCardProps> = (props) => {
 
   return (
     <TouchableOpacity 
-      style={[AlarmCardStyles.card, { borderColor, borderWidth: 2 }]} 
+      style={[style.card, { borderColor, borderWidth: 2 }]} 
       onPress={onPress}
     >
-      <View style={AlarmCardStyles.content}>
-        <View style={AlarmCardStyles.textContainer}>
-          <Text style={AlarmCardStyles.title}>{displayTitle}</Text>
-          <Text style={AlarmCardStyles.subtitle}>{regionName}</Text>
-          <Text style={AlarmCardStyles.subtitle}>{regionLocation}</Text>
+      <View style={style.content}>
+        <View style={style.textContainer}>
+          <Text style={style.title}>{displayTitle}</Text>
+          <Text style={style.subtitle}>{regionName}</Text>
+          <Text style={style.subtitle}>{regionLocation}</Text>
         </View>
-        <Text style={AlarmCardStyles.timestamp}>{timestamp}</Text>
+        <Text style={style.timestamp}>{timestamp}</Text>
       </View>
     </TouchableOpacity>
   );

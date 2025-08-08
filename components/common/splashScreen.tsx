@@ -1,39 +1,39 @@
 // components/common/splashScreen.tsx
-import { SplashScreenStyles } from '@/shared/styles/components';
+import { SplashScreenStyles as style } from '@/shared/styles/components';
 import React from 'react';
 import { ActivityIndicator, Image, Text, View } from 'react-native';
 import { Colors } from '../../shared/styles/global';
 
 const SplashScreen = () => {
   return (
-    <View style={SplashScreenStyles.container}>
+    <View style={style.container}>
       {/* 배경 도형들 */}
-      <View style={SplashScreenStyles.backgroundShapes}>
+      <View style={style.backgroundShapes}>
         <Image
             source={require('../../assets/images/pictures/landing_left.png')}
-            style={[SplashScreenStyles.shape, SplashScreenStyles.topShape]}
+            style={[style.shape, style.topShape]}
             resizeMode="cover"
           />
         <Image
             source={require('../../assets/images/pictures/landing_right.png')}
-            style={[SplashScreenStyles.shape, SplashScreenStyles.bottomShape]}
+            style={[style.shape, style.bottomShape]}
             resizeMode="cover"
           />
       </View>
 
-      <View style={SplashScreenStyles.content}>
+      <View style={style.content}>
         {/* 앱 로고 */}
-        <View style={SplashScreenStyles.logoContainer}>
+        <View style={style.logoContainer}>
           <Image
             source={require('../../assets/images/logos/AudixLogoNavy.png')}
-            style={SplashScreenStyles.logo}
+            style={style.logo}
             resizeMode="cover"
           />
         </View>
         
         {/* 로고 하단 문구 */}
-        <View style={SplashScreenStyles.textContainer}>
-          <Text style={SplashScreenStyles.subtitle}>
+        <View style={style.textContainer}>
+          <Text style={style.subtitle}>
             {`지능적 공장의 안전을\n소리로 지켜주는 스마트 솔루션`}
           </Text>
         </View>

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Dimensions, SafeAreaView, StyleSheet, View } from 'react-native';
+import { SafeAreaView, View } from 'react-native';
 import Animated, {
   cancelAnimation,
   useAnimatedStyle,
@@ -9,6 +9,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { VictoryPie } from 'victory-native';
 import { CardState } from '../../assets/data/areaData';
+import { size, VDonutChartStyles as styles } from '../../shared/styles/components';
 import { Colors, getBorderColor } from '../../shared/styles/global';
 
 interface Props {
@@ -19,9 +20,6 @@ interface Props {
 }
 
 const VDonutChart: React.FC<Props> = ({ deviceId, normalScore, status, name }) => {
-  const screenWidth = Dimensions.get('window').width;
-  const size = screenWidth * 0.4;
-
   // normalScore가 0-1 범위면 100을 곱해서 퍼센트로 변환
   const used = normalScore <= 1 ? normalScore * 100 : normalScore;
   const remaining = 100 - used;
@@ -105,8 +103,8 @@ const VDonutChart: React.FC<Props> = ({ deviceId, normalScore, status, name }) =
   const colorScale = [primaryColor, Colors.borderLight];
 
   return (
-    <SafeAreaView style={[styles.container, { width: size, height: size, zIndex: 1 }]}>
-      <View style={[styles.chartContainer, { zIndex: 1 }]}>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.chartContainer}>
         <VictoryPie
           data={data}
           innerRadius={size * 0.3}
@@ -121,11 +119,10 @@ const VDonutChart: React.FC<Props> = ({ deviceId, normalScore, status, name }) =
         />
 
         {/* 중심에 퍼센트 표시 - ZoomIn 애니메이션 */}
-        <View style={[styles.centerContent, { zIndex: 2 }]}>
+        <View style={styles.centerContent}>
           <Animated.Text
             style={[
               styles.percentText,
-              { fontSize: size * 0.12 },
               animatedTextStyle
             ]}
           >
@@ -136,29 +133,5 @@ const VDonutChart: React.FC<Props> = ({ deviceId, normalScore, status, name }) =
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  chartContainer: {
-    position: 'relative',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  centerContent: {
-    position: 'absolute',
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: '100%',
-    height: '100%',
-  },
-  percentText: {
-    fontWeight: 'bold',
-    color: Colors.textPrimary,
-    textAlign: 'center',
-  },
-});
 
 export default VDonutChart;

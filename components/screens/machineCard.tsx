@@ -1,9 +1,10 @@
 // components/screens/MachineCard.tsx
 import React from 'react';
-import { Image, SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import { Image, SafeAreaView, Text, View } from 'react-native';
 import { CardState } from '../../assets/data/areaData';
 import { Machine } from '../../assets/data/machineData';
-import { Colors, getBorderColor } from '../../shared/styles/global';
+import { MachineCardStyles as styles } from '../../shared/styles/components';
+import { getBorderColor } from '../../shared/styles/global';
 import VDonutChart from './vDonutChart';
 
 const MachineCard: React.FC<Machine> = React.memo(({
@@ -58,46 +59,3 @@ const MachineCard: React.FC<Machine> = React.memo(({
 });
 
 export default MachineCard;
-
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: Colors.background,
-    borderRadius: 8,
-    marginBottom: 16,
-    padding: 16,
-    borderWidth: 1,
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center'
-  },
-  flex1: {
-    flex: 1,
-    flexDirection: 'column'
-  },
-  image: {
-    width: 120,
-    height: 120,
-    marginRight: 12,
-    borderRadius: 8,
-    backgroundColor: Colors.backgroundSecondary,
-  },
-  name: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: Colors.textPrimary,
-  },
-  subName: {
-    fontSize: 14,
-    color: Colors.textSecondary,
-    marginTop: 4
-  },
-  flex3: {
-    marginTop: 12
-  },
-  infoText: {
-    fontSize: 14,
-    color: Colors.textTertiary,
-    marginTop: 2
-  },
-});
