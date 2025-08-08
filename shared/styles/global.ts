@@ -16,6 +16,9 @@ export const Colors = {
   backgroundSafetyAlarm: 'rgba(255, 255, 255, 0.1)',
   backgroundIcon: '#E8E8E8',
 
+  // shadow Colors
+  shadow: '#000',
+
   // icon Colors
   menuIcon: '#2c4d6b',
   loginIcon: '#999', // 회색 아이콘

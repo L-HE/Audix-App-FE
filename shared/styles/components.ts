@@ -144,22 +144,30 @@ export const LoadingScreenStyles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 9999,
   },
   content: {
     backgroundColor: Colors.background,
-    borderRadius: 12,
     padding: 24,
+    borderRadius: 12,
     alignItems: 'center',
-    minWidth: 120,
+    shadowColor: Colors.shadow,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
-  text: {
-    marginTop: 12,
-    fontSize: 14,
+  message: {
+    marginTop: 16,
+    fontSize: 16,
     color: Colors.textPrimary,
+    textAlign: 'center',
   },
 });
 
