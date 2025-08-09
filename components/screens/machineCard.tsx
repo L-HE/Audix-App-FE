@@ -5,7 +5,7 @@ import { CardState } from '../../assets/data/areaData';
 import { Machine } from '../../assets/data/machineData';
 import { MachineCardStyles as styles } from '../../shared/styles/components';
 import { getBorderColor } from '../../shared/styles/global';
-import VDonutChart from './vDonutChart';
+import NativeDonutChart from './nativeDonutChart';
 
 const MachineCard: React.FC<Machine> = React.memo(({
   deviceId,
@@ -51,7 +51,7 @@ const MachineCard: React.FC<Machine> = React.memo(({
             </View>
           </View>
           <View>
-            <VDonutChart deviceId={String(deviceId)} normalScore={normalScore} status={status} name={name} />
+            <NativeDonutChart deviceId={String(deviceId)} normalScore={normalScore} status={status} name={name} />
           </View>
         </View>
       </View>
@@ -59,10 +59,23 @@ const MachineCard: React.FC<Machine> = React.memo(({
   );
 }, (prevProps, nextProps) => {
   // 핵심 데이터만 비교하여 리렌더링 결정
-  return (
+  const shouldSkipUpdate = (
     prevProps.status === nextProps.status &&
-    prevProps.normalScore === nextProps.normalScore
+    prevProps.normalScore === nextProps.normalScore &&
+    prevProps.deviceId === nextProps.deviceId &&
+    prevProps.name === nextProps.name
   );
+  
+  if (!shouldSkipUpdate) {
+    console.log(`🔄 MachineCard [${prevProps.deviceId}] 리렌더링 필요:`, {
+      status: `${prevProps.status} → ${nextProps.status}`,
+      normalScore: `${prevProps.normalScore} → ${nextProps.normalScore}`,
+      deviceId: `${prevProps.deviceId} → ${nextProps.deviceId}`,
+      name: `${prevProps.name} → ${nextProps.name}`
+    });
+  }
+  
+  return shouldSkipUpdate;
 });
 
 export default MachineCard;

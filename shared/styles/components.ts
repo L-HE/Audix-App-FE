@@ -504,7 +504,46 @@ export const VDonutChartStyles = StyleSheet.create({
     fontWeight: 'bold',
     color: Colors.textPrimary,
     textAlign: 'center',
-    fontSize: size * 0.12,
+    fontSize: size * 0.5,
+  },
+});
+
+// Native DonutChart Styles (SVG 기반)
+export const DonutChartStyles = StyleSheet.create({
+  container: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: size, 
+    height: size, 
+  },
+  chartContainer: {
+    position: 'relative',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: size,
+    height: size,
+  },
+  svgContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+  },
+  centerContent: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10,
+  },
+  percentText: {
+    fontWeight: 'bold',
+    color: Colors.textPrimary,
+    textAlign: 'center',
+    fontSize: size * 0.15,
+    backgroundColor: 'transparent',
   },
 });
 

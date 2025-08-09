@@ -7,6 +7,7 @@
     "icon": "./assets/images/icons/AudixLogoNavySimple.png",
     "scheme": "audixapp",
     "userInterfaceStyle": "automatic",
+    "jsEngine": "hermes",
     "newArchEnabled": true,
     "ios": {
       "icon": "./assets/images/icons/AudixLogoNavySimple.png"

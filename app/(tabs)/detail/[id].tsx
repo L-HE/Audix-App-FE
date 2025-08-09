@@ -17,6 +17,29 @@ import { DetailScreenStyles as style } from '../../../shared/styles/screens';
 
 type Params = { id: string };
 
+// React Profiler 콜백 함수
+const onRenderCallback = (
+  id: string,
+  phase: 'mount' | 'update' | 'nested-update',
+  actualDuration: number,
+  baseDuration: number,
+  startTime: number,
+  commitTime: number
+) => {
+  const threshold = 16; // 60fps 기준 16ms
+  
+  if (actualDuration > threshold) {
+    console.log(`🐌 [React Profiler] DetailScreen (${phase}): ${actualDuration.toFixed(2)}ms ← SLOW RENDER!`);
+  } else {
+    console.log(`⚡ [React Profiler] DetailScreen (${phase}): ${actualDuration.toFixed(2)}ms`);
+  }
+  
+  // 추가 성능 정보
+  if (actualDuration > baseDuration * 2) {
+    console.warn(`⚠️ [React Profiler] DetailScreen 예상보다 느린 렌더링: 실제=${actualDuration.toFixed(2)}ms, 예상=${baseDuration.toFixed(2)}ms`);
+  }
+};
+
 const DetailScreen: React.FC = () => {
   const { id } = useLocalSearchParams<Params>();
   const [machines, setMachines] = useState<Machine[]>([]);
@@ -24,20 +47,67 @@ const DetailScreen: React.FC = () => {
   const [isOnlineMode, setIsOnlineMode] = useState(false);
   const { setLoading } = useLoadingStore();
   const { refreshTrigger } = useRefreshStore();
+  
+  // Pagination 상태
+  const [currentPage, setCurrentPage] = useState(0);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [hasNextPage, setHasNextPage] = useState(true);
+  const itemsPerPage = 3; // 페이지당 아이템 수
 
   // 단순한 페이드 인 애니메이션만
   const opacity = useSharedValue(0);
 
-  // 정렬된 데이터를 메모이제이션
+  // 정렬된 데이터를 메모이제이션 (pagination 적용)
   const sortedMachines = useMemo(() => {
-    return machines.sort((a: Machine, b: Machine) => {
+    const sorted = machines.sort((a: Machine, b: Machine) => {
       const scoreA = a.normalScore <= 1 ? a.normalScore * 100 : a.normalScore;
       const scoreB = b.normalScore <= 1 ? b.normalScore * 100 : b.normalScore;
       return scoreA - scoreB;
     });
-  }, [machines]);
+    
+    // 현재 페이지까지의 데이터만 반환 (pagination)
+    const endIndex = (currentPage + 1) * itemsPerPage;
+    const paginatedData = sorted.slice(0, endIndex);
+    
+    console.log(`📄 [Pagination] 현재 페이지: ${currentPage}, 아이템 수: ${paginatedData.length}/${sorted.length}`);
+    console.log(`📄 [Pagination] 페이지당 아이템: ${itemsPerPage}, 종료 인덱스: ${endIndex}`);
+    
+    return paginatedData;
+  }, [machines, currentPage, itemsPerPage]);
 
-  // 데이터 로딩 함수
+  // 전체 데이터 저장 (pagination 계산용)
+  const [allMachines, setAllMachines] = useState<Machine[]>([]);
+
+  // 다음 페이지 로드 함수
+  const loadNextPage = useCallback(() => {
+    if (isLoadingMore || !hasNextPage) {
+      console.log(`🚫 [Pagination] 다음 페이지 로드 스킵 - 로딩중: ${isLoadingMore}, 다음페이지 있음: ${hasNextPage}`);
+      return;
+    }
+    
+    const nextPage = currentPage + 1;
+    const totalItems = machines.length; // allMachines 대신 machines 사용
+    console.log(`📄 [Pagination] 다음 페이지 로드 시작: ${currentPage} → ${nextPage}`);
+    console.log(`📄 [Pagination] 전체 아이템: ${totalItems}, 페이지당: ${itemsPerPage}`);
+    
+    setIsLoadingMore(true);
+    
+    // 시뮬레이션된 로딩 지연
+    setTimeout(() => {
+      const hasMore = (nextPage + 1) * itemsPerPage < totalItems;
+      const currentShowingItems = (nextPage + 1) * itemsPerPage;
+      
+      setCurrentPage(nextPage);
+      setHasNextPage(hasMore);
+      setIsLoadingMore(false);
+      
+      console.log(`✅ [Pagination] 페이지 ${nextPage} 로드 완료`);
+      console.log(`📊 [Pagination] 현재 표시 아이템: ${Math.min(currentShowingItems, totalItems)}/${totalItems}`);
+      console.log(`🔄 [Pagination] 더 로드할 페이지 있음: ${hasMore}`);
+    }, 500);
+  }, [currentPage, machines.length, hasNextPage, isLoadingMore, itemsPerPage]);
+
+  // 데이터 로딩 함수 (수정됨)
   const fetchData = async () => {
     if (!id) return;
 
@@ -49,9 +119,12 @@ const DetailScreen: React.FC = () => {
       
       // ✅ 3초 타임아웃으로 API 호출
       const machineData = await getMachineDataByAreaId(id);
-      console.log('✅ Detail Screen - 받은 기기 데이터:', machineData);
 
+      // 전체 데이터와 첫 페이지 데이터 설정
+      setAllMachines(machineData);
       setMachines(machineData);
+      setCurrentPage(0);
+      setHasNextPage(machineData.length > itemsPerPage);
 
       // ✅ 데이터 소스 확인
       if (machineData.length > 2) { // API 데이터는 보통 더 많을 것
@@ -104,7 +177,6 @@ const DetailScreen: React.FC = () => {
   // ✅ FlashList 렌더링 최적화
   const renderMachine = useCallback(({ item, index }: { item: Machine; index: number }) => {
     const renderStart = performance.now();
-    console.log(`⚡ FlashList 아이템 [${item.deviceId}] 렌더링 시작 (인덱스: ${index})`);
 
     return (
       <Animated.View
@@ -138,64 +210,112 @@ const DetailScreen: React.FC = () => {
   }));
 
   return (
-    <Animated.View style={[style.container, animatedStyle]}>
-      {/* ✅ 에러 메시지 표시 */}
-      {error && (
-        <Animated.View entering={FadeIn.duration(300)} style={style.errorIndicator}>
-          <Text style={style.errorText}>
-            ⚠️ {error}
-          </Text>
-        </Animated.View>
-      )}
+    <React.Profiler id="DetailScreen" onRender={onRenderCallback}>
+      <Animated.View style={[style.container, animatedStyle]}>
+        {/* ✅ 에러 메시지 표시 */}
+        {error && (
+          <Animated.View entering={FadeIn.duration(300)} style={style.errorIndicator}>
+            <Text style={style.errorText}>
+              ⚠️ {error}
+            </Text>
+          </Animated.View>
+        )}
 
-      {/* ✅ FlashList로 교체 */}
-      <FlashList
-        data={sortedMachines}
-        renderItem={renderMachine}
-        keyExtractor={keyExtractor}
-        getItemType={getItemType}
-        // ✅ 올바른 FlashList props
-        estimatedListSize={{ height: sortedMachines.length * 291, width: 320 }} // 전체 리스트 크기 추정
-        estimatedItemSize={291} // 개별 아이템 크기는 여전히 유효할 수 있음
-        // ✅ FlashList 성능 최적화 옵션
-        drawDistance={200} // 화면 밖 렌더링 거리
-        // ✅ 스크롤 성능 모니터링
-        onLoad={(info) => {
-          console.log(`⚡ FlashList 로드 완료:`, {
-            elapsedTime: info.elapsedTimeInMs,
-          });
-        }}
-        onBlankArea={(blankAreaEvent) => {
-          console.log(`⚡ FlashList 빈 영역 감지:`, {
-            offsetStart: blankAreaEvent.offsetStart,
-            offsetEnd: blankAreaEvent.offsetEnd
-          });
-          
-          // 빈 영역이 크면 성능 경고
-          const blankSize = blankAreaEvent.offsetEnd - blankAreaEvent.offsetStart;
-          if (blankSize > 100) {
-            console.warn(`⚠️ FlashList 빈 영역 크기: ${blankSize}px`);
-          }
-        }}
-        // ✅ 뷰 변경 추적
-        onViewableItemsChanged={({ viewableItems, changed }) => {
-          console.log(`👁️ FlashList 화면에 보이는 아이템 수: ${viewableItems.length}`);
-          changed.forEach(item => {
-            if (item.isViewable) {
-              console.log(`👁️ 아이템 [${item.item?.deviceId}] 화면에 진입`);
-            } else {
-              console.log(`👁️ 아이템 [${item.item?.deviceId}] 화면에서 나감`);
+        {/* FlashList로 교체 - Pagination 적용 */}
+        <FlashList
+          data={sortedMachines}
+          renderItem={renderMachine}
+          keyExtractor={keyExtractor}
+          getItemType={getItemType}
+          estimatedListSize={{ height: sortedMachines.length * 160, width: 320 }}
+          estimatedItemSize={160}
+          // FlashList 성능 최적화 옵션 - 스크롤 시 컴포넌트 유지
+          drawDistance={300} // 더 넓은 렌더링 범위
+          overrideItemLayout={(layout, item) => {
+            layout.size = 160;
+          }}
+          // Pagination 관련 이벤트
+          onEndReached={() => {
+            console.log(`🎯 [FlashList] onEndReached 트리거됨 - 페이지 로드 시도`);
+            loadNextPage();
+          }}
+          onEndReachedThreshold={0.8} // 80% 스크롤 시 다음 페이지 로드
+          // 스크롤 성능 모니터링
+          onLoad={(info) => {
+            console.log(`⚡ FlashList 로드 완료:`, {
+              elapsedTime: info.elapsedTimeInMs,
+              totalItems: sortedMachines.length
+            });
+          }}
+          onBlankArea={(blankAreaEvent) => {
+            const blankSize = blankAreaEvent.offsetEnd - blankAreaEvent.offsetStart;
+            if (blankSize > 50) {
+              console.warn(`⚠️ FlashList 빈 영역 크기: ${blankSize}px`);
             }
-          });
-        }}
-        viewabilityConfig={{
-          itemVisiblePercentThreshold: 50
-        }}
-        // ✅ 추가 FlashList 최적화 옵션
-        removeClippedSubviews={true}
-        disableHorizontalListHeightMeasurement={true}
-      />
-    </Animated.View>
+          }}
+          // 뷰 변경 추적
+          onViewableItemsChanged={({ viewableItems, changed }) => {
+            const currentDisplayed = sortedMachines.length;
+            const totalAvailable = machines.length;
+            
+            console.log(`👁️ [FlashList] 화면에 보이는 아이템: ${viewableItems.length}`);
+            console.log(`📊 [Pagination] 현재 로드된 아이템: ${currentDisplayed}/${totalAvailable} (페이지: ${currentPage + 1})`);
+            
+            // 마지막 아이템 근처에서 로그
+            const lastVisibleIndex = Math.max(...viewableItems.map(item => item.index || 0));
+            if (lastVisibleIndex >= currentDisplayed - 2) {
+              console.log(`🔚 [Pagination] 마지막 아이템 근처 도달 (인덱스: ${lastVisibleIndex}/${currentDisplayed - 1})`);
+            }
+            
+            changed.forEach(item => {
+              if (item.isViewable) {
+                console.log(`👁️ 아이템 [${item.item?.deviceId}] 화면에 진입 (인덱스: ${item.index})`);
+              } else {
+                console.log(`👁️ 아이템 [${item.item?.deviceId}] 화면에서 나감 (인덱스: ${item.index})`);
+              }
+            });
+          }}
+          viewabilityConfig={{
+            itemVisiblePercentThreshold: 30, // 30%만 보여도 viewable로 간주
+            minimumViewTime: 100 // 100ms 이상 보여야 viewable로 간주
+          }}
+          // ListFooter로 로딩 상태 표시
+          ListFooterComponent={() => {
+            if (!hasNextPage) {
+              return (
+                <Text style={{ 
+                  textAlign: 'center', 
+                  padding: 20, 
+                  color: '#666',
+                  fontSize: 14 
+                }}>
+                  📄 모든 기기를 불러왔습니다 ({machines.length}개)
+                </Text>
+              );
+            }
+            
+            if (isLoadingMore) {
+              return (
+                <Text style={{ 
+                  textAlign: 'center', 
+                  padding: 20, 
+                  color: '#007AFF',
+                  fontSize: 14 
+                }}>
+                  🔄 더 많은 기기를 불러오는 중...
+                </Text>
+              );
+            }
+            
+            return null;
+          }}
+          // 추가 FlashList 최적화 옵션
+          removeClippedSubviews={false} // 클리핑 비활성화로 컴포넌트 유지
+          disableHorizontalListHeightMeasurement={true}
+          disableAutoLayout={true}
+        />
+      </Animated.View>
+    </React.Profiler>
   );
 };
 
