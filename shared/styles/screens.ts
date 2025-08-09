@@ -151,16 +151,24 @@ export const TabsLayoutStyles = StyleSheet.create({
 
 export const AreaScreenStyles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
+    backgroundColor: Colors.backgroundSecondary,
   },
   body: {
     flexGrow: 1,
     padding: 16,
   },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 40,
+  },
+  
   loadingText: {
-    color: Colors.textSecondary,
+    fontSize: 16,
+    color: '#666',
     textAlign: 'center',
-    marginTop: 50
   },
 });
 

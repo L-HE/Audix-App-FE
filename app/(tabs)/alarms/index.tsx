@@ -6,30 +6,40 @@ import { AlarmsScreenStyles as style } from '@/shared/styles/screens';
 import { AlarmData, alarmData } from '../../../assets/data/alarmData';
 import AlarmCard from '../../../components/screens/alarmCard';
 import { useModal } from '../../../shared/api/modalContextApi';
+import { usePerformanceProfiler } from '../../../shared/utils/performance';
 
 const AlarmScreen: React.FC = () => {
   const { setModalVisible, setModalData } = useModal();
   const [page, setPage] = useState(1);
   const ITEMS_PER_PAGE = 20;
+  
+  // Performance profiler 추가
+  const { measureFunction, measureRender } = usePerformanceProfiler('AlarmScreen');
 
   // 한 번 정렬하고 페이지네이션 적용
   const paginatedData = useMemo(() => {
-    // 1. 먼저 정렬
-    const sorted = [...alarmData].sort((a, b) => {
-      const dateA = new Date(a.createdAt).getTime();
-      const dateB = new Date(b.createdAt).getTime();
-      return dateB - dateA; // 내림차순 정렬
-    });
+    const endMeasurement = measureRender();
+    
+    try {
+      // 1. 먼저 정렬
+      const sorted = [...alarmData].sort((a, b) => {
+        const dateA = new Date(a.createdAt).getTime();
+        const dateB = new Date(b.createdAt).getTime();
+        return dateB - dateA; // 내림차순 정렬
+      });
 
-    // 2. 페이지네이션 적용
-    return sorted.slice(0, page * ITEMS_PER_PAGE);
-  }, [page]);
+      // 2. 페이지네이션 적용
+      return sorted.slice(0, page * ITEMS_PER_PAGE);
+    } finally {
+      endMeasurement();
+    }
+  }, [page, measureRender]);
 
   // handleAlarmPress를 useCallback으로 메모이제이션
-  const handleAlarmPress = useCallback((item: AlarmData) => {
+  const handleAlarmPress = useCallback(measureFunction('handleAlarmPress', (item: AlarmData) => {
     setModalData(item);
     setModalVisible(true);
-  }, [setModalData, setModalVisible]);
+  }), [setModalData, setModalVisible, measureFunction]);
 
   // renderItem 타입을 AlarmData로 수정
   const renderAlarmCard: ListRenderItem<AlarmData> = useCallback(({ item }) => (
