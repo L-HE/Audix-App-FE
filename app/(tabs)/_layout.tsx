@@ -8,7 +8,6 @@ import AppBar from '../../components/common/appBar';
 import BottomNav from '../../components/common/bottomNav';
 import Header from '../../components/common/header';
 import LoadingScreen from '../../components/common/loadingScreen';
-import PerformanceMonitor from '../../components/dev/performanceMonitor';
 import { useLoadingStore } from '../../shared/store/loadingStore';
 import { TabsLayoutStyles as style } from '../../shared/styles/screens';
 import NotificationModal from './notificationModal';
@@ -56,7 +55,6 @@ function TabsLayoutContent() {
 
         <BottomNav />
         <NotificationModal />
-        <PerformanceMonitor />
 
         {isLoading && <LoadingScreen message={loadingMessage} />}
       </View>
