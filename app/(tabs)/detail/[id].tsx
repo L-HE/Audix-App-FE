@@ -1,7 +1,7 @@
 // app/detail/[id].tsx
 import { FlashList } from '@shopify/flash-list';
 import { useLocalSearchParams } from 'expo-router';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Text } from 'react-native';
 import Animated, {
   useAnimatedStyle,
@@ -39,8 +39,6 @@ const onRenderCallback = (
   phase: 'mount' | 'update' | 'nested-update',
   actualDuration: number,
   baseDuration: number,
-  startTime: number,
-  commitTime: number
 ) => {
   const threshold = 16; // 60fps 기준 16ms
   
@@ -59,7 +57,6 @@ const onRenderCallback = (
 const DetailScreen: React.FC = () => {
   const { id } = useLocalSearchParams<Params>();
   const [machines, setMachines] = useState<Machine[]>([]); // 화면에 표시되는 최신 스냅샷
-  const [error, setError] = useState<string | null>(null);
   const [isOnlineMode, setIsOnlineMode] = useState(false);
   const { setLoading } = useLoadingStore();
   const { refreshTrigger } = useRefreshStore();
@@ -76,29 +73,38 @@ const DetailScreen: React.FC = () => {
   // 아이템 높이 측정 상태 추가
   const [measuredItemHeight, setMeasuredItemHeight] = useState<number | null>(null);
 
-  // 정렬된 데이터를 메모이제이션 (pagination 적용)
-  const statusRank = (s: string) => {
-    switch (s) {
-      case 'danger': return 0;
-      case 'warning': return 1;
-      case 'normal': return 2;
-      case 'repair': return 3;
-      case 'offline': return 4;
-      default: return 999;
-    }
-  };
-  const normScoreVal = (v: number) => (v <= 1 ? v * 100 : v);
+  // 1) sortedMachines를 state로 전환
+  const [sortedMachines, setSortedMachines] = useState<Machine[]>([]);
 
-  // 원본 state 배열을 mutate 하지 않도록 복사본에서 정렬
-  const sortedMachines = useMemo(() => {
-    const sorted = [...machines].sort((a, b) => {
-      const ra = statusRank(a.status) - statusRank(b.status);
-      if (ra !== 0) return ra;
-      return normScoreVal(a.normalScore) - normScoreVal(b.normalScore);
-    });
-    const end = (currentPage + 1) * itemsPerPage;
-    return sorted.slice(0, end);
-  }, [machines, currentPage, itemsPerPage]);
+  // 기존 statusRank / normScoreVal
+  const statusRank = useCallback((s: string) => {
+    switch (s) {
+      case 'danger':  return 0;
+      case 'warning': return 1;
+      case 'normal':  return 2;
+      case 'repair':  return 3;
+      case 'offline': return 4;
+      default:        return 999;
+    }
+  }, []);
+  const normScoreVal = useCallback((v: number) => (v <= 1 ? v * 100 : v), []);
+
+  // 2) comparator & binary search insert
+  const comparator = useCallback((a: Machine, b: Machine) => {
+    const ra = statusRank(a.status) - statusRank(b.status);
+    if (ra !== 0) return ra;
+    return normScoreVal(a.normalScore) - normScoreVal(b.normalScore);
+  }, [statusRank, normScoreVal]);
+
+  const binarySearchInsert = useCallback((arr: Machine[], item: Machine) => {
+    let low = 0, high = arr.length;
+    while (low < high) {
+      const mid = (low + high) >>> 1;
+      if (comparator(item, arr[mid]) < 0) high = mid;
+      else low = mid + 1;
+    }
+    return low;
+  }, [comparator]);
 
   // 다음 페이지 로드 함수
   const loadNextPage = useCallback(() => {
@@ -134,18 +140,21 @@ const DetailScreen: React.FC = () => {
     if (!id) return;
 
     setLoading(true, '데이터를 불러오는 중...');
-    setError(null);
 
     try {
       console.log('🌐 Detail Screen - Area ID로 기기 데이터 요청 (3초 타임아웃):', id);
       
-      // ✅ 3초 타임아웃으로 API 호출
+      // 3초 타임아웃으로 API 호출
       const machineData = await getMachineDataByAreaId(id);
 
       // 전체 데이터와 첫 페이지 데이터 설정
       setMachines(machineData); // 전체 새 스냅샷 (초기 로딩은 전체 교체 허용)
       setCurrentPage(0);
       setHasNextPage(machineData.length > itemsPerPage);
+
+      // initial sort + slice
+      const allSorted = [...machineData].sort(comparator);
+      setSortedMachines(allSorted.slice(0, itemsPerPage));
 
       // 데이터 소스 확인
       if (machineData.length > 2) { // API 데이터는 보통 더 많을 것
@@ -164,13 +173,9 @@ const DetailScreen: React.FC = () => {
       if (error instanceof Error) {
         if (error.name === 'AbortError') {
           console.log('⏰ API 요청 타임아웃 (3초), fallback 기기 데이터 사용');
-          setError('네트워크 연결이 느립니다. 저장된 데이터를 표시합니다.');
         } else {
           console.log('🌐 네트워크 오류, fallback 기기 데이터 사용');
-          setError('네트워크 오류가 발생했습니다. 저장된 데이터를 표시합니다.');
         }
-      } else {
-        setError('데이터를 불러오는데 실패했습니다.');
       }
     } finally {
       setLoading(false);
@@ -201,43 +206,58 @@ const DetailScreen: React.FC = () => {
     // 16ms 이내(다음 프레임 수준)로 묶어서 적용
     flushTimerRef.current = setTimeout(() => {
       flushTimerRef.current = null;
-      if (pendingUpdatesRef.current.size === 0) return;
+      const updates = Array.from(pendingUpdatesRef.current.values());
+      if (updates.length === 0) return;
+      pendingUpdatesRef.current.clear();
 
-      const updates = pendingUpdatesRef.current;
-      pendingUpdatesRef.current = new Map();
-
-      let didChange = false; // setMachines 외부에서 최종 변경 여부 확인
       setMachines(prev => {
         let changed = false;
         const nextArr = prev.map(m => {
-          const upd = updates.get(String(m.deviceId));
-          if (!upd) return m; // unchanged
-          const merged: Machine = { ...m, ...upd } as Machine;
-          if (
-            merged.status !== m.status ||
-            merged.normalScore !== m.normalScore
-          ) {
+          const upd = updates.find(u => u.deviceId === m.deviceId);
+          if (!upd) return m;
+          const merged = { ...m, ...upd };
+          if (merged.status !== m.status || merged.normalScore !== m.normalScore) {
             changed = true;
             return merged;
           }
           return m;
         });
+
         if (changed) {
-          didChange = true;
-          console.log(`🔄 [Incremental Update] 기기 데이터 변경 감지, ${nextArr.length}개 아이템 업데이트`);
+          console.log(`🔄 [Incremental Update] ${updates.length}개 아이템 변경`);
+          // incremental sortedMachines 갱신
+          setSortedMachines(prevSorted => {
+            // fullDataMap: deviceId → 최신 Machine
+            const fullDataMap = new Map(nextArr.map(m => [m.deviceId, m]));
+
+            let arr = [...prevSorted];
+            updates.forEach(u => {
+              const full = fullDataMap.get(u.deviceId)!;
+              // 1) 기존 위치 제거
+              const idx = arr.findIndex(x => x.deviceId === full.deviceId);
+              if (idx >= 0) arr.splice(idx, 1);
+              // 2) 새 위치 탐색 및 삽입
+              const insertAt = binarySearchInsert(arr, full);
+              arr.splice(insertAt, 0, full);
+            });
+            // 3) 페이징 범위 유지
+            return arr.slice(0, (currentPage + 1) * itemsPerPage);
+          });
           return nextArr;
-        } else {
-          console.log('🔄 [Incremental Update] 기기 데이터 변경 없음');
         }
         return prev;
       });
 
-      if (didChange) {
-        // 실제 diff 발생시에만 onEndReached 억제 타이머 갱신
-        markDataMutation();
-      }
-    }, 32); // 약 2 프레임
-  }, [markDataMutation]);
+      // onEndReached 억제
+      markDataMutation();
+    }, 32);
+  }, [
+    binarySearchInsert,
+    comparator,
+    currentPage,
+    itemsPerPage,
+    markDataMutation
+  ]);
 
   // 외부에서 호출할 업데이트 enqueue 함수 (예: websocket message handler에서 사용)
   const enqueueMachineUpdates = useCallback((incoming: MachinePartial | MachinePartial[]) => {
@@ -502,6 +522,22 @@ const DetailScreen: React.FC = () => {
       return () => clearTimeout(t);
     }
   }, [currentPage, hasNextPage, handleEndReached]);
+
+  // 페이지 변경 시 표시 목록 확장 (sortedMachines 확장 누락 해결)
+  useEffect(() => {
+    const end = (currentPage + 1) * itemsPerPage;
+
+    // 이미 충분히 포함돼 있으면 패스
+    if (sortedMachines.length >= end) return;
+
+    // 전체를 다시 정렬(빈도 낮음). Incremental 정렬 최적화는 scheduleFlush 에서 유지.
+    const fullSorted = [...machines].sort(comparator);
+    const nextSlice = fullSorted.slice(0, end);
+    if (nextSlice.length !== sortedMachines.length) {
+      setSortedMachines(nextSlice);
+      // 필요 시: console.log(`[Pagination] slice 확장: ${sortedMachines.length} -> ${nextSlice.length}`);
+    }
+  }, [currentPage, machines, comparator, itemsPerPage, sortedMachines.length, sortedMachines]);
 
   return (
     <React.Profiler id="DetailScreen" onRender={onRenderCallback}>
