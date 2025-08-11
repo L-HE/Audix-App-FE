@@ -24,7 +24,6 @@ const NativeDonutChart: React.FC<Props> = ({ deviceId, normalScore, status, name
   const animatedValue = useRef(new Animated.Value(0)).current;
   const isAnimatingRef = useRef(false);
   const prevUsedRef = useRef<number | null>(null);
-  const firstRenderRef = useRef(true);
 
   const used = normalScore <= 1 ? normalScore * 100 : normalScore;
 
@@ -90,32 +89,37 @@ const NativeDonutChart: React.FC<Props> = ({ deviceId, normalScore, status, name
   // 단일 effect: 최초 + 값 변경 시
   useEffect(() => {
     if (!isMounted.current) return;
+    
     const prev = prevUsedRef.current;
+    console.log(`🔍 [${deviceId}] mount check: prev=${prev}, used=${used}, initialAnimate=${initialAnimate}`);
 
+    // prevUsedRef 초기화를 더 명확하게
     if (prev === null) {
       prevUsedRef.current = used;
       if (initialAnimate) {
-        // 0에서 시작 → 강제 애니메이션 (delta 조건 무시)
+        console.log(`🎬 [${deviceId}] 0→${used} 초기 애니메이션`);
         animatedValue.setValue(0);
         startAnimation(used, 0, { force: true });
       } else {
-        // 애니 없이 즉시 반영
+        console.log(`⚡ [${deviceId}] 즉시 ${used} 설정`);
         animatedValue.setValue(used);
       }
       return;
     }
 
     if (prev !== used) {
+      console.log(`📊 [${deviceId}] 값 변경: ${prev} → ${used}`);
       startAnimation(used, prev);
       prevUsedRef.current = used;
     }
-  }, [used, initialAnimate, startAnimation, animatedValue]);
+  }, [used, initialAnimate, startAnimation, animatedValue, deviceId]);
 
   // 컴포넌트 언마운트 시 정리
   useEffect(() => {
     return () => {
-      isMounted.current = false;
-      console.log(`🧹 [${deviceId}] 네이티브 도넛 차트 unmount`);
+      console.log(`🧹 [${deviceId}] unmount - prevUsedRef 초기화`);
+      prevUsedRef.current = null;
+      animatedValue.stopAnimation();
     };
   }, [deviceId]);
 
