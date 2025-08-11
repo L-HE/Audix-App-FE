@@ -16,9 +16,10 @@ interface Props {
 }
 
 const NativeDonutChart: React.FC<Props> = ({ deviceId, normalScore, status, name }) => {
-  // 컴포넌트 마운트 상태 추적
+  // 컴포넌트 마운트 상태 추적: 렌더 시작 시각을 '각 렌더'마다 갱신하도록 변경
   const isMounted = useRef(true);
   const renderStartTime = useRef(performance.now());
+  renderStartTime.current = performance.now();
   
   // normalScore가 0-1 범위면 100을 곱해서 퍼센트로 변환
   const used = normalScore <= 1 ? normalScore * 100 : normalScore;
@@ -47,8 +48,14 @@ const NativeDonutChart: React.FC<Props> = ({ deviceId, normalScore, status, name
 
   // 간단한 애니메이션 시작 함수
   const startAnimation = useCallback((target: number) => {
+    // 완료 콜백 조건
     if (!isMounted.current) return;
-    if (isAnimatingRef.current) return;
+
+    // 이전 애니메이션 진행 중이면 중단하고 재시작 (연속 업데이트 대응)
+    if (isAnimatingRef.current) {
+      animatedValue.stopAnimation();
+      isAnimatingRef.current = false;
+    }
 
     isAnimatingRef.current = true;
     console.log(`🎬 [${deviceId}] 도넛 차트 애니메이션 시작: ${used}%`);
@@ -58,17 +65,14 @@ const NativeDonutChart: React.FC<Props> = ({ deviceId, normalScore, status, name
     
     Animated.timing(animatedValue, {
       toValue: target,
-      duration: 600, // 더 빠른 애니메이션
+      duration: 600, // 빠른 애니메이션
       useNativeDriver: false, // SVG는 네이티브 드라이버 지원 안함
     }).start(() => {
-      if (isMounted.current) return;
+      if (!isMounted.current) return;  // 언마운트되면 추가 처리 불필요
       isAnimatingRef.current = false;
       console.log(`✅ [${deviceId}] 도넛 차트 애니메이션 완료: ${used}%`);
     });
   }, [animatedValue, deviceId]);
-
-  // 데이터 변경 감지 및 애니메이션 트리거
-  const prevNormalScore = useRef(normalScore);
   
   // 단일 effect: 최초 + 값 변경 시
   useEffect(() => {
@@ -83,7 +87,8 @@ const NativeDonutChart: React.FC<Props> = ({ deviceId, normalScore, status, name
       prevUsedRef.current = used;
       startAnimation(used);
     } else {
-      // 값 동일 → 애니메이션 없이 유지
+      // 값 동일 → 애니메이션 없이 유지, 현재 값으로 고정 (jump)
+      animatedValue.stopAnimation();
       animatedValue.setValue(used);
     }
   }, [used, startAnimation, deviceId, animatedValue]);

@@ -61,17 +61,13 @@ const MachineCard: React.FC<Machine> = React.memo(({
   // 핵심 데이터만 비교하여 리렌더링 결정
   const shouldSkipUpdate = (
     prevProps.status === nextProps.status &&
-    prevProps.normalScore === nextProps.normalScore &&
-    prevProps.deviceId === nextProps.deviceId &&
-    prevProps.name === nextProps.name
+    prevProps.normalScore === nextProps.normalScore
   );
   
   if (!shouldSkipUpdate) {
     console.log(`🔄 MachineCard [${prevProps.deviceId}] 리렌더링 필요:`, {
       status: `${prevProps.status} → ${nextProps.status}`,
-      normalScore: `${prevProps.normalScore} → ${nextProps.normalScore}`,
-      deviceId: `${prevProps.deviceId} → ${nextProps.deviceId}`,
-      name: `${prevProps.name} → ${nextProps.name}`
+      normalScore: `${prevProps.normalScore} → ${nextProps.normalScore}`
     });
   }
   
