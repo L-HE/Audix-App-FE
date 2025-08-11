@@ -17,14 +17,19 @@ import { DetailScreenStyles as style } from '../../../shared/styles/screens';
 type Params = { id: string };
 
 // 개별 Machine 행 컴포넌트 (FlashList row)
-// 필요한 필드만 비교하여 불필요한 재렌더 방지
-const MachineRow = React.memo<Machine>((props) => {
-  return <MachineCard {...props} />;
+// animateOnFirstMount 추가
+interface MachineRowProps extends Machine {
+  animateOnFirstMount?: boolean;
+}
+
+const MachineRow = React.memo<MachineRowProps>((props) => {
+  return <MachineCard {...props} animateOnFirstMount={props.animateOnFirstMount} />;
 }, (prev, next) => {
   // Machine에서 렌더에 영향 주는 핵심 필드 비교
   return (
     prev.status === next.status &&
-    prev.normalScore === next.normalScore
+    prev.normalScore === next.normalScore &&
+    prev.animateOnFirstMount === next.animateOnFirstMount
   );
 });
 
@@ -451,18 +456,17 @@ const DetailScreen: React.FC = () => {
           }
         : undefined;
 
-      // 첫 페이지 아이템 한정 최초 한 번만 페이드
       const shouldFade = index < itemsPerPage && !initialFadeIdsRef.current.has(item.deviceId);
       if (shouldFade) initialFadeIdsRef.current.add(item.deviceId);
+
+      const animateOnFirstMount = index < 2; // 상위 두 개만 초기 0→값 애니
 
       return (
         <Animated.View
           onLayout={onLayoutMeasure}
           style={shouldFade ? { opacity: 0 } : undefined}
-          // 수동 페이드 (mount 후 JS side)
           ref={(ref: any) => {
             if (ref && shouldFade) {
-              // requestAnimationFrame 으로 다음 프레임 opacity 1
               requestAnimationFrame(() => {
                 try {
                   ref.setNativeProps({ style: { opacity: 1, transitionDuration: '180ms' } });
@@ -471,7 +475,7 @@ const DetailScreen: React.FC = () => {
             }
           }}
         >
-          <MachineRow {...item} />
+          <MachineRow {...item} animateOnFirstMount={animateOnFirstMount} />
         </Animated.View>
       );
     },

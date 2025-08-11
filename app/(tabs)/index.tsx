@@ -1,9 +1,8 @@
 // app/(tabs)/index.tsx - React Profiler 적용 버전
 import { FlashList, ListRenderItem } from '@shopify/flash-list';
 import { useRouter } from 'expo-router';
-import React, { Profiler, useCallback, useEffect, useMemo, useState } from 'react';
-import { View } from 'react-native';
-import Animated, { FadeIn } from 'react-native-reanimated';
+import React, { Profiler, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Animated, View } from 'react-native'; // ✅ react-native Animated 사용 (reanimated FadeIn 제거)
 
 import { Area, getAreaData } from '../../assets/data/areaData';
 import AreaCard from '../../components/screens/areaCard';
@@ -67,7 +66,7 @@ const AreaScreenContent: React.FC = () => {
       }
       
     } catch (error) {
-      console.error('❌ Area 데이터 로딩 실패:', error);
+      console.warn('❌ Area 데이터 로딩 실패:', error);
       setIsOnlineMode(false);
     } finally {
       setLoading(false);
@@ -92,20 +91,16 @@ const AreaScreenContent: React.FC = () => {
       router.push({ pathname: '/detail/[id]', params: { id: item.id } });
     };
 
-    // 🔧 애니메이션 최적화 - 첫 3개만 애니메이션
-    const animationDelay = index < 3 ? index * 15 : 0;
-    
-    return (
-      <Animated.View
-        entering={index < 3 ? FadeIn.delay(animationDelay).duration(80) : undefined}
-        style={{ marginBottom: 12 }}
-      >
-        <AreaCard
-          {...item}
-          onPress={handlePress}
-        />
-      </Animated.View>
+    const shouldFade = index < 3;           // 첫 3개만 페이드
+    const delay = index * 40;               // 약간 길게 조절
+
+    const card = (
+      <View style={{ marginBottom: 12 }}>
+        <AreaCard {...item} onPress={handlePress} />
+      </View>
     );
+
+    return shouldFade ? <FadeInOnce delay={delay}>{card}</FadeInOnce> : card;
   }, [router]);
 
   // 🔧 키 추출 함수
@@ -144,16 +139,14 @@ const AreaScreenContent: React.FC = () => {
   // 🔧 로딩 컴포넌트
   const LoadingComponent = useMemo(() => {
     if (!loading) return null;
-    
     return (
-      <View style={style.loadingContainer}>
-        <Animated.Text
-          entering={FadeIn.duration(200)}
-          style={style.loadingText}
-        >
-          구역 정보를 불러오는 중...
-        </Animated.Text>
-      </View>
+      <FadeInOnce>
+        <View style={style.loadingContainer}>
+          <Animated.Text style={style.loadingText}>
+            구역 정보를 불러오는 중...
+          </Animated.Text>
+        </View>
+      </FadeInOnce>
     );
   }, [loading]);
 
@@ -165,7 +158,7 @@ const AreaScreenContent: React.FC = () => {
         keyExtractor={keyExtractor}
         estimatedItemSize={120}
         showsVerticalScrollIndicator={false}
-        removeClippedSubviews={true}
+        removeClippedSubviews
         contentContainerStyle={{
           paddingHorizontal: 16,
           paddingTop: 8,
@@ -176,13 +169,30 @@ const AreaScreenContent: React.FC = () => {
         disableAutoLayout={false}
         scrollEventThrottle={16}
         decelerationRate="fast"
-        overrideItemLayout={(layout, item, index) => {
+        overrideItemLayout={(layout) => {
           layout.size = 120;
         }}
         getItemType={() => 'areaCard'}
       />
     </View>
   );
+};
+
+// ✅ 1회 페이드인 래퍼 (수동 opacity 애니메이션)
+const FadeInOnce: React.FC<{ delay?: number; children: React.ReactNode }> = ({ delay = 0, children }) => {
+  const opacity = useRef(new Animated.Value(0)).current;
+  const playedRef = useRef(false);
+  useEffect(() => {
+    if (playedRef.current) return;
+    playedRef.current = true;
+    Animated.timing(opacity, {
+      toValue: 1,
+      duration: 140,
+      delay,
+      useNativeDriver: true
+    }).start();
+  }, [delay, opacity]);
+  return <Animated.View style={{ opacity }}>{children}</Animated.View>;
 };
 
 // 🔍 React Profiler로 감싸진 메인 컴포넌트

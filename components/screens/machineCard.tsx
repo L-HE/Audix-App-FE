@@ -7,7 +7,11 @@ import { MachineCardStyles as styles } from '../../shared/styles/components';
 import { getBorderColor } from '../../shared/styles/global';
 import NativeDonutChart from './nativeDonutChart';
 
-const MachineCard: React.FC<Machine> = React.memo(({
+interface MachineCardProps extends Machine {
+  animateOnFirstMount?: boolean;
+}
+
+const MachineCard: React.FC<MachineCardProps> = React.memo(({
   deviceId,
   name,
   explain,
@@ -15,7 +19,8 @@ const MachineCard: React.FC<Machine> = React.memo(({
   deviceManager,
   status,
   image,
-  normalScore
+  normalScore,
+  animateOnFirstMount
 }) => {
   const borderColor = React.useMemo(() => getBorderColor(status as CardState), [status]);
   const imageSource = React.useMemo(() => {
@@ -47,8 +52,14 @@ const MachineCard: React.FC<Machine> = React.memo(({
             </View>
           </View>
           <View>
-            <NativeDonutChart deviceId={String(deviceId)} normalScore={normalScore} status={status} name={name} />
-          </View>
+              <NativeDonutChart
+                deviceId={String(deviceId)}
+                normalScore={normalScore}
+                status={status}
+                name={name}
+                initialAnimate={!!animateOnFirstMount}
+              />
+            </View>
         </View>
         <View style={styles.flex3}>
               <Text style={styles.infoText}>위치: {address}</Text>

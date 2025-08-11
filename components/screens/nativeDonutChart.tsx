@@ -13,9 +13,10 @@ interface Props {
   normalScore: number;
   status: string;
   name: string;
+  initialAnimate?: boolean;
 }
 
-const NativeDonutChart: React.FC<Props> = ({ deviceId, normalScore, status, name }) => {
+const NativeDonutChart: React.FC<Props> = ({ deviceId, normalScore, status, name, initialAnimate }) => {
   const isMounted = useRef(true);
   const renderStartTime = useRef(performance.now());
   renderStartTime.current = performance.now();
@@ -23,7 +24,7 @@ const NativeDonutChart: React.FC<Props> = ({ deviceId, normalScore, status, name
   const animatedValue = useRef(new Animated.Value(0)).current;
   const isAnimatingRef = useRef(false);
   const prevUsedRef = useRef<number | null>(null);
-  const firstRenderRef = useRef(true); // ✅ useEffect 밖(최상위)으로 이동
+  const firstRenderRef = useRef(true);
 
   const used = normalScore <= 1 ? normalScore * 100 : normalScore;
 
@@ -46,33 +47,33 @@ const NativeDonutChart: React.FC<Props> = ({ deviceId, normalScore, status, name
   const lastAnimTimeRef = useRef(0);
 
   // 간단한 애니메이션 시작 함수
-  const startAnimation = useCallback((target: number, prev: number) => {
+  const startAnimation = useCallback((
+    target: number,
+    prev: number,
+    opts?: { force?: boolean }
+  ) => {
     if (!isMounted.current) return;
 
     const now = Date.now();
     const delta = Math.abs(target - prev);
 
-    // 1) 너무 작은 변화 스킵
-    if (delta < 2) {
+    if (!opts?.force && delta < 2) {
       animatedValue.stopAnimation();
       animatedValue.setValue(target);
       return;
     }
 
-    // 2) 300ms 내 연속 큰 업데이트 → 이전 애니 중단 후 빠른 보강
     const fast = now - lastAnimTimeRef.current < 300;
     lastAnimTimeRef.current = now;
 
-    // 현재 진행 위치에서 시작 (0으로 리셋 X)
     let startFrom = prev;
     animatedValue.stopAnimation((curr: number) => {
-      // curr 가 유효하면 그 지점부터
       if (typeof curr === 'number') startFrom = curr;
     });
-
     animatedValue.setValue(startFrom);
 
-    const duration = Math.min(650, Math.max(180, (delta / 100) * 500)) * (fast ? 0.6 : 1);
+    const baseDur = Math.min(650, Math.max(180, (delta / 100) * 500));
+    const duration = baseDur * (fast ? 0.6 : 1);
 
     isAnimatingRef.current = true;
     Animated.timing(animatedValue, {
@@ -93,8 +94,14 @@ const NativeDonutChart: React.FC<Props> = ({ deviceId, normalScore, status, name
 
     if (prev === null) {
       prevUsedRef.current = used;
-      // 초기엔 바로 값 세팅 (애니 생략)
-      animatedValue.setValue(used);
+      if (initialAnimate) {
+        // 0에서 시작 → 강제 애니메이션 (delta 조건 무시)
+        animatedValue.setValue(0);
+        startAnimation(used, 0, { force: true });
+      } else {
+        // 애니 없이 즉시 반영
+        animatedValue.setValue(used);
+      }
       return;
     }
 
@@ -102,7 +109,7 @@ const NativeDonutChart: React.FC<Props> = ({ deviceId, normalScore, status, name
       startAnimation(used, prev);
       prevUsedRef.current = used;
     }
-  }, [used, startAnimation, animatedValue]);
+  }, [used, initialAnimate, startAnimation, animatedValue]);
 
   // 컴포넌트 언마운트 시 정리
   useEffect(() => {
