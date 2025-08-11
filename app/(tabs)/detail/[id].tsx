@@ -4,7 +4,6 @@ import { useLocalSearchParams } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Text } from 'react-native';
 import Animated, {
-  FadeIn,
   useAnimatedStyle,
   useSharedValue,
   withTiming
@@ -69,36 +68,31 @@ const DetailScreen: React.FC = () => {
   // 단순한 페이드 인 애니메이션만
   const opacity = useSharedValue(0);
 
+  // 아이템 높이 측정 상태 추가
+  const [measuredItemHeight, setMeasuredItemHeight] = useState<number | null>(null);
+
   // 정렬된 데이터를 메모이제이션 (pagination 적용)
+  const statusRank = (s: string) => {
+    switch (s) {
+      case 'danger': return 0;
+      case 'warning': return 1;
+      case 'normal': return 2;
+      case 'repair': return 3;
+      case 'offline': return 4;
+      default: return 999;
+    }
+  };
+  const normScoreVal = (v: number) => (v <= 1 ? v * 100 : v);
+
+  // 원본 state 배열을 mutate 하지 않도록 복사본에서 정렬
   const sortedMachines = useMemo(() => {
-    // 정렬 우선순위: 1) status (danger > warning > normal > repair > offline)
-    //              2) 같은 status 내에서는 normalScore (오름차순)
-    const statusRank: Record<string, number> = {
-      danger: 0,
-      warning: 1,
-      normal: 2,
-      repair: 3,
-      offline: 4,
-    };
-
-    const normScore = (v: number) => (v <= 1 ? v * 100 : v);
-
-    // 원본 state 배열을 mutate 하지 않도록 복사본에서 정렬
     const sorted = [...machines].sort((a, b) => {
-      const ra = statusRank[a.status] ?? 999;
-      const rb = statusRank[b.status] ?? 999;
-      if (ra !== rb) return ra - rb;
-
-      const sa = normScore(a.normalScore);
-      const sb = normScore(b.normalScore);
-      return sa - sb; // 낮은 normalScore 먼저
+      const ra = statusRank(a.status) - statusRank(b.status);
+      if (ra !== 0) return ra;
+      return normScoreVal(a.normalScore) - normScoreVal(b.normalScore);
     });
-
-    // 현재 페이지까지의 데이터만 반환 (pagination)
-    const endIndex = (currentPage + 1) * itemsPerPage;
-    const paginatedData = sorted.slice(0, endIndex);
-
-    return paginatedData;
+    const end = (currentPage + 1) * itemsPerPage;
+    return sorted.slice(0, end);
   }, [machines, currentPage, itemsPerPage]);
 
   // 다음 페이지 로드 함수
@@ -185,9 +179,20 @@ const DetailScreen: React.FC = () => {
   type MachinePartial = Partial<Machine> & { deviceId: number };
   const pendingUpdatesRef = useRef<Map<string, MachinePartial>>(new Map());
   const flushTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  
+  // onEndReached 억제용 타임 윈도우 ref (scheduleFlush에서 변경 발생시 갱신)
+  const suppressEndReachedUntilRef = useRef(0);
+  
+  // (선택) 초기 데이터 세팅 직후 과도 호출 차단 시간을 연장하고 싶다면 여기서 재사용
+  const EXTENDED_BLOCK_MS = 250;
+
+  // 기존 markDataMutation 확장: 차단 시간 연장
+  const markDataMutation = useCallback(() => {
+    suppressEndReachedUntilRef.current = Date.now() + EXTENDED_BLOCK_MS;
+  }, []);
 
   const scheduleFlush = useCallback(() => {
-    if (flushTimerRef.current) return; // 이미 스케줄됨
+    if (flushTimerRef.current) return;
     // 16ms 이내(다음 프레임 수준)로 묶어서 적용
     flushTimerRef.current = setTimeout(() => {
       flushTimerRef.current = null;
@@ -196,6 +201,7 @@ const DetailScreen: React.FC = () => {
       const updates = pendingUpdatesRef.current;
       pendingUpdatesRef.current = new Map();
 
+      let didChange = false; // setMachines 외부에서 최종 변경 여부 확인
       setMachines(prev => {
         let changed = false;
         const nextArr = prev.map(m => {
@@ -204,19 +210,29 @@ const DetailScreen: React.FC = () => {
           const merged: Machine = { ...m, ...upd } as Machine;
           if (
             merged.status !== m.status ||
-            merged.normalScore !== m.normalScore ||
-            merged.name !== m.name ||
-            merged.image !== m.image
+            merged.normalScore !== m.normalScore
           ) {
             changed = true;
             return merged;
           }
           return m;
         });
-        return changed ? nextArr : prev;
+        if (changed) {
+          didChange = true;
+          console.log(`🔄 [Incremental Update] 기기 데이터 변경 감지, ${nextArr.length}개 아이템 업데이트`);
+          return nextArr;
+        } else {
+          console.log('🔄 [Incremental Update] 기기 데이터 변경 없음');
+        }
+        return prev;
       });
-    }, 16); // 약 1 프레임
-  }, []);
+
+      if (didChange) {
+        // 실제 diff 발생시에만 onEndReached 억제 타이머 갱신
+        markDataMutation();
+      }
+    }, 32); // 약 2 프레임
+  }, [markDataMutation]);
 
   // 외부에서 호출할 업데이트 enqueue 함수 (예: websocket message handler에서 사용)
   const enqueueMachineUpdates = useCallback((incoming: MachinePartial | MachinePartial[]) => {
@@ -263,10 +279,6 @@ const DetailScreen: React.FC = () => {
     extra?: unknown
   ) => void;
 
-  const overrideItemLayout: OverrideLayoutFn = useCallback((layout) => {
-    layout.size = 160;
-  }, []);
-
   const footerComponent = useCallback(() => {
     if (!hasNextPage) {
       return (
@@ -292,16 +304,119 @@ const DetailScreen: React.FC = () => {
         </Text>
       );
     }
+    if (hasNextPage && !isLoadingMore) {
+      return (
+        <Text
+          onPress={() => {
+            console.log('[Footer] Manual loadNextPage click');
+            userScrolledRef.current = true;
+            handleEndReached();
+          }}
+          style={{
+            textAlign: 'center',
+            padding: 14,
+            color: '#007AFF',
+            fontWeight: '600'
+          }}
+        >
+          더 불러오기 (디버그)
+        </Text>
+      );
+    }
     return null;
   }, [hasNextPage, isLoadingMore, machines.length]);
 
+  // onEndReached 추가 가드용 ref
+  const lastEndReachedPageRef = useRef(-1);          // 마지막으로 onEndReached 호출 당시의 currentPage
+  const lastEndReachedTimeRef = useRef(0);           // 마지막 호출 시간(ms)
+  const userScrolledRef = useRef(false);             // 사용자가 실제 스크롤을 했는지
+  const pendingPageRequestRef = useRef(false);       // 중복 호출 방지
+
+  // FlashList onEndReached 디버깅 강화 + 조건 세분화
+  const DEBOUNCE_MS = 350;
+  
+  // onEndReached 강화된 가드
   const handleEndReached = useCallback(() => {
-    // ✅ 무한 호출 방지
-    if (isLoadingMore || !hasNextPage) {
+    const now = Date.now();
+    const reasons: string[] = [];
+
+    if (now < suppressEndReachedUntilRef.current) reasons.push('suppressWindow');
+    if (!userScrolledRef.current) reasons.push('noUserScroll');
+    if (isLoadingMore) reasons.push('isLoadingMore');
+    if (pendingPageRequestRef.current) reasons.push('pendingRequest');
+    if (!hasNextPage) reasons.push('noNextPage');
+    if (lastEndReachedPageRef.current === currentPage) reasons.push('duplicatePage');
+    if (now - lastEndReachedTimeRef.current < DEBOUNCE_MS) reasons.push(`debounce(${now - lastEndReachedTimeRef.current}ms)`);
+
+    if (reasons.length) {
+      console.log('[onEndReached] SKIP', {
+        page: currentPage,
+        totalItems: machines.length,
+        shown: sortedMachines.length,
+        reasons
+      });
       return;
     }
+
+    console.log('[onEndReached] TRIGGER', {
+      page: currentPage,
+      totalItems: machines.length,
+      shown: sortedMachines.length
+    });
+
+    pendingPageRequestRef.current = true;
+    lastEndReachedPageRef.current = currentPage;
+    lastEndReachedTimeRef.current = now;
     loadNextPage();
-  }, [isLoadingMore, hasNextPage, loadNextPage]);
+  }, [
+    currentPage,
+    hasNextPage,
+    isLoadingMore,
+    loadNextPage,
+    machines.length,
+    sortedMachines.length
+  ]);
+
+  // 스크롤 발생 감지 (최초 1회만)
+  const handleScroll = useCallback((e: any) => {
+    if (userScrolledRef.current) return;
+    const offsetY = e?.nativeEvent?.contentOffset?.y ?? 0;
+    if (offsetY > 4) { // 32 → 4 로 낮춤 (스크롤 높이 작을 때도 감지)
+      userScrolledRef.current = true;
+      console.log('[Scroll] userScrolledRef = true (offsetY=', offsetY, ')');
+    }
+  }, []);
+
+  // 컨텐츠 높이가 화면보다 작아 스크롤 불가한 경우 다음 페이지 자동 시도
+  const handleContentSizeChange = useCallback(
+    (w: number, h: number) => {
+      // 레이아웃 높이 측정이 필요하므로 ref 로 한 번 저장
+      if (!layoutHeightRef.current) return;
+      if (
+        h <= layoutHeightRef.current + 4 &&  // 거의 동일
+        hasNextPage &&
+        !isLoadingMore &&
+        !pendingPageRequestRef.current
+      ) {
+        console.log('[ContentSize] 콘텐츠가 화면보다 작음 → next page preload');
+        // 스크롤이 불가하므로 userScrolled 로 간주
+        userScrolledRef.current = true;
+        handleEndReached();
+      }
+    },
+    [hasNextPage, isLoadingMore, handleEndReached]
+  );
+
+  // 레이아웃 높이 저장
+  const layoutHeightRef = useRef(0);
+  const onLayoutRoot = useCallback((e: any) => {
+    layoutHeightRef.current = e?.nativeEvent?.layout?.height ?? 0;
+  }, []);
+
+  // 페이지 변경시 pending 해제
+  useEffect(() => {
+    pendingPageRequestRef.current = false;
+  }, [currentPage]);
 
   // 화면 진입 애니메이션
   useEffect(() => {
@@ -321,14 +436,47 @@ const DetailScreen: React.FC = () => {
     }
   }, [refreshTrigger, isOnlineMode]);
 
-  // FlashList 렌더링 최적화
-  const renderMachine = useCallback(({ item, index }: { item: Machine; index: number }) => {
-    return (
-      <Animated.View entering={FadeIn.delay(index * 25).duration(240)}>
-        <MachineRow {...item} />
-      </Animated.View>
-    );
-  }, []);
+  // 간단한 수동 페이드용 (Reanimated entering 제거)
+  const initialFadeIdsRef = useRef<Set<number>>(new Set());
+
+  const renderMachine = useCallback(
+    ({ item, index }: { item: Machine; index: number }) => {
+      const onLayoutMeasure = !measuredItemHeight
+        ? (e: any) => {
+            const h = e.nativeEvent.layout.height;
+            if (h > 0 && !measuredItemHeight) {
+              setMeasuredItemHeight(h);
+              console.log('[Measure] MachineCard height=', h);
+            }
+          }
+        : undefined;
+
+      // 첫 페이지 아이템 한정 최초 한 번만 페이드
+      const shouldFade = index < itemsPerPage && !initialFadeIdsRef.current.has(item.deviceId);
+      if (shouldFade) initialFadeIdsRef.current.add(item.deviceId);
+
+      return (
+        <Animated.View
+          onLayout={onLayoutMeasure}
+          style={shouldFade ? { opacity: 0 } : undefined}
+          // 수동 페이드 (mount 후 JS side)
+          ref={(ref: any) => {
+            if (ref && shouldFade) {
+              // requestAnimationFrame 으로 다음 프레임 opacity 1
+              requestAnimationFrame(() => {
+                try {
+                  ref.setNativeProps({ style: { opacity: 1, transitionDuration: '180ms' } });
+                } catch {}
+              });
+            }
+          }}
+        >
+          <MachineRow {...item} />
+        </Animated.View>
+      );
+    },
+    [itemsPerPage, measuredItemHeight]
+  );
 
   const keyExtractor = useCallback((item: Machine) => item.deviceId.toString(), []);
 
@@ -340,63 +488,47 @@ const DetailScreen: React.FC = () => {
     opacity: opacity.value,
   }));
 
+  // 2) 초기 pagination 지연: 첫 페이지 UI 안정 뒤 200ms 후 prefetch
+  useEffect(() => {
+    if (currentPage === 0 && hasNextPage) {
+      const t = setTimeout(() => {
+        userScrolledRef.current = true;
+        handleEndReached();
+      }, 200);
+      return () => clearTimeout(t);
+    }
+  }, [currentPage, hasNextPage, handleEndReached]);
+
   return (
     <React.Profiler id="DetailScreen" onRender={onRenderCallback}>
       <Animated.View style={[style.container, animatedStyle]}>
-        {/* ✅ 에러 메시지 표시 */}
-        {error && (
-          <Animated.View entering={FadeIn.duration(300)} style={style.errorIndicator}>
-            <Text style={style.errorText}>
-              ⚠️ {error}
-            </Text>
-          </Animated.View>
-        )}
-
         {/* FlashList로 교체 - Pagination 적용 */}
         <FlashList
           data={sortedMachines}
           renderItem={renderMachine}
           keyExtractor={keyExtractor}
           getItemType={getItemType}
-          estimatedItemSize={160}
-          drawDistance={1000}
-          overrideItemLayout={overrideItemLayout}
+          estimatedItemSize={measuredItemHeight ?? 160}
+          drawDistance={600}
           onEndReached={handleEndReached}
-          onEndReachedThreshold={0.8}
-          onLoad={(info) => {
-            console.log('⚡ FlashList 로드 완료:', {
-              elapsedTime: info.elapsedTimeInMs,
-              totalItems: sortedMachines.length
-            });
+          onEndReachedThreshold={0.65}
+          onScroll={handleScroll}
+          scrollEventThrottle={16}
+          onContentSizeChange={handleContentSizeChange}
+          onLayout={onLayoutRoot}
+          ListFooterComponent={footerComponent}
+          contentContainerStyle={{
+            paddingHorizontal: 16,
+            paddingTop: 8,
+            paddingBottom: 16,
           }}
+          removeClippedSubviews
           onBlankArea={(e) => {
             const blankSize = e.offsetEnd - e.offsetStart;
-            if (blankSize > 50) {
-              console.warn(`⚠️ FlashList 빈 영역 크기: ${blankSize}px`);
+            if (blankSize > (measuredItemHeight ? measuredItemHeight * 2 : 320)) {
+              console.warn(`⚠️ Blank area: ${blankSize.toFixed(1)}px (estItem=${measuredItemHeight ?? 160})`);
             }
           }}
-          onViewableItemsChanged={({ viewableItems, changed }) => {
-            const currentDisplayed = sortedMachines.length;
-            const totalAvailable = machines.length;
-            console.log(`👁️ [FlashList] 화면에 보이는 아이템: ${viewableItems.length}`);
-            console.log(`📊 [Pagination] 현재 로드된 아이템: ${currentDisplayed}/${totalAvailable} (페이지: ${currentPage + 1})`);
-            const lastVisibleIndex = viewableItems.length
-              ? Math.max(...viewableItems.map(v => v.index ?? 0))
-              : -1;
-            if (lastVisibleIndex >= currentDisplayed - 2) {
-              console.log(`🔚 마지막 아이템 근처 (index ${lastVisibleIndex}/${currentDisplayed - 1})`);
-            }
-            changed.forEach(ci => {
-              if (ci.isViewable) {
-                console.log(`👁️ in [${ci.item?.deviceId}] index=${ci.index}`);
-              }
-            });
-          }}
-          viewabilityConfig={viewabilityConfig}
-          ListFooterComponent={footerComponent}
-          removeClippedSubviews={false}
-          disableHorizontalListHeightMeasurement
-          disableAutoLayout
         />
       </Animated.View>
     </React.Profiler>

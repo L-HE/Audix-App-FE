@@ -6,7 +6,6 @@ import { View } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
 
 import { Area, getAreaData } from '../../assets/data/areaData';
-import PerformanceMonitor from '../../components/dev/performanceMonitor';
 import AreaCard from '../../components/screens/areaCard';
 import { useRefreshStore } from '../../shared/store/refreshStore';
 import { AreaScreenStyles as style } from '../../shared/styles/screens';
@@ -124,7 +123,7 @@ const AreaScreenContent: React.FC = () => {
     } catch (error) {
       console.log('📱 WebSocket 연결 실패, 오프라인 모드');
     }
-  }, []); // 빈 의존성 배열
+  }, []);
 
   // 🔧 초기 데이터 로드 - 한 번만 실행
   useEffect(() => {
@@ -132,7 +131,7 @@ const AreaScreenContent: React.FC = () => {
     return () => {
       webSocketClient.disconnect();
     };
-  }, []); // 빈 의존성 배열
+  }, []);
 
   // 🔧 WebSocket 새로고침 - 직접 호출로 변경
   useEffect(() => {
@@ -158,10 +157,6 @@ const AreaScreenContent: React.FC = () => {
     );
   }, [loading]);
 
-  // 🔧 간단한 헤더/푸터 컴포넌트
-  const HeaderComponent = useMemo(() => <View style={{ height: 8 }} />, []);
-  const FooterComponent = useMemo(() => <View style={{ height: 16 }} />, []);
-
   return (
     <View style={style.container}>
       <FlashList
@@ -177,8 +172,6 @@ const AreaScreenContent: React.FC = () => {
           paddingBottom: 16,
         }}
         ListEmptyComponent={LoadingComponent}
-        ListHeaderComponent={HeaderComponent}
-        ListFooterComponent={FooterComponent}
         drawDistance={250}
         disableAutoLayout={false}
         scrollEventThrottle={16}
@@ -188,9 +181,6 @@ const AreaScreenContent: React.FC = () => {
         }}
         getItemType={() => 'areaCard'}
       />
-      
-      {/* 🔍 Performance Monitor */}
-      <PerformanceMonitor />
     </View>
   );
 };

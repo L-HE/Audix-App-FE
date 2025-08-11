@@ -247,7 +247,7 @@ export const DetailScreenStyles = StyleSheet.create({
     marginBottom: 8,
     borderRadius: 8,
     alignItems: 'center',
-    shadowColor: '#000',
+    shadowColor: Colors.shadow,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -257,7 +257,7 @@ export const DetailScreenStyles = StyleSheet.create({
     elevation: 3,
   },
   errorText: {
-    color: '#FFFFFF',
+    color: Colors.textWhite,
     fontSize: 14,
     fontWeight: '600',
     textAlign: 'center',

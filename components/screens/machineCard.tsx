@@ -45,14 +45,14 @@ const MachineCard: React.FC<Machine> = React.memo(({
               <Text style={styles.name}>{name}</Text>
               <Text style={styles.subName}>{explain}</Text>
             </View>
-            <View style={styles.flex3}>
-              <Text style={styles.infoText}>위치: {address}</Text>
-              <Text style={styles.infoText}>담당자: {deviceManager}</Text>
-            </View>
           </View>
           <View>
             <NativeDonutChart deviceId={String(deviceId)} normalScore={normalScore} status={status} name={name} />
           </View>
+        </View>
+        <View style={styles.flex3}>
+              <Text style={styles.infoText}>위치: {address}</Text>
+              <Text style={styles.infoText}>담당자: {deviceManager}</Text>
         </View>
       </View>
     </SafeAreaView>
@@ -63,13 +63,6 @@ const MachineCard: React.FC<Machine> = React.memo(({
     prevProps.status === nextProps.status &&
     prevProps.normalScore === nextProps.normalScore
   );
-  
-  if (!shouldSkipUpdate) {
-    console.log(`🔄 MachineCard [${prevProps.deviceId}] 리렌더링 필요:`, {
-      status: `${prevProps.status} → ${nextProps.status}`,
-      normalScore: `${prevProps.normalScore} → ${nextProps.normalScore}`
-    });
-  }
   
   return shouldSkipUpdate;
 });

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef } from 'react';
-import { Animated, SafeAreaView, Text, View } from 'react-native';
+import { Animated, Easing, SafeAreaView, Text, View } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 import { CardState } from '../../assets/data/areaData';
 import { size, DonutChartStyles as styles } from '../../shared/styles/components';
@@ -16,26 +16,22 @@ interface Props {
 }
 
 const NativeDonutChart: React.FC<Props> = ({ deviceId, normalScore, status, name }) => {
-  // 컴포넌트 마운트 상태 추적: 렌더 시작 시각을 '각 렌더'마다 갱신하도록 변경
   const isMounted = useRef(true);
   const renderStartTime = useRef(performance.now());
   renderStartTime.current = performance.now();
-  
-  // normalScore가 0-1 범위면 100을 곱해서 퍼센트로 변환
+
+  const animatedValue = useRef(new Animated.Value(0)).current;
+  const isAnimatingRef = useRef(false);
+  const prevUsedRef = useRef<number | null>(null);
+  const firstRenderRef = useRef(true); // ✅ useEffect 밖(최상위)으로 이동
+
   const used = normalScore <= 1 ? normalScore * 100 : normalScore;
-  
+
   // SVG 도넛 차트 계산
   const radius = size * 0.35;
   const strokeWidth = size * 0.1;
   const center = size * 0.5;
   const circumference = 2 * Math.PI * radius;
-
-  const animatedValue = useRef(new Animated.Value(0)).current;
-
-  // 애니메이션 값 - 간단한 방식으로 변경
-  // useRef로 setState 대체
-  const isAnimatingRef = useRef(false);
-  const prevUsedRef = useRef<number | null>(null);
 
   // 색상 계산
   const primaryColor = React.useMemo(() => {
@@ -46,52 +42,67 @@ const NativeDonutChart: React.FC<Props> = ({ deviceId, normalScore, status, name
     }
   }, [status]);
 
+  // Δ 2% 미만 변화 스킵 / 빠른 연속 업데이트 디바운스용
+  const lastAnimTimeRef = useRef(0);
+
   // 간단한 애니메이션 시작 함수
-  const startAnimation = useCallback((target: number) => {
-    // 완료 콜백 조건
+  const startAnimation = useCallback((target: number, prev: number) => {
     if (!isMounted.current) return;
 
-    // 이전 애니메이션 진행 중이면 중단하고 재시작 (연속 업데이트 대응)
-    if (isAnimatingRef.current) {
+    const now = Date.now();
+    const delta = Math.abs(target - prev);
+
+    // 1) 너무 작은 변화 스킵
+    if (delta < 2) {
       animatedValue.stopAnimation();
-      isAnimatingRef.current = false;
+      animatedValue.setValue(target);
+      return;
     }
 
-    isAnimatingRef.current = true;
-    console.log(`🎬 [${deviceId}] 도넛 차트 애니메이션 시작: ${used}%`);
+    // 2) 300ms 내 연속 큰 업데이트 → 이전 애니 중단 후 빠른 보강
+    const fast = now - lastAnimTimeRef.current < 300;
+    lastAnimTimeRef.current = now;
 
-    // 간단한 애니메이션 - 리스너 없이 바로 목표값으로
-    animatedValue.setValue(0);
-    
+    // 현재 진행 위치에서 시작 (0으로 리셋 X)
+    let startFrom = prev;
+    animatedValue.stopAnimation((curr: number) => {
+      // curr 가 유효하면 그 지점부터
+      if (typeof curr === 'number') startFrom = curr;
+    });
+
+    animatedValue.setValue(startFrom);
+
+    const duration = Math.min(650, Math.max(180, (delta / 100) * 500)) * (fast ? 0.6 : 1);
+
+    isAnimatingRef.current = true;
     Animated.timing(animatedValue, {
       toValue: target,
-      duration: 600, // 빠른 애니메이션
-      useNativeDriver: false, // SVG는 네이티브 드라이버 지원 안함
+      duration,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: false
     }).start(() => {
-      if (!isMounted.current) return;  // 언마운트되면 추가 처리 불필요
+      if (!isMounted.current) return;
       isAnimatingRef.current = false;
-      console.log(`✅ [${deviceId}] 도넛 차트 애니메이션 완료: ${used}%`);
     });
-  }, [animatedValue, deviceId]);
-  
+  }, [animatedValue]);
+
   // 단일 effect: 최초 + 값 변경 시
   useEffect(() => {
     if (!isMounted.current) return;
-
-    const renderEnd = performance.now();
-    console.log(`🔄 [${deviceId}] 렌더링: ${(renderEnd - renderStartTime.current).toFixed(2)}ms`);
-
     const prev = prevUsedRef.current;
-    if (prev === null || prev !== used) {
-      console.log(`📊 [${deviceId}] used 변경: ${prev} → ${used}`);
+
+    if (prev === null) {
       prevUsedRef.current = used;
-      startAnimation(used);
-    } else {
-      // 값 동일 → 애니메이션 없이 유지, 현재 값으로 고정 (jump)
-      animatedValue.stopAnimation();
+      // 초기엔 바로 값 세팅 (애니 생략)
       animatedValue.setValue(used);
+      return;
     }
-  }, [used, startAnimation, deviceId, animatedValue]);
+
+    if (prev !== used) {
+      startAnimation(used, prev);
+      prevUsedRef.current = used;
+    }
+  }, [used, startAnimation, animatedValue]);
 
   // 컴포넌트 언마운트 시 정리
   useEffect(() => {

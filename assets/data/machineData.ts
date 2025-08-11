@@ -59,7 +59,7 @@ export const machineData: Machine[] = [
     status: 'danger',
     deviceManager: '김재걸',
     image: require('../images/logos/AudixLogoNavy.png'),
-    normalScore: 0.2,
+    normalScore: 0.30,
   },
   {
     deviceId: 4,
