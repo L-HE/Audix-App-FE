@@ -6,8 +6,8 @@ export const Colors = {
   danger: '#FF2F16', /* 빨강 (위험) */
   warning: '#FFC525', /* 노랑 (점검요망) */
   normal: '#1CAA00', /* 초록 (안전) */
-  fixing: '#898989', /* 연한 회색 (수리 중) */
-  mic_issue: '#515151', /* 진한 회색 (마이크 미연결) */
+  repair: '#898989', /* 연한 회색 (수리 중) */
+  offline: '#515151', /* 진한 회색 (마이크 미연결) */
 
   // Background Colors
   background: '#fff',
@@ -67,11 +67,11 @@ export const getBorderColor = (state: CardState): string => {
       return Colors.warning;
     case 'normal':
       return Colors.normal;
-    case 'fixing':
-      return Colors.fixing;
-    case 'mic_issue':
-      return Colors.mic_issue;
+    case 'repair':
+      return Colors.repair;
+    case 'offline':
+      return Colors.offline;
     default:
-      return Colors.mic_issue;
+      return Colors.offline;
   }
 };

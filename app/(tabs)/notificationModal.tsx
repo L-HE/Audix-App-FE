@@ -27,8 +27,8 @@ const NotificationModal: React.FC = () => {
       danger: '위험',
       warning: '점검 요망',
       normal: '정상',
-      fixing: '점검 중',
-      mic_issue: '마이크 미연결',
+      repair: '점검 중',
+      offline: '마이크 미연결',
     };
     
     return STATUS_LABELS[modalData.status];
@@ -40,16 +40,16 @@ const NotificationModal: React.FC = () => {
     danger: Colors.danger,
     warning: Colors.warning,
     normal: Colors.normal,
-    fixing: Colors.fixing,
-    mic_issue: Colors.mic_issue,
+    repair: Colors.repair,
+    offline: Colors.offline,
   };
 
   const STATUS_LABELS: Record<CardState, string> = {
     danger: '위험',
     warning: '점검 요망',
     normal: '정상',
-    fixing: '점검 중',
-    mic_issue: '마이크 미연결',
+    repair: '점검 중',
+    offline: '마이크 미연결',
   };
 
   const ALARM_LABELS: Record<AlarmType, string> = {

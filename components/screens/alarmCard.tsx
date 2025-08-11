@@ -24,8 +24,8 @@ const AlarmCard: React.FC<AlarmCardProps> = (props) => {
     danger: '위험',
     warning: '점검 요망',
     normal: '정상',
-    fixing: '점검 중',
-    mic_issue: '마이크 미연결',
+    repair: '점검 중',
+    offline: '마이크 미연결',
   };
 
   // 동적 alarmTitle 생성
@@ -35,11 +35,10 @@ const AlarmCard: React.FC<AlarmCardProps> = (props) => {
       return '안전 사고 발생';
     }
     
-    // machine 타입이면 status에 따라 매핑
-    return STATUS_LABELS[status];
+    return STATUS_LABELS[status as CardState];
   }, [type, status]);
 
-  const borderColor = getBorderColor(status);
+  const borderColor = getBorderColor(status as CardState);
   const getRelativeTime = useTimeStore((state) => state.getRelativeTime);
   
   const timestamp = React.useMemo(() => {

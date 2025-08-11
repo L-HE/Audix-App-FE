@@ -26,7 +26,7 @@ export const machineData: Machine[] = [
     status: 'danger',
     deviceManager: '이하은',
     image: require('../images/logos/AudixLogoNavy.png'),
-    normalScore: 15,
+    normalScore: 0.15,
   },
   {
     deviceId: 2,
@@ -37,7 +37,7 @@ export const machineData: Machine[] = [
     status: 'normal',
     deviceManager: '김서현',
     image: require('../images/logos/AudixLogoNavy.png'),
-    normalScore: 80,
+    normalScore: 0.8,
   },
   {
     deviceId: 5,
@@ -48,7 +48,7 @@ export const machineData: Machine[] = [
     status: 'danger',
     deviceManager: '도종명',
     image: require('../images/logos/AudixLogoNavy.png'),
-    normalScore: 8,
+    normalScore: 0.08,
   },
   {
     deviceId: 3,
@@ -59,7 +59,7 @@ export const machineData: Machine[] = [
     status: 'danger',
     deviceManager: '김재걸',
     image: require('../images/logos/AudixLogoNavy.png'),
-    normalScore: 20,
+    normalScore: 0.2,
   },
   {
     deviceId: 4,
@@ -70,7 +70,7 @@ export const machineData: Machine[] = [
     status: 'warning',
     deviceManager: '김현민',
     image: require('../images/logos/AudixLogoNavy.png'),
-    normalScore: 55,
+    normalScore: 0.55,
   },
   {
     deviceId: 6,
@@ -81,7 +81,7 @@ export const machineData: Machine[] = [
     status: 'warning',
     deviceManager: '김현민',
     image: require('../images/logos/AudixLogoNavy.png'),
-    normalScore: 30,
+    normalScore: 0.3,
   },
   {
     deviceId: 7,
@@ -92,7 +92,7 @@ export const machineData: Machine[] = [
     status: 'normal',
     deviceManager: '김현민',
     image: require('../images/logos/AudixLogoNavy.png'),
-    normalScore: 80,
+    normalScore: 0.8,
   },
   {
     deviceId: 8,
@@ -103,7 +103,7 @@ export const machineData: Machine[] = [
     status: 'normal',
     deviceManager: '김현민',
     image: require('../images/logos/AudixLogoNavy.png'),
-    normalScore: 70,
+    normalScore: 0.7,
   },
   {
     deviceId: 9,
@@ -114,7 +114,29 @@ export const machineData: Machine[] = [
     status: 'danger',
     deviceManager: '김현민',
     image: require('../images/logos/AudixLogoNavy.png'),
-    normalScore: 10,
+    normalScore: 0.1,
+  },
+  {
+    deviceId: 10,
+    areaId: 2,
+    explain: '자동차 용접 로봇팔',
+    name: '로봇팔',
+    address: '4층 자동차 부재료 조립구역',
+    status: 'mic_issue',
+    deviceManager: '김철수',
+    image: require('../images/logos/AudixLogoNavy.png'),
+    normalScore: 0,
+  },
+  {
+    deviceId: 11,
+    areaId: 2,
+    explain: '자동차 도장 로봇팔',
+    name: '로봇팔',
+    address: '4층 자동차 부재료 조립구역',
+    status: 'fixing',
+    deviceManager: '김영희',
+    image: require('../images/logos/AudixLogoNavy.png'),
+    normalScore: 0,
   },
 ];
 

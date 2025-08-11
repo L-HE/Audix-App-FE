@@ -71,22 +71,35 @@ const DetailScreen: React.FC = () => {
 
   // 정렬된 데이터를 메모이제이션 (pagination 적용)
   const sortedMachines = useMemo(() => {
+    // 정렬 우선순위: 1) status (danger > warning > normal > repair > offline)
+    //              2) 같은 status 내에서는 normalScore (오름차순)
+    const statusRank: Record<string, number> = {
+      danger: 0,
+      warning: 1,
+      normal: 2,
+      repair: 3,
+      offline: 4,
+    };
+
+    const normScore = (v: number) => (v <= 1 ? v * 100 : v);
+
     // 원본 state 배열을 mutate 하지 않도록 복사본에서 정렬
-    const sorted = [...machines].sort((a: Machine, b: Machine) => {
-      const scoreA = a.normalScore <= 1 ? a.normalScore * 100 : a.normalScore;
-      const scoreB = b.normalScore <= 1 ? b.normalScore * 100 : b.normalScore;
-      return scoreA - scoreB;
+    const sorted = [...machines].sort((a, b) => {
+      const ra = statusRank[a.status] ?? 999;
+      const rb = statusRank[b.status] ?? 999;
+      if (ra !== rb) return ra - rb;
+
+      const sa = normScore(a.normalScore);
+      const sb = normScore(b.normalScore);
+      return sa - sb; // 낮은 normalScore 먼저
     });
-    
+
     // 현재 페이지까지의 데이터만 반환 (pagination)
     const endIndex = (currentPage + 1) * itemsPerPage;
     const paginatedData = sorted.slice(0, endIndex);
 
     return paginatedData;
   }, [machines, currentPage, itemsPerPage]);
-
-  // 전체 데이터 저장 (pagination 계산용)
-  const [allMachines, setAllMachines] = useState<Machine[]>([]);
 
   // 다음 페이지 로드 함수
   const loadNextPage = useCallback(() => {
@@ -131,7 +144,6 @@ const DetailScreen: React.FC = () => {
       const machineData = await getMachineDataByAreaId(id);
 
       // 전체 데이터와 첫 페이지 데이터 설정
-      setAllMachines(machineData);
       setMachines(machineData); // 전체 새 스냅샷 (초기 로딩은 전체 교체 허용)
       setCurrentPage(0);
       setHasNextPage(machineData.length > itemsPerPage);

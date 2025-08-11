@@ -42,7 +42,7 @@ export const alarmData: AlarmData[] = [
   },
   {
     alarmId: '6',
-    status: 'fixing',
+    status: 'repair',
     regionName: 'B-2구역',
     regionLocation: '1층 전장품 검수구역',
     model: 'COMP-202',
@@ -52,7 +52,7 @@ export const alarmData: AlarmData[] = [
   },
   {
     alarmId: '5',
-    status: 'mic_issue',
+    status: 'offline',
     regionName: 'C-3구역',
     regionLocation: '지하 1층 원자재 보관구역',
     model: 'WELD-303',
