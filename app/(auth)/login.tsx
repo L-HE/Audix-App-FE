@@ -1,5 +1,5 @@
 // app/(auth)/login.tsx
-import { Colors } from '@/shared/styles/global';
+import { Colors } from '@/shared/styles/colors';
 import { Ionicons } from '@expo/vector-icons';
 import * as Font from 'expo-font';
 import { Image as ExpoImage } from 'expo-image';

@@ -3,9 +3,6 @@ const { getDefaultConfig } = require('expo/metro-config');
 
 const config = getDefaultConfig(__dirname);
 
-// NativeWind 지원
-config.resolver.sourceExts.push('css');
-
 // tslib 해결을 위한 resolver 설정 추가
 config.resolver.alias = {
   ...config.resolver.alias,

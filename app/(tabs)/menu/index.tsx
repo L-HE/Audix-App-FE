@@ -1,5 +1,5 @@
 // app/(tabs)/menu/index.tsx
-import { Colors } from '@/shared/styles/global';
+import { Colors } from '@/shared/styles/colors';
 import { MenuScreenStyles as style } from '@/shared/styles/screens';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';

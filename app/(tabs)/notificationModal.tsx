@@ -6,7 +6,7 @@ import RNModal from 'react-native-modal';
 import { Portal } from 'react-native-portalize';
 import { AlarmType } from '../../assets/data/alarmData';
 import { useModal } from '../../shared/api/modalContextApi';
-import { Colors } from '../../shared/styles/global';
+import { Colors } from '../../shared/styles/colors';
 import { NotificationModalStyles as style } from '../../shared/styles/screens';
 
 /**

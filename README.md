@@ -41,21 +41,16 @@ npm run android
 - **TypeScript** - 정적 타입 검사
 
 ### UI/UX
-- **NativeWind** - Tailwind CSS for React Native
+- **Expo Router** - 네비게이션
 - **React Navigation** - 네비게이션
-- **React Native Paper** - Material Design 컴포넌트
 
 ### 상태 관리
 - **Zustand** - 경량 상태 관리
-- **React Query** - 서버 상태 관리
 
 ### 통신
 - **Axios** - HTTP 클라이언트
-- **Socket.io** - 실시간 통신
-- **Expo Push Notifications** - 푸시 알림
 
 ### 데이터 시각화
-- **Victory Native** - 차트 라이브러리
 - **React Native SVG** - SVG 렌더링
 
 ## 📁 프로젝트 구조

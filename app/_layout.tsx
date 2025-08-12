@@ -6,13 +6,16 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import SplashScreen from '../components/common/splashScreen';
 import { ModalProvider, useModal } from '../shared/api/modalContextApi';
 import { useTimeStore } from '../shared/store/timeStore';
-import { performanceTracker } from '../shared/utils/performanceTracker';
 import { webSocketClient } from '../shared/websocket/client';
 import { preloadLoginAssets } from './(auth)/login';
 
 export const headerShown = false;
 
-// ✅ 1. HeavyInitTasks 최적화: 백그라운드 처리
+/* =============================================================================
+   타입 & 유틸
+   ============================================================================= */
+
+// ▸ 백그라운드 작업 구조
 interface BackgroundTask {
   name: string;
   task: () => Promise<void>;
@@ -20,234 +23,144 @@ interface BackgroundTask {
   required: boolean;
 }
 
+/* =============================================================================
+   RootLayoutContent
+   - 앱 초기화, 스플래시 → 본 UI 전환, 백그라운드 태스크 실행, 타이머/웹소켓 관리
+   ============================================================================= */
+
 function RootLayoutContent() {
+  // ----- 전역 UI 스테이트 -----
   const [isAppInitialized, setIsAppInitialized] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [backgroundTasksStatus, setBackgroundTasksStatus] = useState({
-    completed: 0,
-    total: 0,
-    critical: false
-  });
-  
-  const { setModalVisible } = useModal();
-  const backgroundTasksRef = useRef<BackgroundTask[]>([]);
-  const initializationStartedRef = useRef(false); // ✅ 중복 초기화 방지
-  
-  // TimeStore 함수들 가져오기
-  const startTimer = useTimeStore((state) => state.startTimer);
-  const stopTimer = useTimeStore((state) => state.stopTimer);
 
-  // ✅ 백그라운드 작업 정의 (useCallback 제거 - 의존성 문제 해결)
+  // ----- 모달 제어 -----
+  const { setModalVisible } = useModal();
+
+  // ----- 재실행/중복 방지용 ref -----
+  const initializationStartedRef = useRef(false);
+  const backgroundTasksRef = useRef<BackgroundTask[]>([]);
+
+  // ----- 타임스토어(상대시간 UI 갱신) -----
+  const startTimer = useTimeStore((s) => s.startTimer);
+  const stopTimer = useTimeStore((s) => s.stopTimer);
+
+  // ---------------------------------------------------------------------------
+  // 백그라운드 작업 정의 (UI 표시 후 실행)
+  // ---------------------------------------------------------------------------
   const defineBackgroundTasks = (): BackgroundTask[] => [
-    {
-      name: 'DatabaseInit',
-      task: async () => {
-        await new Promise(resolve => setTimeout(resolve, 500));
-        console.log('📊 데이터베이스 초기화 완료');
-      },
-      priority: 'high',
-      required: false
-    },
-    {
-      name: 'AnalyticsSetup',
-      task: async () => {
-        await new Promise(resolve => setTimeout(resolve, 300));
-        console.log('📈 분석 도구 설정 완료');
-      },
-      priority: 'medium',
-      required: false
-    },
-    {
-      name: 'CachePreload',
-      task: async () => {
-        await new Promise(resolve => setTimeout(resolve, 800));
-        console.log('💾 캐시 프리로드 완료');
-      },
-      priority: 'low',
-      required: false
-    },
-    {
-      name: 'RemoteConfigFetch',
-      task: async () => {
-        await new Promise(resolve => setTimeout(resolve, 400));
-        console.log('🌐 원격 설정 동기화 완료');
-      },
-      priority: 'medium',
-      required: false
-    }
+    { name: 'DatabaseInit',      task: async () => { await wait(500); }, priority: 'high',   required: false },
+    { name: 'AnalyticsSetup',    task: async () => { await wait(300); }, priority: 'medium', required: false },
+    { name: 'CachePreload',      task: async () => { await wait(800); }, priority: 'low',    required: false },
+    { name: 'RemoteConfigFetch', task: async () => { await wait(400); }, priority: 'medium', required: false },
   ];
 
-  // ✅ 백그라운드 작업 실행기 최적화
+  // ---------------------------------------------------------------------------
+  // 백그라운드 작업 실행기
+  // - 우선순위 배치별로 비동기 실행
+  // - 성능 계측/로그 제거(요청사항)
+  // ---------------------------------------------------------------------------
   const executeBackgroundTasks = useCallback(() => {
-    if (backgroundTasksRef.current.length > 0) {
-      console.log('⚠️ [Background] 이미 실행 중인 백그라운드 작업 있음 - 스킵');
-      return;
-    }
+    // 이미 실행 중이면 재시작 방지
+    if (backgroundTasksRef.current.length > 0) return;
 
     const tasks = defineBackgroundTasks();
     backgroundTasksRef.current = tasks;
-    
-    setBackgroundTasksStatus({
-      completed: 0,
-      total: tasks.length,
-      critical: false
-    });
 
-    console.log(`🚀 [Background] ${tasks.length}개 백그라운드 작업 시작`);
-    performanceTracker.addEvent('BackgroundTasksStart');
+    const high = tasks.filter((t) => t.priority === 'high');
+    const med  = tasks.filter((t) => t.priority === 'medium');
+    const low  = tasks.filter((t) => t.priority === 'low');
 
-    const highPriorityTasks = tasks.filter(t => t.priority === 'high');
-    const mediumPriorityTasks = tasks.filter(t => t.priority === 'medium');
-    const lowPriorityTasks = tasks.filter(t => t.priority === 'low');
-
-    let completedCount = 0;
-
-    const executeTaskBatch = async (taskBatch: BackgroundTask[], batchName: string) => {
-      const batchStart = performance.now();
-      
-      await Promise.all(taskBatch.map(async (bgTask) => {
-        try {
-          const taskStart = performance.now();
-          await bgTask.task();
-          performanceTracker.addDuration(`Background_${bgTask.name}`, taskStart);
-          
-          completedCount++;
-          setBackgroundTasksStatus(prev => ({
-            ...prev,
-            completed: completedCount
-          }));
-          
-        } catch (error) {
-          console.error(`❌ [Background] ${bgTask.name} 실패:`, error);
-          performanceTracker.addEvent(`Background_${bgTask.name}_Error`);
-        }
+    const runBatch = async (batch: BackgroundTask[]) => {
+      await Promise.all(batch.map(async (bg) => {
+        try { await bg.task(); } catch { /* 실패해도 앱 흐름은 유지 */ }
       }));
-      
-      performanceTracker.addDuration(`BackgroundBatch_${batchName}`, batchStart);
-      console.log(`✅ [Background] ${batchName} 배치 완료 (${taskBatch.length}개)`);
     };
 
-    // 단계별 실행
-    executeTaskBatch(highPriorityTasks, 'High');
-    setTimeout(() => executeTaskBatch(mediumPriorityTasks, 'Medium'), 50);
-    setTimeout(() => executeTaskBatch(lowPriorityTasks, 'Low'), 200);
-
-    performanceTracker.addEvent('BackgroundTasksInitiated');
-  }, []); // ✅ 빈 의존성 배열
-
-  // ✅ SplashScreen 완료 콜백
-  const handleSplashComplete = useCallback(() => {
-    console.log('✅ [SplashScreen] 완료 - LoginScreen으로 전환');
-    performanceTracker.addEvent('SplashScreenCompleted');
-    // 추가 처리가 필요하면 여기서
+    // 즉시/지연 실행으로 배치 순차 시작
+    runBatch(high);
+    setTimeout(() => { runBatch(med); }, 50);
+    setTimeout(() => { runBatch(low); }, 200);
   }, []);
 
-  // ✅ 초기화 로직 최적화
+  // ---------------------------------------------------------------------------
+  // 스플래시 완료 콜백
+  // - 필요 시 로그인 화면 진입 등 추가 처리 가능
+  // ---------------------------------------------------------------------------
+  const handleSplashComplete = useCallback(() => {
+    // 추가 액션이 필요하면 여기에 작성
+  }, []);
+
+  // ---------------------------------------------------------------------------
+  // 초기화 로직
+  // - 1회만 실행(가드)
+  // - 에셋 프리로드, 토큰 확인, 웹소켓 연결, 타이머 시작
+  // - UI 표시 이후 백그라운드 태스크 실행
+  // ---------------------------------------------------------------------------
   useEffect(() => {
-    // 중복 실행 방지
-    if (initializationStartedRef.current) {
-      console.log('⚠️ [App] 초기화 이미 시작됨 - 스킵');
-      return;
-    }
-    
+    if (initializationStartedRef.current) return;
     initializationStartedRef.current = true;
 
     const initializeApp = async () => {
       try {
-        performanceTracker.start('AppInitialization');
-        console.log('앱 초기화 시작...');
-        performanceTracker.addEvent('InitStart');
-
-        // LoginScreen 에셋 조기 프리로딩
+        // 1) 로그인 화면(아이콘/폰트 등) 에셋 조기 프리로드
         preloadLoginAssets();
 
-        const criticalInitStart = performance.now();
-        
-        // 필수 초기화 작업들
-        const authStart = performance.now();
+        // 2) 인증 토큰 확인 (샘플: 존재 여부만 판단)
         const token = await checkAuthToken();
-        performanceTracker.addDuration('AuthCheck', authStart);
         setIsAuthenticated(!!token);
 
-        const wsStart = performance.now();
+        // 3) WebSocket 연결 및 알림 핸들러
         try {
           webSocketClient.connect();
-          webSocketClient.setOnAlert((data) => {
-            console.log('🚨 WebSocket 알림 수신:', data);
+          webSocketClient.setOnAlert(() => {
             setModalVisible(true);
           });
-        } catch (wsError) {
-          console.warn('⚠️ WebSocket 연결 실패 - 계속 진행:', wsError);
+        } catch {
+          // 연결 실패 시에도 앱은 계속 진행
         }
-        performanceTracker.addDuration('WebSocketInit', wsStart);
 
-        const timerStart = performance.now();
+        // 4) 상대 시간 갱신 타이머 시작
         startTimer();
-        performanceTracker.addDuration('TimerStart', timerStart);
 
-        performanceTracker.addDuration('CriticalInit', criticalInitStart);
-        
-        performanceTracker.addEvent('InitComplete');
-        console.log('📱 앱 핵심 초기화 완료 - UI 표시 준비');
-        
-        // ✅ UI 표시
+        // 5) 핵심 초기화 완료 → UI 노출
         setIsAppInitialized(true);
 
-        // ✅ 백그라운드 작업은 UI 표시 후 한 번만 시작
-        setTimeout(() => {
-          executeBackgroundTasks();
-        }, 100);
-
-        performanceTracker.addEvent('SplashScreenEnd');
-
-      } catch (error) {
-        console.error('앱 초기화 실패:', error);
-        const errorMessage = typeof error === 'object' && error !== null && 'message' in error ? (error as { message: string }).message : String(error);
-        performanceTracker.addEvent('InitError', { error: errorMessage });
+        // 6) UI 노출 후 백그라운드 태스크 실행(초기 렌더 부담 완화)
+        setTimeout(() => executeBackgroundTasks(), 100);
+      } catch {
+        // 핵심 초기화 실패 시에도 스플래시는 종료하여 사용자에게 UI를 보여줌
         setIsAppInitialized(true);
       }
     };
 
     initializeApp();
 
-    // 정리 함수
+    // 정리(cleanup): 앱 언마운트 시 연결/타이머 정리
     return () => {
-      console.log('🔄 [App] 정리 함수 실행');
       webSocketClient.disconnect();
       stopTimer();
     };
-  }, []); // ✅ 빈 의존성 배열로 1회만 실행
+  }, [executeBackgroundTasks, setModalVisible, startTimer, stopTimer]);
 
-  // 로딩 중일 때 SplashScreen 표시
+  // ---------------------------------------------------------------------------
+  // 스플래시 노출
+  // ---------------------------------------------------------------------------
   if (!isAppInitialized) {
     return <SplashScreen onInitializationComplete={handleSplashComplete} />;
   }
 
-  // ✅ LoginScreen 렌더링 준비 완료
-  performanceTracker.addEvent('LoginScreenReady');
-
-  return (
-    <>
-      <Slot />
-    </>
-  );
+  // ---------------------------------------------------------------------------
+  // 실제 화면 렌더링
+  // ---------------------------------------------------------------------------
+  return <Slot />;
 }
 
-async function checkAuthToken() {
-  const checkStart = performance.now();
-  await new Promise(resolve => setTimeout(resolve, 100));
-  console.log(`🔐 토큰 체크 완료: ${(performance.now() - checkStart).toFixed(2)}ms`);
-  return null;
-}
+/* =============================================================================
+   RootLayout
+   - SafeAreaProvider / Portal Host / Modal Provider 래핑
+   ============================================================================= */
 
 export default function RootLayout() {
-  const layoutStart = performance.now();
-  
-  useEffect(() => {
-    const layoutEnd = performance.now();
-    console.log(`🏗️ RootLayout 렌더링: ${(layoutEnd - layoutStart).toFixed(2)}ms`);
-  }, [layoutStart]);
-
   return (
     <SafeAreaProvider>
       <Host>
@@ -257,4 +170,20 @@ export default function RootLayout() {
       </Host>
     </SafeAreaProvider>
   );
+}
+
+/* =============================================================================
+   Helpers
+   ============================================================================= */
+
+// ▸ 간단한 지연 유틸
+function wait(ms: number) {
+  return new Promise<void>((res) => setTimeout(res, ms));
+}
+
+// ▸ 인증 토큰 확인(샘플: 실제 구현에 맞게 교체)
+async function checkAuthToken() {
+  await wait(100);
+  // 실제 구현에서는 SecureStore/AsyncStorage, 서버 검증 등을 수행
+  return null; // 토큰 없다고 가정
 }
