@@ -4,22 +4,38 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Image, Text, View } from 'react-native';
 import { Colors } from '../../shared/styles/global';
 import { performanceTracker } from '../../shared/utils/performanceTracker';
+// Expo Image 캐싱
+import { preloadIoniconsFont } from '@/app/(auth)/login';
+import { Image as ExpoImage } from 'expo-image';
 
 interface SplashScreenProps {
   onInitializationComplete?: () => void;
 }
 
+// 로고 이미지 URI (require 대신 asset URI 사용)
+const logoUri = require('../../assets/images/logos/AudixLogoNavy.png');
+const leftUri = require('../../assets/images/pictures/landing_left.png');
+const rightUri = require('../../assets/images/pictures/landing_right.png');
+
 const SplashScreen: React.FC<SplashScreenProps> = ({ onInitializationComplete }) => {
   const [logoLoaded, setLogoLoaded] = useState(false);
-  const [backgroundImagesLoaded, setBackgroundImagesLoaded] = useState(0); // 0, 1, 2 (두 개 배경 이미지)
+  const [backgroundImagesLoaded, setBackgroundImagesLoaded] = useState(0);
   const [isReadyToExit, setIsReadyToExit] = useState(false);
   
-  // ✅ 애니메이션 제거 - 즉시 초기화
+  // Expo 이미지 프리로드
+  useEffect(() => {
+    preloadIoniconsFont();
+    ExpoImage.prefetch(logoUri);
+    ExpoImage.prefetch(leftUri);
+    ExpoImage.prefetch(rightUri);
+  }, []);
+
+  // 애니메이션 제거 - 즉시 초기화
   const initializeWithoutAnimation = useCallback(async () => {
     const initStart = performance.now();
     performanceTracker.addEvent('SplashInitStart');
     
-    // ✅ 최소 표시 시간 (800ms) - 너무 빨리 지나가지 않도록
+    // 최소 표시 시간 (800ms) - 너무 빨리 지나가지 않도록
     const minDisplayTime = new Promise(resolve => {
       setTimeout(() => {
         performanceTracker.addEvent('SplashMinTimeComplete');
@@ -38,10 +54,10 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onInitializationComplete })
     
   }, []);
 
-  // ✅ 종료 조건 체크
+  // 종료 조건 체크
   useEffect(() => {
     if (isReadyToExit && logoLoaded && backgroundImagesLoaded >= 2) {
-      console.log('✅ [SplashScreen] 모든 조건 완료 - 다음 화면으로 전환');
+      console.log('[SplashScreen] 모든 조건 완료 - 다음 화면으로 전환');
       performanceTracker.addEvent('SplashReadyToExit');
       
       if (onInitializationComplete) {
@@ -53,7 +69,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onInitializationComplete })
     }
   }, [isReadyToExit, logoLoaded, backgroundImagesLoaded, onInitializationComplete]);
 
-  // ✅ 강제 종료 타이머 (최대 2초)
+  // 강제 종료 타이머 (최대 2초)
   useEffect(() => {
     const forceExitTimer = setTimeout(() => {
       if (!isReadyToExit || !logoLoaded || backgroundImagesLoaded < 2) {
@@ -70,7 +86,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onInitializationComplete })
   }, [isReadyToExit, logoLoaded, backgroundImagesLoaded, onInitializationComplete]);
 
   useEffect(() => {
-    // ✅ SplashScreen 렌더링 시작
+    // SplashScreen 렌더링 시작
     const splashStart = performance.now();
     performanceTracker.addEvent('SplashScreenStart');
 
@@ -85,14 +101,14 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onInitializationComplete })
     };
   }, [initializeWithoutAnimation]);
 
-  // ✅ 로고 로딩 최적화 (애니메이션 제거)
+  // ExpoImage로 로고 캐싱 및 표시
   const handleLogoLoad = useCallback(() => {
     setLogoLoaded(true);
     performanceTracker.addEvent('SplashLogoLoaded');
     console.log('📱 [SplashScreen] 로고 이미지 로딩 완료');
   }, []);
 
-  // ✅ 배경 이미지 로딩 최적화
+  // 배경 이미지 로딩 최적화
   const handleBackgroundImageLoad = useCallback((imageName: string) => {
     setBackgroundImagesLoaded(prev => {
       const newCount = prev + 1;
@@ -102,7 +118,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onInitializationComplete })
     });
   }, []);
 
-  // ✅ 에러 핸들링
+  // 에러 핸들링
   const handleImageError = useCallback((imageName: string) => {
     console.warn(`⚠️ [SplashScreen] ${imageName} 이미지 로딩 실패 - 계속 진행`);
     performanceTracker.addEvent(`SplashImage_${imageName}_Error`);
@@ -115,53 +131,52 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onInitializationComplete })
     }
   }, []);
 
-  // ✅ 로딩 완료 여부 계산
+  // 로딩 완료 여부 계산
   const allResourcesLoaded = logoLoaded && backgroundImagesLoaded >= 2;
   const showLoadingIndicator = !allResourcesLoaded || !isReadyToExit;
 
   return (
     <View style={style.container}>
-      {/* 배경 도형들 - 애니메이션 없음 */}
+      {/* 배경 도형들 */}
       <View style={style.backgroundShapes}>
         <Image
-          source={require('../../assets/images/pictures/landing_left.png')}
+          source={leftUri}
           style={[style.shape, style.topShape]}
-          resizeMode="cover"
           onLoad={() => handleBackgroundImageLoad('Left')}
           onError={() => handleImageError('LeftBackground')}
-          fadeDuration={0} // 즉시 표시
+          resizeMode='cover'
+          fadeDuration={0}
         />
         <Image
-          source={require('../../assets/images/pictures/landing_right.png')}
+          source={rightUri}
           style={[style.shape, style.bottomShape]}
-          resizeMode="cover"
           onLoad={() => handleBackgroundImageLoad('Right')}
           onError={() => handleImageError('RightBackground')}
-          fadeDuration={0} // 즉시 표시
+          resizeMode='cover'
+          fadeDuration={0}
         />
       </View>
 
-      {/* ✅ 정적 콘텐츠 (애니메이션 제거) */}
+      {/* 정적 콘텐츠 */}
       <View style={style.content}>
         {/* 앱 로고 */}
         <View style={style.logoContainer}>
-          <Image
-            source={require('../../assets/images/logos/AudixLogoNavy.png')}
+          <ExpoImage
+            source={logoUri}
             style={style.logo}
-            resizeMode="cover"
+            contentFit="cover"
             onLoad={handleLogoLoad}
-            onError={() => handleImageError('Logo')}
-            fadeDuration={0} // 즉시 표시
+            onError={() => handleLogoLoad()} // 에러 시에도 로딩 완료 처리
+            cachePolicy="memory-disk" // 캐싱 정책: 메모리+디스크
+            transition={0}
           />
           
-          {/* ✅ 로고 로딩 중 플레이스홀더 */}
+          {/* 로고 로딩 중 플레이스홀더 */}
           {!logoLoaded && (
-            <View style={[style.logo, { 
-              position: 'absolute', 
-              backgroundColor: '#f0f0f0', 
-              borderRadius: 8,
-              opacity: 0.3
-            }]} />
+            <View style={[
+              style.logo, 
+              { position: 'absolute', backgroundColor: '#f0f0f0', borderRadius: 8, opacity: 0.3 }
+            ]} />
           )}
         </View>
         
@@ -172,7 +187,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onInitializationComplete })
           </Text>
         </View>
 
-        {/* ✅ 로딩 인디케이터만 애니메이션 */}
+        {/* 로딩 인디케이터만 애니메이션 */}
         <View style={{ minHeight: 50, justifyContent: 'center' }}>
           {showLoadingIndicator ? (
             <ActivityIndicator 
@@ -185,7 +200,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onInitializationComplete })
           )}
         </View>
         
-        {/* ✅ 상태 표시 (간소화) */}
+        {/* 상태 표시 (간소화) */}
         {__DEV__ && (
           <Text style={{ 
             position: 'absolute', 

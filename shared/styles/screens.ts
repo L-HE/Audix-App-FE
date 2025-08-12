@@ -198,6 +198,14 @@ export const MenuScreenStyles = StyleSheet.create({
     marginHorizontal: 16,
     borderRadius: 12,
     overflow: 'hidden',
+    shadowColor: Colors.shadow,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
   },
   menuItem: {
     flexDirection: 'row',

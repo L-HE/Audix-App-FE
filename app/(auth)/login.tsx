@@ -1,6 +1,7 @@
 // app/(auth)/login.tsx
 import { Colors } from '@/shared/styles/global';
 import { Ionicons } from '@expo/vector-icons';
+import * as Font from 'expo-font';
 import { Image as ExpoImage } from 'expo-image';
 import { router } from 'expo-router';
 import React, { Profiler, useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -107,6 +108,12 @@ const onRenderCallback = (
   } else {
     console.log(`⚡ [React Profiler] ${id} (${phase}): ${actualDuration.toFixed(2)}ms`);
   }
+};
+
+// ✅ Ionicons 폰트 프리로딩 함수
+export const preloadIoniconsFont = async () => {
+  await Font.loadAsync(Ionicons.font);
+  console.log('✅ [LoginScreen] Ionicons 폰트 프리로딩 완료');
 };
 
 // ✅ 메모이제이션된 컴포넌트들

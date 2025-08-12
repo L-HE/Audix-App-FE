@@ -720,8 +720,8 @@ const DetailScreen: React.FC = () => {
           renderItem={renderMachine}
           keyExtractor={keyExtractor}
           getItemType={getItemType}
-          estimatedItemSize={270} //
-          drawDistance={200} //
+          estimatedItemSize={270}
+          drawDistance={200}
           onEndReached={handleEndReached}
           onEndReachedThreshold={0.5}
           onScroll={handleScroll}
@@ -734,7 +734,7 @@ const DetailScreen: React.FC = () => {
             paddingTop: 8,
             paddingBottom: 16,
           }}
-          removeClippedSubviews= {true} // ✅ 성능 향상
+          removeClippedSubviews= {true} // 성능 향상
           extraData={isLoadingMore} // 리렌더링 최적화
           disableAutoLayout={true} // 레이아웃 시프트 방지
           onBlankArea={(e) => {
