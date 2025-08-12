@@ -8,15 +8,19 @@ import React, { useCallback, useRef, useState } from 'react';
 import { Animated, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import LogoutModal from '../../../components/screens/logoutModal';
 
+// 탭 헤더 숨기기
 export const headerShown = false;
 
+/** 
+ * 단일 메뉴 아이템 컴포넌트
+ * - 아이콘, 제목, 부제목, 클릭 이벤트 표시
+ */
 interface MenuItemProps {
   icon: keyof typeof Ionicons.glyphMap;
   title: string;
   subtitle?: string;
   onPress: () => void;
 }
-
 const MenuItem: React.FC<MenuItemProps> = ({ icon, title, subtitle, onPress }) => (
   <TouchableOpacity style={style.menuItem} onPress={onPress}>
     <View style={style.menuIcon}>
@@ -30,37 +34,38 @@ const MenuItem: React.FC<MenuItemProps> = ({ icon, title, subtitle, onPress }) =
   </TouchableOpacity>
 );
 
+/**
+ * 메뉴 화면 본문
+ * - 탭 진입 시 애니메이션
+ * - 로그아웃 모달 관리
+ */
 const MenuScreenContent: React.FC = () => {
   const router = useRouter();
-  
-  // 모달 상태 관리
+
+  // 로그아웃 모달 표시 여부
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
-  // 애니메이션 관련 상태
-  const slideAnim = useRef(new Animated.Value(100)).current; // 초기값: 화면 오른쪽 밖 (+100)
-  const opacityAnim = useRef(new Animated.Value(0)).current;   // 초기값: 투명
-  const hasAnimatedRef = useRef(false); // 최초 1회만 애니메이션
+  // 진입 애니메이션 값
+  const slideAnim = useRef(new Animated.Value(100)).current; // X축 이동(오른쪽→왼쪽)
+  const opacityAnim = useRef(new Animated.Value(0)).current; // 투명도
+  const hasAnimatedRef = useRef(false); // 최초 1회만 실행
 
-  // 탭 포커스 시 슬라이드 애니메이션 (오른쪽 → 왼쪽)
+  // 탭이 포커스될 때 애니메이션 실행
   useFocusEffect(
     useCallback(() => {
-      console.log('📱 [MenuScreen] Tab focused');
-      
-      // 이미 애니메이션 재생했으면 스킵 (탭 재방문 시 애니메이션 안함)
       if (hasAnimatedRef.current) {
+        // 재진입 시 즉시 표시
         slideAnim.setValue(0);
         opacityAnim.setValue(1);
         return;
       }
-
-      // 최초 진입 시에만 애니메이션
       hasAnimatedRef.current = true;
-      
-      // 초기 위치 설정 (오른쪽 밖)
+
+      // 초기값 설정
       slideAnim.setValue(100);
       opacityAnim.setValue(0);
 
-      // 슬라이드 + 페이드인 애니메이션 (동시 실행)
+      // 슬라이드+페이드 병렬 실행
       Animated.parallel([
         Animated.timing(slideAnim, {
           toValue: 0,
@@ -73,18 +78,11 @@ const MenuScreenContent: React.FC = () => {
           delay: 50,
           useNativeDriver: true,
         }),
-      ]).start(() => {
-        console.log('✅ [MenuScreen] 슬라이드 애니메이션 완료');
-      });
-
-      // cleanup (탭 떠날 때는 애니메이션 없음)
-      return () => {
-        console.log('🔄 [MenuScreen] Tab unfocused');
-      };
+      ]).start();
     }, [slideAnim, opacityAnim])
   );
 
-  // 로그아웃 모달 보이기
+  // 로그아웃 버튼 클릭 시
   const handleLogoutPress = () => {
     setShowLogoutModal(true);
   };
@@ -94,41 +92,31 @@ const MenuScreenContent: React.FC = () => {
     setShowLogoutModal(false);
   };
 
-  // 로그아웃 모달 확인
+  // 로그아웃 모달 확인 → 로그인 화면 이동
   const handleLogoutConfirm = () => {
-    console.log('✅ [MenuScreen] 로그아웃 확인 → 로그인 화면으로 이동');
     setShowLogoutModal(false);
-    // 로그아웃 로직 실행
     router.replace('/(auth)/login');
   };
 
+  // 메뉴 항목 목록
   const menuItems = [
     {
       icon: 'person-circle-outline' as const,
       title: '내 정보',
       subtitle: '사원 및 조직 정보',
-      onPress: () => {
-        console.log('👤 [MenuScreen] 내 정보 클릭');
-        router.push('/');
-      },
+      onPress: () => router.push('/'),
     },
     {
       icon: 'key-outline' as const,
       title: '비밀번호 변경',
       subtitle: '비밀번호 설정 변경',
-      onPress: () => {
-        console.log('🔑 [MenuScreen] 비밀번호 변경 클릭');
-        router.push('/');
-      },
+      onPress: () => router.push('/'),
     },
     {
       icon: 'chatbubble-ellipses-outline' as const,
       title: '문의하기',
       subtitle: '앱 관련 문의',
-      onPress: () => {
-        console.log('💬 [MenuScreen] 문의하기 클릭');
-        router.push('/');
-      },
+      onPress: () => router.push('/'),
     },
     {
       icon: 'exit-outline' as const,
@@ -138,13 +126,13 @@ const MenuScreenContent: React.FC = () => {
   ];
 
   return (
-    <Animated.View 
+    <Animated.View
       style={[
         style.container,
         {
-          transform: [{ translateX: slideAnim }], // 오른쪽(+100) → 중앙(0)
+          transform: [{ translateX: slideAnim }],
           opacity: opacityAnim,
-        }
+        },
       ]}
     >
       <ScrollView style={style.scrollView}>
@@ -161,7 +149,7 @@ const MenuScreenContent: React.FC = () => {
         </View>
       </ScrollView>
 
-      {/* 로그아웃 확인 모달*/}
+      {/* 로그아웃 확인 모달 */}
       <LogoutModal
         visible={showLogoutModal}
         onCancel={handleLogoutCancel}
@@ -171,7 +159,7 @@ const MenuScreenContent: React.FC = () => {
   );
 };
 
-// 메인 컴포넌트 (애니메이션 래퍼)
+// 메인 래퍼
 const MenuScreen: React.FC = () => {
   return <MenuScreenContent />;
 };

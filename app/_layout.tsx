@@ -8,7 +8,7 @@ import { ModalProvider, useModal } from '../shared/api/modalContextApi';
 import { useTimeStore } from '../shared/store/timeStore';
 import { performanceTracker } from '../shared/utils/performanceTracker';
 import { webSocketClient } from '../shared/websocket/client';
-import { initLoginScreenPreload } from './(auth)/login';
+import { preloadLoginAssets } from './(auth)/login';
 
 export const headerShown = false;
 
@@ -159,7 +159,7 @@ function RootLayoutContent() {
         performanceTracker.addEvent('InitStart');
 
         // LoginScreen 에셋 조기 프리로딩
-        initLoginScreenPreload();
+        preloadLoginAssets();
 
         const criticalInitStart = performance.now();
         

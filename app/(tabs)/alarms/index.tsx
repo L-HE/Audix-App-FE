@@ -1,7 +1,7 @@
 // app/(tabs)/alarms/index.tsx
 import { useFocusEffect } from '@react-navigation/native';
 import { FlashList, ListRenderItem } from '@shopify/flash-list';
-import React, { Profiler, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Animated, Easing, InteractionManager, Text, View } from 'react-native';
 
 import { AlarmsScreenStyles as style } from '@/shared/styles/screens';
@@ -9,109 +9,59 @@ import { AlarmData, alarmData } from '../../../assets/data/alarmData';
 import AlarmCard from '../../../components/screens/alarmCard';
 import { useModal } from '../../../shared/api/modalContextApi';
 
-// React Profiler 콜백 함수
-const onRenderCallback = (
-  id: string,
-  phase: 'mount' | 'update' | 'nested-update',
-  actualDuration: number,
-  baseDuration: number,
-) => {
-  const isSlowRender = actualDuration > 16;
-  const expectedTime = baseDuration * 0.6;
-  
-  if (isSlowRender) {
-    console.log(`🐌 [React Profiler] ${id} (${phase}): ${actualDuration.toFixed(2)}ms ← SLOW RENDER!`);
-    
-    if (actualDuration > expectedTime) {
-      console.warn(`⚠️ [React Profiler] ${id} 예상보다 느린 렌더링: 실제=${actualDuration.toFixed(2)}ms, 예상=${expectedTime.toFixed(2)}ms`);
-    }
-  } else {
-    console.log(`⚡ [React Profiler] ${id} (${phase}): ${actualDuration.toFixed(2)}ms`);
-  }
-};
-
-// 🚀 React.memo로 최적화된 AlarmCard 컴포넌트
+// ─────────────────────────────────────────────
+// 성능 최적화를 위한 메모이제이션된 알람 카드
+//  - 동일 item의 주요 필드가 변하지 않으면 리렌더 방지
+// ─────────────────────────────────────────────
 const MemoizedAlarmCard = React.memo<{
   item: AlarmData;
   onPress: (item: AlarmData) => void;
 }>(({ item, onPress }) => {
-  return (
-    <AlarmCard
-      {...item}
-      onPress={() => onPress(item)}
-    />
-  );
+  return <AlarmCard {...item} onPress={() => onPress(item)} />;
 }, (prevProps, nextProps) => {
-  // 정확한 비교로 불필요한 리렌더 방지
-  return prevProps.item.alarmId === nextProps.item.alarmId &&
-         prevProps.item.status === nextProps.item.status &&
-         prevProps.item.createdAt === nextProps.item.createdAt;
+  return (
+    prevProps.item.alarmId === nextProps.item.alarmId &&
+    prevProps.item.status === nextProps.item.status &&
+    prevProps.item.createdAt === nextProps.item.createdAt
+  );
 });
 
+// ─────────────────────────────────────────────
+// 알람 화면 콘텐츠 컴포넌트
+//  - 정렬/페이지네이션/모달 연동/진입 애니메이션
+// ─────────────────────────────────────────────
 const AlarmScreenContent: React.FC = () => {
+  // ───────── 상태: 모달 제어, 페이지네이션 ─────────
   const { setModalVisible, setModalData } = useModal();
   const [currentPage, setCurrentPage] = useState(0);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const ITEMS_PER_PAGE = 8;
-  const renderStartTime = useRef(performance.now());
 
-  // 🎬 단일 애니메이션 상태 (중복 제거)
-  const slideAnim = useRef(new Animated.Value(-100)).current;
-  const opacityAnim = useRef(new Animated.Value(0)).current;
-  const hasAnimatedRef = useRef(false);
-  const animationRef = useRef<Animated.CompositeAnimation | null>(null);
+  // ───────── 애니메이션 상태: 첫 진입 시 슬라이드/페이드 인 ─────────
+  const slideAnim = useRef(new Animated.Value(-100)).current; // 좌→우 슬라이드 시작 위치
+  const opacityAnim = useRef(new Animated.Value(0)).current;  // 투명 → 불투명
+  const hasAnimatedRef = useRef(false);                       // 동일 화면 재진입 시 중복 애니메이션 방지
+  const animationRef = useRef<Animated.CompositeAnimation | null>(null); // 진행 중 애니메이션 핸들
 
-  // 성능 기반 애니메이션 설정
-  const [shouldAnimate, setShouldAnimate] = useState(true);
-
-  const shouldAnimateRef = useRef(true);
-  useEffect(() => { shouldAnimateRef.current = shouldAnimate; }, [shouldAnimate]);
-
-  // 성능 체크
-  useEffect(() => {
-    const sub = InteractionManager.runAfterInteractions(() => {
-      const start = performance.now();
-      for (let i = 0; i < 10000; i++) Math.random();
-      const duration = performance.now() - start;
-      
-      if (duration > 8) {
-        setShouldAnimate(false);
-        console.log('⚡ [AlarmScreen] 애니메이션 최적화 모드 활성화');
-      }
-    });
-
-    return () => sub?.cancel?.();
-  }, []);
-
-  // 🚀 최적화된 애니메이션 함수
+  // ───────── 리스트 진입 애니메이션 실행 ─────────
   const runEntranceAnimation = useCallback(() => {
-    console.log('🎬 [AlarmScreen] 애니메이션 시작 시도');
-
+    // 이전 애니메이션이 남아있다면 중단
     if (animationRef.current) {
       animationRef.current.stop();
-      console.log('🛑 [AlarmScreen] 이전 애니메이션 중단');
+      animationRef.current = null;
     }
 
+    // 이미 애니메이션이 끝난 상태라면 최종 상태로 즉시 고정
     if (hasAnimatedRef.current) {
       slideAnim.setValue(0);
       opacityAnim.setValue(1);
-      console.log('⚡ [AlarmScreen] 즉시 표시 (이미 애니메이션됨)');
       return;
     }
 
-    if (!shouldAnimateRef.current) {
-      slideAnim.setValue(0);
-      opacityAnim.setValue(1);
-      hasAnimatedRef.current = true;
-      console.log('⚡ [AlarmScreen] 즉시 표시 (성능 최적화)');
-      return;
-    }
-
+    // 초기값 설정 후 슬라이드/페이드 인 병렬 실행
     hasAnimatedRef.current = true;
     slideAnim.setValue(-100);
     opacityAnim.setValue(0);
-
-    console.log('🎬 [AlarmScreen] 슬라이드 애니메이션 시작');
 
     const slideAnimation = Animated.timing(slideAnim, {
       toValue: 0,
@@ -128,73 +78,53 @@ const AlarmScreenContent: React.FC = () => {
     });
 
     animationRef.current = Animated.parallel([slideAnimation, opacityAnimation]);
-    animationRef.current.start(({ finished }) => {
-      console.log(finished ? '✅ [AlarmScreen] 애니메이션 완료' : '⚠️ [AlarmScreen] 애니메이션 중단됨');
+    animationRef.current.start(() => {
       animationRef.current = null;
     });
-    // slideAnim/opacityAnim은 ref.current라 안정적
-  }, [slideAnim, opacityAnim]);
+  }, [opacityAnim, slideAnim]);
 
-  // 최신 함수 참조를 ref로 보관
+  // 최신 애니메이션 함수를 ref에 보관 (useFocusEffect 내 콜백에서 안정 참조)
   const runAnimRef = useRef(runEntranceAnimation);
-
   useEffect(() => {
     runAnimRef.current = runEntranceAnimation;
   }, [runEntranceAnimation]);
-  
+
+  // ───────── 알람 데이터 최신순 정렬 + 캐시 ─────────
   const sortedAlarmDataCache = useRef<AlarmData[] | null>(null);
   const sortedAlarmData = useMemo(() => {
-    if (sortedAlarmDataCache.current) {
-      console.log(`⚡ [AlarmScreen] 캐시된 정렬 데이터 사용`);
-      return sortedAlarmDataCache.current;
-    }
+    if (sortedAlarmDataCache.current) return sortedAlarmDataCache.current;
 
-    const sortStart = performance.now();
-    console.log(`📊 [AlarmScreen] 전체 데이터 정렬 시작: ${alarmData.length}개 아이템`);
-    
     const sorted = [...alarmData].sort((a, b) => {
       const dateA = new Date(a.createdAt).getTime();
       const dateB = new Date(b.createdAt).getTime();
       return dateB - dateA;
     });
-
     sortedAlarmDataCache.current = sorted;
-    const sortEnd = performance.now();
-    console.log(`⚡ [AlarmScreen] 전체 데이터 정렬 완료: ${(sortEnd - sortStart).toFixed(2)}ms`);
-    
     return sorted;
   }, []);
 
-  // 페이지네이션된 데이터
+  // ───────── 페이지네이션된 데이터 계산 ─────────
   const paginatedData = useMemo(() => {
-    renderStartTime.current = performance.now();
     const maxItems = (currentPage + 1) * ITEMS_PER_PAGE;
-    const result = sortedAlarmData.slice(0, Math.min(maxItems, sortedAlarmData.length));
-    
-    console.log(`📄 [AlarmScreen] 페이지네이션: page=${currentPage}, 최대=${maxItems}, 실제표시=${result.length}/${sortedAlarmData.length}`);
-    
-    return result;
+    return sortedAlarmData.slice(0, Math.min(maxItems, sortedAlarmData.length));
   }, [currentPage, sortedAlarmData]);
 
-  // 다음 페이지 여부
+  // ───────── 다음 페이지 존재 여부 ─────────
   const hasNextPage = useMemo(() => {
     const maxLoadableItems = (currentPage + 1) * ITEMS_PER_PAGE;
-    const hasMore = maxLoadableItems < sortedAlarmData.length;
-    console.log(`🔄 [AlarmScreen] 더 로드할 페이지 있음: ${hasMore}`);
-    return hasMore;
+    return maxLoadableItems < sortedAlarmData.length;
   }, [currentPage, sortedAlarmData.length]);
 
-  // 포커스 효과: deps 비움(한 번의 포커스 사이클에 1회)
+  // ───────── 화면 포커스 시 진입 애니메이션 트리거 ─────────
+  // FlashList의 초기 레이아웃이 끝난 뒤 애니메이션 실행
   useFocusEffect(
     useCallback(() => {
       let cancelled = false;
-      // FlashList가 첫 렌더/레이아웃을 끝낸 뒤 실행
       const task = InteractionManager.runAfterInteractions(() => {
-          if (!cancelled) {
-            runAnimRef.current?.();
-          }
+        if (!cancelled) {
+          runAnimRef.current?.();
+        }
       });
-
       return () => {
         cancelled = true;
         // @ts-ignore: cancel optional
@@ -203,86 +133,63 @@ const AlarmScreenContent: React.FC = () => {
     }, [])
   );
 
-  const handleAlarmPress = useCallback((item: AlarmData) => {
-    console.log(`🔔 [AlarmScreen] 알람 클릭: ${item.alarmId}`);
-    setModalData(item);
-    setModalVisible(true);
-  }, [setModalData, setModalVisible]);
+  // ───────── 알람 카드 클릭 시 모달 오픈 ─────────
+  const handleAlarmPress = useCallback(
+    (item: AlarmData) => {
+      setModalData(item);
+      setModalVisible(true);
+    },
+    [setModalData, setModalVisible]
+  );
 
-  // 🎯 최적화된 renderItem 함수
-  const renderAlarmCard: ListRenderItem<AlarmData> = useCallback(({ item, index }) => {
-    // 첫 번째와 마지막 아이템 렌더링 로그
-    if (index === 0 || index === paginatedData.length - 1) {
-      console.log(`📋 [AlarmScreen] 카드 렌더링: index=${index}, id=${item.alarmId}`);
-    }
-    
-    return (
-      <MemoizedAlarmCard 
-        item={item} 
-        onPress={handleAlarmPress}
-      />
-    );
-  }, [handleAlarmPress, paginatedData.length]);
+  // ───────── FlashList의 renderItem (메모이제이션) ─────────
+  const renderAlarmCard: ListRenderItem<AlarmData> = useCallback(
+    ({ item }) => <MemoizedAlarmCard item={item} onPress={handleAlarmPress} />,
+    [handleAlarmPress]
+  );
 
-  // Context나 글로벌 상태로 페이지 상태 관리
+  // ───────── 페이지 상태 로컬 보관/복원 ─────────
   const pageStateRef = useRef({ currentPage: 0, hasAnimated: false });
 
-  // 페이지 상태 복원
   useEffect(() => {
     if (pageStateRef.current.currentPage > 0) {
       setCurrentPage(pageStateRef.current.currentPage);
-      console.log(`🔄 [AlarmScreen] 페이지 상태 복원: ${pageStateRef.current.currentPage}`);
     }
     if (pageStateRef.current.hasAnimated) {
       hasAnimatedRef.current = true;
     }
   }, []);
 
+  // ───────── 다음 페이지 로드 ─────────
   const loadNextPage = useCallback(async () => {
-    if (isLoadingMore || !hasNextPage) {
-      console.log(`⏭️ [AlarmScreen] 페이지 로드 스킵: loading=${isLoadingMore}, hasNext=${hasNextPage}`);
-      return;
-    }
+    if (isLoadingMore || !hasNextPage) return;
 
-    console.log(`📄 [AlarmScreen] 다음 페이지 로드 시작: ${currentPage} → ${currentPage + 1}`);
     setIsLoadingMore(true);
+    // 실제 API가 있다면 여기에서 fetch/요청 수행
+    await new Promise((resolve) => setTimeout(resolve, 200));
 
-    await new Promise(resolve => setTimeout(resolve, 200));
-
-    setCurrentPage(prev => prev + 1);
-    pageStateRef.current.currentPage = currentPage + 1; // 상태 저장
+    setCurrentPage((prev) => {
+      const next = prev + 1;
+      pageStateRef.current.currentPage = next; // 복원용 저장
+      return next;
+    });
     setIsLoadingMore(false);
-    
-    console.log(`✅ [AlarmScreen] 페이지 ${currentPage + 1} 로드 완료`);
-  }, [currentPage, hasNextPage, isLoadingMore]);
+  }, [hasNextPage, isLoadingMore]);
 
+  // ───────── FlashList 보조 설정 ─────────
   const keyExtractor = useCallback((item: AlarmData) => item.alarmId, []);
   const getItemType = useCallback(() => 'alarmCard', []);
-
   const onEndReached = useCallback(() => {
-    console.log(`🔄 [AlarmScreen] onEndReached 트리거`);
     loadNextPage();
   }, [loadNextPage]);
 
-  // 뷰어블 로그 스팸 방지(측정 잡음 제거)
-  const lastRangeRef = useRef<{first:number;last:number} | null>(null);
-  const onViewableItemsChanged = useCallback(({ viewableItems }: any) => {
-    if (!viewableItems?.length) return;
-    const first = viewableItems[0].index ?? 0;
-    const last = viewableItems[viewableItems.length - 1].index ?? first;
-    const prev = lastRangeRef.current;
-    if (!prev || prev.first !== first || prev.last !== last) {
-      lastRangeRef.current = { first, last };
-      console.log(`👁️ [AlarmScreen] 화면에 보이는 아이템: ${first}-${last}`);
-    }
-  }, []);
-
+  // ───────── 뷰어빌리티 옵션 (필요시 조정) ─────────
   const viewabilityConfig = useRef({
     itemVisiblePercentThreshold: 50,
     minimumViewTime: 100,
   }).current;
 
-  // Footer 컴포넌트
+  // ───────── 리스트 Footer (로딩/더보기/끝) ─────────
   const footerComponent = useCallback(() => {
     if (isLoadingMore) {
       return (
@@ -295,11 +202,11 @@ const AlarmScreenContent: React.FC = () => {
     if (hasNextPage) {
       return (
         <View style={{ padding: 16, alignItems: 'center' }}>
-          <Text 
+          <Text
             onPress={loadNextPage}
-            style={{ 
-              color: '#007AFF', 
-              fontSize: 14, 
+            style={{
+              color: '#007AFF',
+              fontSize: 14,
               fontWeight: '600',
               textAlign: 'center',
               paddingVertical: 8,
@@ -325,14 +232,15 @@ const AlarmScreenContent: React.FC = () => {
     return null;
   }, [hasNextPage, isLoadingMore, loadNextPage, paginatedData.length, sortedAlarmData.length]);
 
+  // ───────── 렌더 ─────────
   return (
-    <Animated.View 
+    <Animated.View
       style={[
         style.container,
         {
           transform: [{ translateX: slideAnim }],
           opacity: opacityAnim,
-        }
+        },
       ]}
     >
       <FlashList<AlarmData>
@@ -343,31 +251,24 @@ const AlarmScreenContent: React.FC = () => {
         estimatedItemSize={120}
         onEndReached={onEndReached}
         onEndReachedThreshold={0.5}
-        onViewableItemsChanged={onViewableItemsChanged}
+        // onViewableItemsChanged 제거: 디버그 로그 삭제
         viewabilityConfig={viewabilityConfig}
         showsVerticalScrollIndicator={false}
         removeClippedSubviews={true}
         drawDistance={300}
         contentContainerStyle={style.contentContainer}
         ListFooterComponent={footerComponent}
-        onBlankArea={(info) => {
-          const blankSize = info.offsetEnd - info.offsetStart;
-          if (blankSize > 240) {
-            console.warn(`⚠️ [AlarmScreen] Blank area: ${blankSize.toFixed(1)}px`);
-          }
-        }}
+        // onBlankArea 제거: 디버그 경고 삭제
       />
     </Animated.View>
   );
 };
 
-// Profiler로 감싼 메인 컴포넌트
+// ─────────────────────────────────────────────
+// 메인 스크린 컴포넌트 (Profiler 제거)
+// ─────────────────────────────────────────────
 const AlarmScreen: React.FC = () => {
-  return (
-    <Profiler id="AlarmScreen" onRender={onRenderCallback}>
-      <AlarmScreenContent />
-    </Profiler>
-  );
+  return <AlarmScreenContent />;
 };
 
 export default AlarmScreen;
