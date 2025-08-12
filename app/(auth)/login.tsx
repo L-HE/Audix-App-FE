@@ -1,10 +1,10 @@
 // app/(auth)/login.tsx
 import { Colors } from '@/shared/styles/global';
 import { Ionicons } from '@expo/vector-icons';
+import { Image as ExpoImage } from 'expo-image';
 import { router } from 'expo-router';
 import React, { Profiler, useCallback, useEffect, useRef, useState } from 'react';
 import {
-  Image,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -19,19 +19,20 @@ import { performanceTracker } from '../../shared/utils/performanceTracker';
 
 // ✅ 3. LoginScreen 마운트 최적화: 컴포넌트 프리로딩
 interface PreloadedAssets {
-  backgroundImage: any;
+  backgroundImageLeft: any;
+  backgroundImageRight: any;
   logoImage: any;
   isReady: boolean;
 }
 
-// 전역 프리로딩 상태
 let preloadedAssets: PreloadedAssets = {
-  backgroundImage: null,
+  backgroundImageLeft: null,
+  backgroundImageRight: null,
   logoImage: null,
   isReady: false
 };
 
-// ✅ 에셋 프리로딩 함수
+// ✅ 에셋 프리로딩 함수 - ExpoImage 캐싱 활용
 const preloadLoginAssets = async (): Promise<PreloadedAssets> => {
   if (preloadedAssets.isReady) {
     console.log('✅ [LoginScreen] 에셋 이미 프리로드됨');
@@ -42,26 +43,27 @@ const preloadLoginAssets = async (): Promise<PreloadedAssets> => {
   performanceTracker.addEvent('LoginAssetsPreloadStart');
 
   try {
-    // 이미지 프리로딩 (병렬)
-    const [backgroundImg, logoImg] = await Promise.all([
-      new Promise((resolve) => {
-        const bgImg = require('../../assets/images/pictures/login_left.png');
-        resolve(bgImg);
-      }),
-      new Promise((resolve) => {
-        const logo = require('../../assets/images/logos/AudixLogoNavy.png');
-        resolve(logo);
-      })
-    ]);
+    // ExpoImage.prefetch로 이미지 캐싱 (병렬)
+    const imageUrls = [
+      require('../../assets/images/pictures/login_left.png'),
+      require('../../assets/images/pictures/login_right.png'),
+      require('../../assets/images/logos/AudixLogoNavy.png'),
+      require('../../assets/images/icons/AudixLogoNavySimple.png')
+    ];
 
+    // ExpoImage prefetch는 자동 캐싱을 제공
+    await Promise.all(imageUrls.map(url => ExpoImage.prefetch(url)));
     preloadedAssets = {
-      backgroundImage: backgroundImg,
-      logoImage: logoImg,
+      backgroundImageLeft: require('../../assets/images/pictures/login_left.png'),
+      backgroundImageRight: require('../../assets/images/pictures/login_right.png'),
+      logoImage: require('../../assets/images/logos/AudixLogoNavy.png'),
       isReady: true
     };
 
-    performanceTracker.addDuration('LoginAssetsPreload', preloadStart);
-    console.log('✅ [LoginScreen] 에셋 프리로딩 완료');
+    const preloadDuration = performance.now() - preloadStart;
+    performanceTracker.addDuration('LoginAssetsPreload', preloadDuration);
+    performanceTracker.addEvent('LoginAssetsPreloadComplete');
+    console.log(`✅ [LoginScreen] 에셋 프리로딩 및 캐싱 완료 (${preloadDuration.toFixed(2)}ms)`);
     
     return preloadedAssets;
   } catch (error) {
@@ -117,6 +119,10 @@ const LoginScreenContent: React.FC = () => {
   const passwordInputRef = useRef<TextInput>(null);
   const scrollViewRef = useRef<ScrollView>(null);
   const renderStartTime = useRef(performance.now());
+  
+  // ✅ 이미지 로드 추적용 ref들
+  const imageLoadedCount = useRef(0);
+  const loginScreenMountTime = useRef(performance.now());
 
   // ✅ 스크롤 성능 최적화 (기존과 동일)
   const scrollToField = useCallback((yOffset: number) => {
@@ -288,8 +294,63 @@ const LoginScreenContent: React.FC = () => {
     passwordInputRef.current?.focus();
   }, []);
 
+  // 더 정확한 이미지 로드 추적을 위한 개선
+  // ✅ 이미지별 상태 추적
+  const imageStates = useRef({
+    logo: false,
+    leftBackground: false,
+    rightBackground: false
+  });
+
+  // ✅ 개선된 handleImageLoad
   const handleImageLoad = useCallback((imageName: string) => {
-    console.log(`🖼️ [LoginScreen] ${imageName} 이미지 로드 완료`);
+    const loadTime = performance.now();
+    
+    // 이미지별 상태 업데이트
+    switch (imageName) {
+      case '로고':
+        if (imageStates.current.logo) {
+          console.log(`⚠️ [LoginScreen] 로고 이미지 중복 로드 방지`);
+          return;
+        }
+        imageStates.current.logo = true;
+        break;
+      case '왼쪽 배경':
+        if (imageStates.current.leftBackground) {
+          console.log(`⚠️ [LoginScreen] 왼쪽 배경 이미지 중복 로드 방지`);
+          return;
+        }
+        imageStates.current.leftBackground = true;
+        break;
+      case '오른쪽 배경':
+        if (imageStates.current.rightBackground) {
+          console.log(`⚠️ [LoginScreen] 오른쪽 배경 이미지 중복 로드 방지`);
+          return;
+        }
+        imageStates.current.rightBackground = true;
+        break;
+      default:
+        console.warn(`⚠️ [LoginScreen] 알 수 없는 이미지: ${imageName}`);
+        return;
+    }
+    
+    performanceTracker.addEvent(`LoginImage_${imageName}`, 'loaded');
+    console.log(`🖼️ [LoginScreen] ${imageName} 이미지 로드 완료 (${loadTime.toFixed(2)}ms 시점)`);
+    
+    // 모든 이미지 로드 완료 확인
+    const allLoaded = imageStates.current.logo && 
+                     imageStates.current.leftBackground && 
+                     imageStates.current.rightBackground;
+    
+    if (allLoaded) {
+      const totalImageLoadTime = performance.now() - loginScreenMountTime.current;
+      performanceTracker.addDuration('LoginImagesComplete', totalImageLoadTime);
+      performanceTracker.addEvent('LoginImagesAllLoaded', 'complete');
+      console.log(`✅ [LoginScreen] 모든 이미지 캐싱 및 로드 완료 (총 ${totalImageLoadTime.toFixed(2)}ms)`);
+    } else {
+      const loadedCount = Object.values(imageStates.current).filter(Boolean).length;
+      console.log(`📊 [LoginScreen] 이미지 로드 진행: ${loadedCount}/3 완료`);
+    }
   }, []);
 
   if (!coreUIReady) {
@@ -314,30 +375,40 @@ const LoginScreenContent: React.FC = () => {
         showsVerticalScrollIndicator={false}
         bounces={false}
         removeClippedSubviews={true}
-        // ✅ 추가 최적화
         scrollEventThrottle={16}
         decelerationRate="fast"
       >
         <View style={style.content}>
           {/* 로고 영역 - 배경 도형들 포함 */}
           <View style={style.logoContainer}>
-            <View style={style.backgroundShapes}>
-              <View style={style.circle} />
-              {/* ✅ 프리로딩된 이미지 사용 */}
-              {backgroundImagesReady && (
-                <Image
-                  source={preloadedAssets.isReady ? preloadedAssets.backgroundImage : require('../../assets/images/pictures/login_left.png')}
+            {/* ✅ 배경 이미지들을 logoContainer 내부로 이동 */}
+            {backgroundImagesReady && (
+              <>
+                <ExpoImage
+                  source={preloadedAssets.isReady ? preloadedAssets.backgroundImageLeft : require('../../assets/images/pictures/login_left.png')}
                   style={style.triangleLeft}
                   onLoad={() => handleImageLoad('왼쪽 배경')}
+                  cachePolicy="memory-disk"
+                  priority="normal"
                 />
-              )}
-            </View>
+                <ExpoImage
+                  source={preloadedAssets.isReady ? preloadedAssets.backgroundImageRight : require('../../assets/images/pictures/login_right.png')}
+                  style={style.triangleRight}
+                  onLoad={() => handleImageLoad('오른쪽 배경')}
+                  cachePolicy="memory-disk"
+                  priority="normal"
+                />
+              </>
+            )}
             
-            <Image
+            {/* ✅ 로고 이미지 */}
+            <ExpoImage
               source={preloadedAssets.isReady ? preloadedAssets.logoImage : require('../../assets/images/logos/AudixLogoNavy.png')}
               style={style.logo}
-              resizeMode="contain"
+              contentFit="contain"
               onLoad={() => handleImageLoad('로고')}
+              cachePolicy="memory-disk"
+              priority="high"
             />
           </View>
 
