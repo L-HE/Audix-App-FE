@@ -9,7 +9,6 @@ import { useTimeStore } from '../shared/store/timeStore';
 import { performanceTracker } from '../shared/utils/performanceTracker';
 import { webSocketClient } from '../shared/websocket/client';
 import { initLoginScreenPreload } from './(auth)/login';
-import NotificationModal from './(tabs)/notificationModal';
 
 export const headerShown = false;
 
@@ -230,7 +229,6 @@ function RootLayoutContent() {
   return (
     <>
       <Slot />
-      <NotificationModal />
     </>
   );
 }

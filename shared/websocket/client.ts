@@ -2,9 +2,9 @@
 class WebSocketClient {
     private ws: WebSocket | null = null;
     private reconnectAttempts = 0;
-    private maxReconnectAttempts = 3;
-    private connectionTimeout = 3000;
-    private isConnected = false; // ✅ 연결 상태 추적
+    private maxReconnectAttempts = 2;
+    private connectionTimeout = 500;
+    private isConnected = false; // 연결 상태 추적
     private onAlertCallback?: (data: any) => void;
 
     connect() {
@@ -13,7 +13,7 @@ class WebSocketClient {
                 console.log('🔌 WebSocket 연결 시도...');
 
                 const timeoutId = setTimeout(() => {
-                    console.log('⏰ WebSocket 연결 타임아웃 (3초)');
+                    console.log('⏰ WebSocket 연결 타임아웃 (1초)');
                     if (this.ws) {
                         this.ws.close();
                     }

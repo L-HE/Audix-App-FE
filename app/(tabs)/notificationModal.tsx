@@ -1,6 +1,6 @@
 // app/(tabs)/notificationModal.tsx
 import { CardState } from '@/assets/data/areaData';
-import React from 'react';
+import React, { Profiler } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import RNModal from 'react-native-modal';
 import { Portal } from 'react-native-portalize';
@@ -9,7 +9,38 @@ import { useModal } from '../../shared/api/modalContextApi';
 import { Colors } from '../../shared/styles/global';
 import { NotificationModalStyles as style } from '../../shared/styles/screens';
 
-const NotificationModal: React.FC = () => {
+// NotificationModal 전용 Profiler 콜백
+const onModalRenderCallback = (
+  id: string,
+  phase: 'mount' | 'update' | 'nested-update',
+  actualDuration: number,
+  baseDuration: number,
+  startTime: number,
+  commitTime: number
+) => {
+  const threshold = 16; // 60fps 기준
+  const isSlowRender = actualDuration > threshold;
+  
+  if (isSlowRender) {
+    console.log(`[Modal Profiler] ${id} (${phase}): ${actualDuration.toFixed(2)}ms <- SLOW MODAL RENDER!`);
+    
+    // 모달의 경우 50ms 이상이면 상세 정보 출력
+    if (actualDuration > 50) {
+      console.log(`[Modal Details] ${id}:`, {
+        phase,
+        actualDuration: `${actualDuration.toFixed(2)}ms`,
+        baseDuration: `${baseDuration.toFixed(2)}ms`,
+        startTime: `${startTime.toFixed(2)}ms`,
+        commitTime: `${commitTime.toFixed(2)}ms`,
+        renderingTime: `${(commitTime - startTime).toFixed(2)}ms`
+      });
+    }
+  } else {
+    console.log(`[Modal Profiler] ${id} (${phase}): ${actualDuration.toFixed(2)}ms`);
+  }
+};
+
+const NotificationModalContent: React.FC = () => {
   const { modalVisible, modalData, hideModal } = useModal();
 
   // Hook을 먼저 모두 호출
@@ -79,6 +110,12 @@ const NotificationModal: React.FC = () => {
         onBackdropPress={hideModal}
         onBackButtonPress={hideModal}
         style={{ zIndex: 10000 }}
+        onModalShow={() => {
+          console.log(`[Modal] 애니메이션 완료 - 모달 완전히 표시됨`);
+        }}
+        onModalHide={() => {
+          console.log(`[Modal] 애니메이션 완료 - 모달 완전히 숨겨짐`);
+        }}
       >
         <View style={[style.container, { backgroundColor: bodyBackgroundColor }]}>
           {/* 상단 컬러 헤더 */}
@@ -97,15 +134,13 @@ const NotificationModal: React.FC = () => {
               <Text style={style.alarmSubtitle}>{modalData.model}</Text>
             )}
 
-            {/* LLM message box */}
+            {/* LLM 메세지 box */}
             <View style={[
               style.messageBox, 
-              // safety 타입일 때 메시지 박스 배경색도 조정
               { backgroundColor: isSafetyAlarm ? Colors.backgroundSafetyAlarm : Colors.backgroundSecondary }
             ]}>
               <Text style={[
                 style.messageText,
-                // safety 타입일 때 텍스트 색상도 흰색으로 변경
                 { color: isSafetyAlarm ? Colors.textPrimary : Colors.textPrimary }
               ]}>
                 {modalData.message}
@@ -119,7 +154,6 @@ const NotificationModal: React.FC = () => {
             >
               <Text style={[
                 style.closeButtonText,
-                // safety 타입일 때 버튼 텍스트 색상 조정
                 { color: isSafetyAlarm ? Colors.textPrimary : Colors.textPrimary }
               ]}>
                 닫기
@@ -129,6 +163,15 @@ const NotificationModal: React.FC = () => {
         </View>
       </RNModal>
     </Portal>
+  );
+};
+
+// Profiler로 감싼 메인 컴포넌트
+const NotificationModal: React.FC = () => {
+  return (
+    <Profiler id="NotificationModal" onRender={onModalRenderCallback}>
+      <NotificationModalContent />
+    </Profiler>
   );
 };
 

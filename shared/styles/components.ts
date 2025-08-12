@@ -262,14 +262,6 @@ export const AlarmCardStyles = StyleSheet.create({
     borderRadius: 12,
     marginHorizontal: 16,
     marginVertical: 6,
-    shadowColor: Colors.shadow,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
   content: {
     padding: 16,
@@ -314,7 +306,7 @@ export const AreaCardStyles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
-    elevation: 4,
+    elevation: 2,
   },
   cardImage: {
     width: 80,
