@@ -1,58 +1,87 @@
 // app/(tabs)/alarms/index.tsx
-import React, { useCallback, useMemo, useState } from 'react';
-import { FlatList, ListRenderItem, View } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
+import { Animated, FlatList, ListRenderItem } from 'react-native';
 
 import { AlarmsScreenStyles as style } from '@/shared/styles/screens';
 import { AlarmData, alarmData } from '../../../assets/data/alarmData';
 import AlarmCard from '../../../components/screens/alarmCard';
 import { useModal } from '../../../shared/api/modalContextApi';
-import { usePerformanceProfiler } from '../../../shared/utils/performance';
 
 const AlarmScreen: React.FC = () => {
   const { setModalVisible, setModalData } = useModal();
   const [page, setPage] = useState(1);
   const ITEMS_PER_PAGE = 20;
-  
-  // Performance profiler 추가
-  const { measureFunction, measureRender } = usePerformanceProfiler('AlarmScreen');
 
-  // 한 번 정렬하고 페이지네이션 적용
+  // 애니메이션 관련 상태
+  const slideAnim = useRef(new Animated.Value(-100)).current; // 초기값: 화면 왼쪽 밖
+  const opacityAnim = useRef(new Animated.Value(0)).current;   // 초기값: 투명
+  const hasAnimatedRef = useRef(false); // 최초 1회만 애니메이션
+
+  // 탭 포커스 시 슬라이드 애니메이션
+  useFocusEffect(
+    useCallback(() => {
+      // 이미 애니메이션 재생했으면 스킵 (탭 재방문 시 애니메이션 안함)
+      if (hasAnimatedRef.current) {
+        slideAnim.setValue(0);
+        opacityAnim.setValue(1);
+        return;
+      }
+
+      // 최초 진입 시에만 애니메이션
+      hasAnimatedRef.current = true;
+      
+      // 초기 위치 설정
+      slideAnim.setValue(-100);
+      opacityAnim.setValue(0);
+
+      // 슬라이드 + 페이드인 애니메이션 (동시 실행)
+      Animated.parallel([
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.timing(opacityAnim, {
+          toValue: 1,
+          duration: 250,
+          delay: 50,
+          useNativeDriver: true,
+        }),
+      ]).start();
+
+      // cleanup (탭 떠날 때는 애니메이션 없음)
+      return () => {
+        // 필요 시 cleanup 로직
+      };
+    }, [slideAnim, opacityAnim])
+  );
+
+  // 기존 로직들
   const paginatedData = useMemo(() => {
-    const endMeasurement = measureRender();
-    
-    try {
-      // 1. 먼저 정렬
-      const sorted = [...alarmData].sort((a, b) => {
+    const sorted = [...alarmData].sort((a, b) => {
         const dateA = new Date(a.createdAt).getTime();
         const dateB = new Date(b.createdAt).getTime();
-        return dateB - dateA; // 내림차순 정렬
+        return dateB - dateA;
       });
 
-      // 2. 페이지네이션 적용
       return sorted.slice(0, page * ITEMS_PER_PAGE);
-    } finally {
-      endMeasurement();
-    }
-  }, [page, measureRender]);
+  }, [page]);
 
-  // handleAlarmPress를 useCallback으로 메모이제이션
-  const handleAlarmPress = useCallback(measureFunction('handleAlarmPress', (item: AlarmData) => {
+  const handleAlarmPress = useCallback((item: AlarmData) => {
     setModalData(item);
     setModalVisible(true);
-  }), [setModalData, setModalVisible, measureFunction]);
+  }, [setModalData, setModalVisible]);
 
-  // renderItem 타입을 AlarmData로 수정
   const renderAlarmCard: ListRenderItem<AlarmData> = useCallback(({ item }) => (
     <AlarmCard
-      {...item} // AlarmData의 모든 속성 전달
-      onPress={() => handleAlarmPress(item)} // onPress 함수 추가
+      {...item}
+      onPress={() => handleAlarmPress(item)}
     />
   ), [handleAlarmPress]);
 
-  // keyExtractor를 useCallback으로 메모이제이션
   const keyExtractor = useCallback((item: AlarmData) => item.alarmId, []);
 
-  // 무한 스크롤 로직
   const loadMore = useCallback(() => {
     const totalItems = alarmData.length;
     const currentItems = paginatedData.length;
@@ -63,8 +92,15 @@ const AlarmScreen: React.FC = () => {
   }, [paginatedData.length]);
 
   return (
-    <View style={style.container}>
-      {/* FlatList 타입 명시 */}
+    <Animated.View 
+      style={[
+        style.container,
+        {
+          transform: [{ translateX: slideAnim }],
+          opacity: opacityAnim,
+        }
+      ]}
+    >
       <FlatList<AlarmData>
         data={paginatedData}
         renderItem={renderAlarmCard}
@@ -84,7 +120,7 @@ const AlarmScreen: React.FC = () => {
           index,
         })}
       />
-    </View>
+    </Animated.View>
   );
 };
 
