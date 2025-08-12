@@ -16,10 +16,70 @@ export interface AlarmData {
 }
 
 export interface AlarmCardProps extends AlarmData {
-  onPress: () => void; // ✅ UI 컴포넌트용 props에만 onPress 포함
+  onPress: () => void;
 }
 
 export const alarmData: AlarmData[] = [
+  {
+    alarmId: '14',
+    status: 'warning',
+    regionName: 'A-1구역',
+    regionLocation: '2층 자동차 부재료 조립구역',
+    model: 'SO-ARM101',
+    createdAt: new Date(Date.now() - 3 * 60 * 1000),
+    message: "현재 장비에서 이상음이 감지됩니다.\n점검이 필요합니다.",
+    type: 'machine',
+  },
+  {
+    alarmId: '13',
+    status: 'warning',
+    regionName: 'A-1구역',
+    regionLocation: '2층 자동차 부재료 조립구역',
+    model: 'SO-ARM101',
+    createdAt: new Date(Date.now() - 3 * 60 * 1000),
+    message: "현재 장비에서 이상음이 감지됩니다.\n점검이 필요합니다.",
+    type: 'machine',
+  },
+  {
+    alarmId: '12',
+    status: 'warning',
+    regionName: 'A-1구역',
+    regionLocation: '2층 자동차 부재료 조립구역',
+    model: 'SO-ARM101',
+    createdAt: new Date(Date.now() - 3 * 60 * 1000),
+    message: "현재 장비에서 이상음이 감지됩니다.\n점검이 필요합니다.",
+    type: 'machine',
+  },
+  {
+    alarmId: '11',
+    status: 'warning',
+    regionName: 'A-1구역',
+    regionLocation: '2층 자동차 부재료 조립구역',
+    model: 'SO-ARM101',
+    createdAt: new Date(Date.now() - 4 * 60 * 1000),
+    message: "현재 장비에서 이상음이 감지됩니다.\n점검이 필요합니다.",
+    type: 'machine',
+  },
+  {
+    alarmId: '10',
+    status: 'warning',
+    regionName: 'A-1구역',
+    regionLocation: '2층 자동차 부재료 조립구역',
+    model: 'SO-ARM101',
+    createdAt: new Date(Date.now() - 8 * 60 * 1000),
+    message: "현재 장비에서 이상음이 감지됩니다.\n점검이 필요합니다.",
+    type: 'machine',
+  },
+  {
+    alarmId: '9',
+    status: 'warning',
+    regionName: 'A-1구역',
+    regionLocation: '2층 자동차 부재료 조립구역',
+    model: 'SO-ARM101',
+    createdAt: new Date(Date.now() - 12 * 60 * 1000),
+    message: "현재 장비에서 이상음이 감지됩니다.\n점검이 필요합니다.",
+    type: 'machine',
+  },
   {
     alarmId: '8',
     status: 'warning',
