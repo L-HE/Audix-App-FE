@@ -1,5 +1,4 @@
 // assets/data/machineData.ts
-import { ImageSourcePropType } from 'react-native';
 import { BASE_URL } from '../../shared/api/config';
 import { getDevicesByAreaIdFromRedis } from '../../shared/api/device';
 import { webSocketClient } from '../../shared/websocket/client';
@@ -7,26 +6,28 @@ import { webSocketClient } from '../../shared/websocket/client';
 export type Machine = {
   deviceId: number;
   areaId?: number;
-  explain: string;
   name: string;
+  model: string;
   address: string;
-  status: string;
   deviceManager?: string;
-  image?: ImageSourcePropType;
+  parts: object;
   normalScore: number;
+  image?: string;
+  status?: string;
 };
 
 export const machineData: Machine[] = [
   {
-    deviceId: 1,
-    areaId: 16,
-    explain: '자동차 부재료 조립용 로봇팔',
-    name: '로봇팔',
-    address: '2층 자동차 부재료 조립구역',
-    status: 'danger',
-    deviceManager: '이하은',
-    image: require('../images/logos/AudixLogoNavy.png'),
-    normalScore: 0.15,
+    deviceId: 0,
+    areaId: 0,
+    name: '',
+    model: '',
+    address: '',
+    deviceManager: '',
+    parts: {},
+    normalScore: 0,
+    image: '',
+    status: '',
   }
 ];
 
@@ -116,13 +117,14 @@ const transformDeviceToMachine = (device: any, isOnline: boolean): Machine => {
   return {
     deviceId: Number(device.deviceId) || 0,
     areaId: Number(device.areaId) || undefined,
-    explain: String(device.explain || '설명 없음'),
     name: String(device.name || '장비명 없음'),
+    model: String(device.model || '모델명 없음'),
     address: String(device.address || '주소 정보 없음'),
-    status: String(status),
     deviceManager: String(device.deviceManager || '담당자 없음'),
-    image: imageSource, // 처리된 이미지 소스
+    parts: {},
     normalScore: normalScore,
+    image: imageSource,
+    status: String(status),
   };
 };
 
@@ -186,24 +188,26 @@ const generateFallbackData = (areaId: number): Machine[] => {
     {
       deviceId: areaId * 1000 + 1,
       areaId: areaId,
-      explain: '자동차 부재료 조립용 로봇팔',
       name: `로봇팔 AUD-${areaId}-001`,
+      model: '자동차 부재료 조립용 로봇팔',
       address: `${areaId}구역 자동차 부재료 조립구역`,
-      status: 'normal',
       deviceManager: '시스템 관리자',
-      image: require('../images/logos/AudixLogoNavy.png'),
+      parts: {},
       normalScore: 85,
+      image: require('../images/logos/AudixLogoNavy.png'),
+      status: 'normal',
     },
     {
       deviceId: areaId * 1000 + 2,
       areaId: areaId,
-      explain: '품질 검사용 센서',
       name: `품질센서 AUD-${areaId}-002`,
+      model: '품질 검사용 센서',
       address: `${areaId}구역 품질 검사구역`,
-      status: 'warning',
       deviceManager: '시스템 관리자',
-      image: require('../images/logos/AudixLogoNavy.png'),
+      parts: {},
       normalScore: 65,
+      image: require('../images/logos/AudixLogoNavy.png'),
+      status: 'warning',
     },
   ];
 

@@ -25,8 +25,8 @@ const STATE_ORDER_MAP = { danger: 0, warning: 1, normal: 2, fixing: 3, mic_issue
 const sortAreasByState = (areas: Area[]): Area[] => {
   if (areas.length === 0) return [];
   return areas.slice().sort((a, b) => {
-    const aOrder = STATE_ORDER_MAP[a.state as keyof typeof STATE_ORDER_MAP] ?? 99;
-    const bOrder = STATE_ORDER_MAP[b.state as keyof typeof STATE_ORDER_MAP] ?? 99;
+    const aOrder = STATE_ORDER_MAP[a.status as keyof typeof STATE_ORDER_MAP] ?? 99;
+    const bOrder = STATE_ORDER_MAP[b.status as keyof typeof STATE_ORDER_MAP] ?? 99;
     return aOrder - bOrder;
   });
 };
@@ -75,7 +75,7 @@ const MemoizedAreaCardWrapper = React.memo<{
   );
 
   return shouldFade ? <MemoizedFadeInOnce delay={delay}>{card}</MemoizedFadeInOnce> : card;
-}, (prev, next) => prev.item.id === next.item.id && prev.item.state === next.item.state);
+}, (prev, next) => prev.item.id === next.item.id && prev.item.status === next.item.status);
 
 // ─────────────────────────────────────────────
 // 메인 화면 콘텐츠 컴포넌트

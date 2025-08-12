@@ -8,10 +8,10 @@ export type CardState = 'danger' | 'warning' | 'normal' | 'repair' | 'offline';
 
 export interface AreaCardProps {
   id: string;
-  title: string;
-  subtitle: string;
+  name: string;
+  address: string;
   image: ImageSourcePropType;
-  state: CardState;
+  status: CardState;
   onPress: () => void;
 }
 
@@ -49,13 +49,13 @@ const mapStatusToState = (status: string): CardState => {
 // API 데이터를 areaData 형식으로 변환
 const transformApiToAreaData = (apiData: ApiArea[]): Area[] => {
   return apiData.map((item) => ({
-    id: item.id.toString(),        // id → id (number → string)
-    title: item.name,              // name → title
-    subtitle: item.explain,        // explain → subtitle
+    id: item.id.toString(),        // number → string
+    name: item.name,
+    address: item.explain,
     image: item.image
       ? { uri: `${BASE_URL}${item.image}` }  // API 이미지 경로 사용
       : require('../images/logos/AudixLogoNavy.png'), // fallback 이미지
-    state: mapStatusToState(item.status), // status → state (실제 매핑)
+    status: mapStatusToState(item.status), // status (실제 매핑)
   }));
 };
 
@@ -91,9 +91,9 @@ export const getAreaData = async (): Promise<Area[]> => {
 export const areaData: Area[] = [
   {
     id: '1',
-    title: 'A-1구역',
-    subtitle: '2층 자동차 부재료 조립구역',
+    name: 'A-1구역',
+    address: '2층 자동차 부재료 조립구역',
     image: require('../images/logos/AudixLogoNavy.png'),
-    state: 'warning',
+    status: 'warning',
   }
 ];

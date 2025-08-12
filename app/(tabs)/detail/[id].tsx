@@ -293,7 +293,7 @@ const DetailScreen: React.FC = () => {
 
   const comparator = useCallback(
     (a: Machine, b: Machine) => {
-      const ra = statusRank(a.status) - statusRank(b.status);
+      const ra = statusRank(a.status ?? '') - statusRank(b.status ?? '');
       if (ra !== 0) return ra;
       return normScoreVal(a.normalScore) - normScoreVal(b.normalScore);
     },
