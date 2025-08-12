@@ -62,13 +62,10 @@ const transformApiToAreaData = (apiData: ApiArea[]): Area[] => {
 // API에서 데이터 가져오기
 export const getAreaData = async (): Promise<Area[]> => {
   try {
-    console.log('🌐 API Area 데이터 요청 중... (3초 타임아웃)');
-    
-    // 3초 타임아웃으로 API 호출
+    // 타임아웃으로 API 호출
     const apiData = await getAreaList();
     
     if (apiData && apiData.length > 0) {
-      console.log('✅ API Area 데이터 사용');
       return transformApiToAreaData(apiData);
     } else {
       console.log('⚠️ API 응답이 비어있음, fallback 데이터 사용');
@@ -77,10 +74,10 @@ export const getAreaData = async (): Promise<Area[]> => {
   } catch (error) {
     console.error('❌ API Area 데이터 요청 실패, fallback 데이터 사용:', error);
     
-    // ✅ 에러 타입 확인
+    // 에러 타입 확인
     if (error instanceof Error) {
       if (error.name === 'AbortError') {
-        console.log('⏰ API 요청 타임아웃 (3초), fallback 데이터 사용');
+        console.log('⏰ API 요청 타임아웃, fallback 데이터 사용');
       } else {
         console.log('🌐 네트워크 오류, fallback 데이터 사용');
       }
@@ -98,33 +95,5 @@ export const areaData: Area[] = [
     subtitle: '2층 자동차 부재료 조립구역',
     image: require('../images/logos/AudixLogoNavy.png'),
     state: 'warning',
-  },
-  {
-    id: '2',
-    title: 'B-2구역',
-    subtitle: '1층 전장품 검수구역',
-    image: require('../images/logos/AudixLogoNavy.png'),
-    state: 'danger',
-  },
-  {
-    id: '3',
-    title: 'C-2구역',
-    subtitle: '1층 전장품 검수구역',
-    image: require('../images/logos/AudixLogoNavy.png'),
-    state: 'normal',
-  },
-  {
-    id: '4',
-    title: 'D-1구역',
-    subtitle: '1층 전장품 검수구역',
-    image: require('../images/logos/AudixLogoNavy.png'),
-    state: 'repair',
-  },
-  {
-    id: '5',
-    title: 'D-2구역',
-    subtitle: '1층 전장품 검수구역',
-    image: require('../images/logos/AudixLogoNavy.png'),
-    state: 'offline',
-  },
+  }
 ];

@@ -27,150 +27,7 @@ export const machineData: Machine[] = [
     deviceManager: '이하은',
     image: require('../images/logos/AudixLogoNavy.png'),
     normalScore: 0.15,
-  },
-  {
-    deviceId: 2,
-    areaId: 17,
-    explain: '자동차 부재료 조립용 로봇팔',
-    name: '로봇팔',
-    address: '2층 자동차 부재료 조립구역',
-    status: 'normal',
-    deviceManager: '김서현',
-    image: require('../images/logos/AudixLogoNavy.png'),
-    normalScore: 0.8,
-  },
-  {
-    deviceId: 5,
-    areaId: 1,
-    explain: '자동차 부재료 조립용 로봇팔',
-    name: '로봇팔',
-    address: '2층 자동차 부재료 조립구역',
-    status: 'danger',
-    deviceManager: '도종명',
-    image: require('../images/logos/AudixLogoNavy.png'),
-    normalScore: 0.08,
-  },
-  {
-    deviceId: 3,
-    areaId: 2,
-    explain: '자동차 부재료 조립용 로봇팔',
-    name: '로봇팔',
-    address: '2층 자동차 부재료 조립구역',
-    status: 'danger',
-    deviceManager: '김재걸',
-    image: require('../images/logos/AudixLogoNavy.png'),
-    normalScore: 0.20,
-  },
-  {
-    deviceId: 4,
-    areaId: 2,
-    explain: '자동차 부재료 조립용 로봇팔',
-    name: '로봇팔',
-    address: '2층 자동차 부재료 조립구역',
-    status: 'warning',
-    deviceManager: '김현민',
-    image: require('../images/logos/AudixLogoNavy.png'),
-    normalScore: 0.55,
-  },
-  {
-    deviceId: 6,
-    areaId: 2,
-    explain: '자동차 부재료 조립용 로봇팔',
-    name: '로봇팔',
-    address: '2층 자동차 부재료 조립구역',
-    status: 'warning',
-    deviceManager: '김현민',
-    image: require('../images/logos/AudixLogoNavy.png'),
-    normalScore: 0.3,
-  },
-  {
-    deviceId: 7,
-    areaId: 2,
-    explain: '자동차 부재료 조립용 로봇팔',
-    name: '로봇팔',
-    address: '2층 자동차 부재료 조립구역',
-    status: 'normal',
-    deviceManager: '김현민',
-    image: require('../images/logos/AudixLogoNavy.png'),
-    normalScore: 0.8,
-  },
-  {
-    deviceId: 8,
-    areaId: 2,
-    explain: '자동차 부재료 조립용 로봇팔',
-    name: '로봇팔',
-    address: '2층 자동차 부재료 조립구역',
-    status: 'normal',
-    deviceManager: '김현민',
-    image: require('../images/logos/AudixLogoNavy.png'),
-    normalScore: 0.7,
-  },
-  {
-    deviceId: 9,
-    areaId: 2,
-    explain: '자동차 부재료 조립용 로봇팔',
-    name: '로봇팔',
-    address: '2층 자동차 부재료 조립구역',
-    status: 'danger',
-    deviceManager: '김현민',
-    image: require('../images/logos/AudixLogoNavy.png'),
-    normalScore: 0.1,
-  },
-  {
-    deviceId: 10,
-    areaId: 2,
-    explain: '자동차 용접 로봇팔',
-    name: '로봇팔',
-    address: '4층 자동차 부재료 조립구역',
-    status: 'offline',
-    deviceManager: '김철수',
-    image: require('../images/logos/AudixLogoNavy.png'),
-    normalScore: 0,
-  },
-  {
-    deviceId: 11,
-    areaId: 2,
-    explain: '자동차 도장 로봇팔',
-    name: '로봇팔',
-    address: '4층 자동차 부재료 조립구역',
-    status: 'repair',
-    deviceManager: '김영희',
-    image: require('../images/logos/AudixLogoNavy.png'),
-    normalScore: 0,
-  },
-  {
-    deviceId: 12,
-    areaId: 2,
-    explain: '자동차 도장 로봇팔',
-    name: '로봇팔',
-    address: '4층 자동차 부재료 조립구역',
-    status: 'normal',
-    deviceManager: '김영희',
-    image: require('../images/logos/AudixLogoNavy.png'),
-    normalScore: 0.9,
-  },
-  {
-    deviceId: 13,
-    areaId: 2,
-    explain: '자동차 도장 로봇팔',
-    name: '로봇팔',
-    address: '4층 자동차 부재료 조립구역',
-    status: 'normal',
-    deviceManager: '김영희',
-    image: require('../images/logos/AudixLogoNavy.png'),
-    normalScore: 0.9,
-  },
-  {
-    deviceId: 14,
-    areaId: 2,
-    explain: '자동차 도장 로봇팔',
-    name: '로봇팔',
-    address: '4층 자동차 부재료 조립구역',
-    status: 'normal',
-    deviceManager: '김영희',
-    image: require('../images/logos/AudixLogoNavy.png'),
-    normalScore: 0.9,
-  },
+  }
 ];
 
 // 3초 타임아웃을 포함한 Redis API 호출 함수
@@ -178,7 +35,6 @@ const getDevicesWithTimeout = async (areaId: number, timeout = 3000): Promise<an
   return new Promise(async (resolve, reject) => {
     // 타임아웃 설정
     const timeoutId = setTimeout(() => {
-      //console.log(`⏰ Redis API 타임아웃 (${timeout}ms) - Area ID: ${areaId}`);
       reject(new Error('AbortError')); // AbortError로 타임아웃 구분
     }, timeout);
 
@@ -204,7 +60,6 @@ const transformDeviceToMachine = (device: any, isOnline: boolean): Machine => {
       if (typeof device.image === 'string' && device.image.trim()) {
         // BASE_URL 검증
         if (!BASE_URL || typeof BASE_URL !== 'string') {
-          //console.log('🚨 BASE_URL이 유효하지 않음, 로컬 이미지 사용');
           throw new Error('Invalid BASE_URL');
         }
 
@@ -219,18 +74,17 @@ const transformDeviceToMachine = (device: any, isOnline: boolean): Machine => {
         // URI 검증
         if (imageUri && typeof imageUri === 'string' && imageUri.startsWith('http')) {
           imageSource = { uri: imageUri };
-          //console.log(`🖼️ 온라인 모드: API 이미지 사용 - ${imageUri}`);
         } else {
-          //console.log(`🚨 잘못된 URI 형식: ${imageUri}, 로컬 이미지 사용`);
+          console.log(`🚨 잘못된 URI 형식: ${imageUri}, 로컬 이미지 사용`);
         }
       }
     } catch (error) {
-      //console.log('🖼️ API 이미지 로드 실패, 로컬 이미지 사용:', error);
+      console.log('🖼️ API 이미지 로드 실패, 로컬 이미지 사용:', error);
     }
   } else if (!isOnline) {
-    //console.log('📱 오프라인 모드: 로컬 이미지 사용');
+    console.log('📱 오프라인 모드: 로컬 이미지 사용');
   } else {
-    //console.log('🖼️ 기본 로컬 이미지 사용 (device.image 없음)');
+    console.log('🖼️ 기본 로컬 이미지 사용 (device.image 없음)');
   }
 
   // normalScore도 안전하게 처리
@@ -244,26 +98,19 @@ const transformDeviceToMachine = (device: any, isOnline: boolean): Machine => {
 
   let status = 'normal';
 
-  //console.log(`🔍 Device "${device.name}" normalScore: ${normalScore}`);
-
   if (normalScore < 0.3) {
     status = 'danger';
-    //console.log(`🔴 normalScore ${normalScore} < 0.3 → danger`);
   } else if (normalScore < 0.5) {
     status = 'warning';
-    //console.log(`🟡 normalScore ${normalScore} < 0.5 → warning`);
   } else {
     status = 'normal';
-    //console.log(`🟢 normalScore ${normalScore} >= 0.5 → normal`);
   }
 
   // Redis에서 온 status가 유효한 값이면 normalScore 결과 덮어쓰기
   const validStatuses = ['normal', 'warning', 'danger', 'fixing', 'mic_issue'];
   if (device.status && validStatuses.includes(device.status)) {
-    //console.log(`🔄 Redis status "${device.status}" 사용, normalScore 기반 "${status}" 대신`);
     status = device.status;
   } else {
-    //console.log(`✅ normalScore ${normalScore} 기반 status "${status}" 사용`);
   }
 
   return {
@@ -284,11 +131,9 @@ export const getMachineDataByAreaId = async (areaId: string): Promise<Machine[]>
   // 1단계: WebSocket 연결 상태 확인
   const isWebSocketConnected = webSocketClient.getConnectionStatus();
   
-  //console.log(`📡 Area ID ${areaId} 기기 데이터 요청 - WebSocket: ${isWebSocketConnected ? '연결됨' : '연결 안됨'}`);
-
   // 2단계: WebSocket 연결이 안되어 있으면 오프라인 모드
   if (!isWebSocketConnected) {
-    //console.log('📱 WebSocket 연결 실패 → 오프라인 모드: 즉시 fallback 데이터 사용');
+    console.log('📱 WebSocket 연결 실패 → 오프라인 모드: 즉시 fallback 데이터 사용');
     const numericAreaId = parseInt(areaId, 10);
     const fallbackData = machineData.filter(machine => machine.areaId === numericAreaId);
     
@@ -301,12 +146,10 @@ export const getMachineDataByAreaId = async (areaId: string): Promise<Machine[]>
 
   // 3단계: WebSocket 연결되어 있으면 온라인 모드 → API 시도
   try {
-    //console.log('✅ WebSocket 연결 성공 → 온라인 모드: API 요청 시도');
     const numericAreaId = parseInt(areaId, 10);
     const devices = await getDevicesWithTimeout(numericAreaId, 3000);
 
     if (!devices || devices.length === 0) {
-      //console.log('⚠️ API 응답이 비어있음, fallback 데이터 사용');
       const fallbackData = machineData.filter(machine => machine.areaId === numericAreaId);
       
       if (fallbackData.length === 0) {
@@ -318,12 +161,10 @@ export const getMachineDataByAreaId = async (areaId: string): Promise<Machine[]>
 
     // API 데이터를 온라인 모드로 변환 (API 이미지 시도)
     const transformedData = devices.map(device => transformDeviceToMachine(device, true));
-    //console.log('✅ 온라인 모드: API 데이터 + API 이미지 사용');
     
     return transformedData;
 
   } catch (error) {
-    //console.error('❌ API 요청 실패:', error);
     
     // API 실패 시에도 WebSocket이 연결되어 있으면 온라인으로 간주
     // 하지만 이미지는 로컬 이미지 사용
@@ -334,14 +175,12 @@ export const getMachineDataByAreaId = async (areaId: string): Promise<Machine[]>
       return generateFallbackData(numericAreaId);
     }
 
-    //console.log('🔄 WebSocket 연결됨 + API 실패: Fallback 데이터 + 로컬 이미지 사용');
     return fallbackData;
   }
 };
 
 // 동적 fallback 데이터 생성 함수 (로컬 이미지 사용)
 const generateFallbackData = (areaId: number): Machine[] => {
-  //console.log(`🏭 Area ID ${areaId}에 대한 동적 기기 데이터 생성`);
 
   const fallbackDevices: Machine[] = [
     {

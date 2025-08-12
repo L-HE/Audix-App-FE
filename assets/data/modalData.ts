@@ -4,13 +4,13 @@ type ModalProps = Omit<AlarmData, 'onPress'>;
 
 export const modalData: ModalProps[] = [
   {
-    alarmId: '7',
-    status: 'warning',
-    regionName: 'A-1구역',
-    regionLocation: '2층 자동차 부재료 조립구역',
-    model: 'SO-ARM101',
-    createdAt: new Date(Date.now() - 14 * 60 * 1000),
-    message: "현재 장비에서 이상음이 감지됩니다. 점검이 필요합니다.",
+    alarmId: '',
+    status: 'offline',
+    regionName: '',
+    regionLocation: '',
+    model: '',
+    createdAt: new Date(Date.now() - 0 * 60 * 1000),
+    message: "",
     type: 'machine',
   },
 ];

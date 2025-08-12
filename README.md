@@ -51,33 +51,63 @@ npm run android
 ```
 audix-app/
 ├── app/
-│   ├── detail/
-│   │   └── [id].tsx
-│   ├── _layout.tsx
-│   ├── index.tsx
-│   └── notificationModal.tsx
+│   ├── (auth)/
+│   │   ├── _layout.tsx
+│   │   └── login.tsx
+│   ├── (tabs)/
+│   │   ├── alarms/
+│   │   │   └── index.tsx
+│   │   ├── detail/
+│   │   │   └── [id].tsx
+│   │   ├── menu/
+│   │   │   └── index.tsx
+│   │   ├── _layout.tsx
+│   │   ├── index.tsx
+│   │   └── notificationModal.tsx
+│   └── _layout.tsx
 ├── assets/
-│   ├── data/
-│   │   ├── areaData.ts
-│   │   ├── machineData.ts
-│   │   └── modalData.ts
-│   ├── fonts
-│   └── images
-├── components/                  # 재사용 가능한 컴포넌트
-│   ├── common/                  # 공통 컴포넌트
+│   ├── data
+│   ├── fonts/
+│   │   └── SpaceMono-Regular.ttf
+│   └── images/
+│       ├── icons/
+│       │   └── AudixLogoNavySimple.png
+│       ├── logos/
+│       │   ├── AudixLogoNavy.png
+│       │   └── AudixLogoNavySimpleTransparent.png
+│       └── pictures
+├── components/
+│   ├── common/
 │   │   ├── appBar.tsx
 │   │   ├── bottomNav.tsx
-│   │   └── header.tsx
-│   └── screens/                 # 화면 컴포넌트
+│   │   ├── header.tsx
+│   │   ├── loadingScreen.tsx
+│   │   ├── skeletonLoader.tsx
+│   │   └── splashScreen.tsx
+│   └── screens/
+│       ├── alarmCard.tsx
 │       ├── areaCard.tsx
+│       ├── logoutModal.tsx
 │       ├── machineCard.tsx
-│       ├── searchInput.tsx
-│       └── vDonutChart.tsx
+│       ├── nativeDonutChart.tsx
+│       └── searchInput.tsx
 ├── shared/
 │   ├── api/
+│   │   ├── area.tsx
+│   │   ├── config.ts
+│   │   ├── device.tsx
 │   │   └── modalContextApi.tsx
-│   └── styles/
-│       └── global.ts
+│   ├── store/
+│   │   ├── authStore.ts
+│   │   ├── loadingStore.ts
+│   │   ├── refreshStore.ts
+│   │   └── timeStore.ts
+│   ├── styles/
+│   │   ├── colors.ts
+│   │   ├── components.ts
+│   │   └── screens.ts
+│   └── websocket/
+│       └── client.ts
 ├── app.json
 ├── babel.config.js
 ├── eslint.config.js
