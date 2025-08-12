@@ -50,12 +50,12 @@ export const LoginScreenStyles = StyleSheet.create({
   },
   circle: {
     position: 'absolute',
-    backgroundColor: Colors.backgroundIcon,
+    backgroundColor: Colors.circleIcon,
     borderRadius: 999,
-    width: 120,
-    height: 120,
-    top: 40,
-    right: 25,
+    width: 100,
+    height: 100,
+    top: 50,
+    right: 20,
   },
   triangleLeft: {
     position: 'absolute',
@@ -64,7 +64,7 @@ export const LoginScreenStyles = StyleSheet.create({
   },
   logo: {
     width: '80%',
-    height: 200,
+    height: '90%',
     zIndex: 2,
   },
   form: {

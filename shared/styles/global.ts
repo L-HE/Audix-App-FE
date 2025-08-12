@@ -23,6 +23,7 @@ export const Colors = {
   // icon Colors
   menuIcon: '#2c4d6b',
   loginIcon: '#999', // 회색 아이콘
+  circleIcon: '#D9D9D9',
   tabIcon: '#656565', // 탭 아이콘 색상
   iconWhite: '#fff', // 흰색 아이콘
 
