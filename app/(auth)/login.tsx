@@ -159,20 +159,20 @@ const LoginScreenContent: React.FC = () => {
   
   // ✅ 스크롤 성능 대폭 개선
   const scrollToField = useCallback((yOffset: number) => {
-    const scrollStart = performance.now();
-    
-    // ✅ 즉시 스크롤 - 디바운싱 제거
-    if (keyboardTimeoutRef.current) {
-      clearTimeout(keyboardTimeoutRef.current);
-    }
-    
-    // ✅ requestAnimationFrame 제거, 즉시 실행
-    scrollViewRef.current?.scrollTo({ 
-      y: yOffset, 
-      animated: false // ✅ 애니메이션 비활성화로 성능 향상
-    });
-    
-    const scrollEnd = performance.now();
+  const scrollStart = performance.now();
+  
+  // ✅ 즉시 스크롤 - 디바운싱 제거
+  if (keyboardTimeoutRef.current) {
+    clearTimeout(keyboardTimeoutRef.current);
+  }
+  
+  // ✅ requestAnimationFrame 제거, 즉시 실행
+  scrollViewRef.current?.scrollTo({ 
+    y: yOffset, 
+    animated: true // ✅ 부드러운 스크롤을 위해 animated: true로 변경
+  });
+  
+  const scrollEnd = performance.now();
     console.log(`📜 [LoginScreen] 즉시 스크롤 완료: ${(scrollEnd - scrollStart).toFixed(2)}ms → ${yOffset}px`);
   }, []);
 
@@ -183,19 +183,16 @@ const LoginScreenContent: React.FC = () => {
     
     switch (currentFocus) {
       case 'userId':
-        scrollToField(80); // ✅ 사용자ID 필드에 맞는 위치
+        scrollToField(80);
         break;
       case 'password':
-        scrollToField(160); // ✅ 비밀번호 필드에 맞는 위치
+        scrollToField(160);
         break;
-      default:
-        console.log(`⌨️ [LoginScreen] 포커스된 필드 없음 - 스크롤 스킵`);
     }
   }, [scrollToField]);
 
   const handleKeyboardHide = useCallback(() => {
-    console.log(`⌨️ [LoginScreen] 키보드 숨겨짐 - 상단으로 스크롤`);
-    scrollToField(0);
+    scrollToField(0); // ✅ 원래 위치로 복귀
   }, [scrollToField]);
 
   // ✅ 마운트 프로세스 최적화
