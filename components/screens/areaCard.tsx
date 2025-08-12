@@ -20,8 +20,8 @@ const AreaCard: React.FC<AreaCardProps> = ({ title, subtitle, image, state, onPr
 
       {/* 텍스트 영역 */}
       <View style={style.textContainer}>
-        <Text style={style.cardTitle}>{title}</Text>       {/* 메인 타이틀 */}
-        <Text style={style.cardSubtitle}>{subtitle}</Text> {/* 서브 타이틀 */}
+        <Text style={style.cardTitle}>{title}</Text>
+        <Text style={style.cardSubtitle}>{subtitle}</Text>
       </View>
     </TouchableOpacity>
   );

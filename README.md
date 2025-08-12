@@ -14,24 +14,18 @@ npm run android
 ## ✨ 주요 기능
 
 ### 🔔 실시간 알림
-- Push 알림을 통한 즉시 이상 징후 전달
+- 모달 알림을 통한 즉시 이상 징후 전달
 - 알림 우선순위별 분류 (긴급, 주의, 정보)
-- 알림 히스토리 및 읽음 상태 관리
+- 알림 히스토리 및 장비 점검 여부 상태 관리
 
 ### 📊 실시간 모니터링
 - 공장별/기계별 실시간 상태 대시보드
-- 음성 데이터 시각화 (파형, 주파수 분석)
+- 음성 데이터의 정상도 표현
 - 이상 감지 현황 실시간 업데이트
 
 ### 🏭 다중 공장 관리
 - 여러 공장 간 빠른 전환
 - 공장별 기계 목록 및 상태
-- 위치 기반 공장 정보
-
-### 📈 간편 통계
-- 일/주/월별 이상 감지 요약
-- 기계별 성능 지표
-- 트렌드 분석 차트
 
 ## 🛠️ 기술 스택
 
@@ -48,7 +42,6 @@ npm run android
 - **Zustand** - 경량 상태 관리
 
 ### 통신
-- **Axios** - HTTP 클라이언트
 
 ### 데이터 시각화
 - **React Native SVG** - SVG 렌더링
@@ -116,11 +109,8 @@ npm install
 # Expo 개발 서버 시작
 npm start
 
-# iOS 시뮬레이터에서 실행
-npm run ios
-
 # Android 에뮬레이터에서 실행
-npm run android
+npx expo run:android
 
 # 웹에서 실행 (개발용)
 npm run web
@@ -129,96 +119,107 @@ npm run web
 
 ## 📱 주요 화면
 
-### 1. 대시보드
+### 1. 구역 스크린
 - 전체 공장 상태 요약
 - 실시간 알림 피드
-- 빠른 액션 버튼
 
-### 2. 모니터링
+### 2. 장비 모니터링
 - 공장별/기계별 상세 모니터링
-- 실시간 음성 데이터 시각화
-- 이상 감지 알림 내역
+- 실시간 음성 데이터에 대한 정상도 시각화
+- 이상 감지 알림
 
-### 3. 알림 센터
+### 3. 알림 스크린
 - 모든 알림 히스토리
 - 중요도별 필터링
-- 읽음/미읽음 상태 관리
 
-### 4. 통계
-- 일/주/월별 통계
-- 기계별 성능 지표
-- 트렌드 분석 차트
-
-### 5. 설정
-- 알림 설정
-- 계정 관리
-- 앱 환경설정
+### 4. 설정
+- 내 정보
+- 비밀번호 변경
+- 문의하기
+- 로그아웃
 
 ## 🔧 주요 컴포넌트
 
-### `<RealtimeChart />`
-실시간 음성 데이터를 시각화하는 차트 컴포넌트
+### `<NativeDonutChart />`
+실시간 음성 데이터에 대한 정상도 차트 컴포넌트
 ```typescript
-<RealtimeChart
-  data={audioData}
-  type="waveform"
-  height={200}
-  anomalyThreshold={0.8}
+<NativeDonutChart
+  deviceId={String(deviceId)}
+  normalScore={normalScore}
+  status={status}
+  name={name}
+  initialAnimate={!!animateOnFirstMount}
 />
 ```
 
-### `<NotificationCard />`
+### `<AreaCard />`
+실시간 구역 상태를 나타내는 카트 컴포넌트
+```typescript
+<FlashList
+  data={sortedCards}
+  renderItem={renderAreaCard}
+  keyExtractor={keyExtractor}
+  estimatedItemSize={120}
+  showsVerticalScrollIndicator={false}
+  removeClippedSubviews={true}
+  contentContainerStyle={contentContainerStyle}
+  drawDistance={200}
+  disableAutoLayout={true}
+  scrollEventThrottle={16}
+  decelerationRate="fast"
+  overrideItemLayout={overrideItemLayout}
+  getItemType={getItemType}
+/>
+```
+
+### `<MachineCard />`
+실시간 장비 상태를 나타내는 카트 컴포넌트
+```typescript
+<FlashList
+  data={sortedMachines}
+  renderItem={renderMachine}
+  keyExtractor={keyExtractor}
+  getItemType={getItemType}
+  estimatedItemSize={270}
+  drawDistance={200}
+  onEndReached={handleEndReached}
+  onEndReachedThreshold={0.5}
+  onScroll={handleScroll}
+  scrollEventThrottle={16}
+  onContentSizeChange={handleContentSizeChange}
+  onLayout={onLayoutRoot}
+  removeClippedSubviews={true}
+  extraData={isLoadingMore}
+  disableAutoLayout={true}
+/>
+```
+
+### `<AlarmCard />`
 알림을 표시하는 카드 컴포넌트
 ```typescript
-<NotificationCard
-  notification={notification}
-  onPress={handleNotificationPress}
-  onDismiss={handleDismiss}
+<FlashList<AlarmData>
+  data={paginatedData}
+  renderItem={renderAlarmCard}
+  keyExtractor={keyExtractor}
+  getItemType={getItemType}
+  estimatedItemSize={120}
+  onEndReached={onEndReached}
+  onEndReachedThreshold={0.5}
+  viewabilityConfig={viewabilityConfig}
+  showsVerticalScrollIndicator={false}
+  removeClippedSubviews={true}
+  drawDistance={300}
+  contentContainerStyle={style.contentContainer}
+  ListFooterComponent={footerComponent}
 />
 ```
 
-### `<StatusIndicator />`
-기계 상태를 표시하는 인디케이터
-```typescript
-<StatusIndicator
-  status="normal" | "warning" | "critical"
-  size="small" | "medium" | "large"
-/>
-```
-
-## 🔔 푸시 알림 설정
-
-### 알림 권한 요청
-```typescript
-import { registerForPushNotificationsAsync } from './src/services/notifications';
-
-// 앱 시작 시 권한 요청
-await registerForPushNotificationsAsync();
-```
-
-### 백그라운드 알림 처리
-```typescript
-import { useEffect } from 'react';
-import * as Notifications from 'expo-notifications';
-
-useEffect(() => {
-  const subscription = Notifications.addNotificationReceivedListener(
-    handleNotificationReceived
-  );
-  return () => subscription.remove();
-}, []);
-```
+### `<NotificationModal />`
 
 ## 🔐 보안
 
-### API 인증
-- JWT 토큰 기반 인증
-- 자동 토큰 갱신
-- 안전한 토큰 저장 (Expo SecureStore)
-
-
 ### 코드 스타일
-- ESLint + Prettier 사용
+- ESLint 사용
 - TypeScript strict 모드
 - Conventional Commits
 
