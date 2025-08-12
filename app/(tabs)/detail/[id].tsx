@@ -203,7 +203,6 @@ const DetailScreen: React.FC = () => {
 
   const scheduleFlush = useCallback(() => {
     if (flushTimerRef.current) return;
-    // 16ms 이내(다음 프레임 수준)로 묶어서 적용
     flushTimerRef.current = setTimeout(() => {
       flushTimerRef.current = null;
       const updates = Array.from(pendingUpdatesRef.current.values());
@@ -212,40 +211,85 @@ const DetailScreen: React.FC = () => {
 
       setMachines(prev => {
         let changed = false;
+        const actualChanges = new Set<number>(); // ✅ 실제 변경된 deviceId 추적
+        
         const nextArr = prev.map(m => {
           const upd = updates.find(u => u.deviceId === m.deviceId);
-          if (!upd) return m;
-          const merged = { ...m, ...upd };
-          if (merged.status !== m.status || merged.normalScore !== m.normalScore) {
-            changed = true;
-            return merged;
+          if (!upd) return m; // ✅ 업데이트 없으면 동일 객체 유지
+          
+          // ✅ 실제 변경 여부 먼저 확인
+          const hasStatusChange = upd.status !== undefined && upd.status !== m.status;
+          const hasScoreChange = upd.normalScore !== undefined && upd.normalScore !== m.normalScore;
+          const hasNameChange = upd.name !== undefined && upd.name !== m.name;
+          
+          if (!hasStatusChange && !hasScoreChange && !hasNameChange) {
+            return m; // ✅ 실제 변경 없으면 원본 객체 유지
           }
-          return m;
+          
+          // ✅ 실제 변경 있을 때만 새 객체 생성
+          changed = true;
+          actualChanges.add(m.deviceId);
+          return { ...m, ...upd };
         });
 
         if (changed) {
-          console.log(`🔄 [Incremental Update] ${updates.length}개 아이템 변경`);
-          // incremental sortedMachines 갱신
+          console.log(`🔄 [Incremental Update] ${actualChanges.size}개 아이템 실제 변경: [${Array.from(actualChanges).join(', ')}]`);
+          
+          // ✅ incremental sortedMachines 갱신 (변경된 것만 처리)
           setSortedMachines(prevSorted => {
-            // fullDataMap: deviceId → 최신 Machine
-            const fullDataMap = new Map(nextArr.map(m => [m.deviceId, m]));
-
-            let arr = [...prevSorted];
-            updates.forEach(u => {
-              const full = fullDataMap.get(u.deviceId)!;
-              // 1) 기존 위치 제거
-              const idx = arr.findIndex(x => x.deviceId === full.deviceId);
-              if (idx >= 0) arr.splice(idx, 1);
-              // 2) 새 위치 탐색 및 삽입
-              const insertAt = binarySearchInsert(arr, full);
-              arr.splice(insertAt, 0, full);
+            if (actualChanges.size === 0) return prevSorted; // ✅ 변경 없으면 동일 배열 유지
+            
+            // ✅ 변경된 아이템만 fullDataMap에 포함
+            const changedMachines = new Map<number, Machine>();
+            nextArr.forEach(m => {
+              if (actualChanges.has(m.deviceId)) {
+                changedMachines.set(m.deviceId, m);
+              }
             });
-            // 3) 페이징 범위 유지
-            return arr.slice(0, (currentPage + 1) * itemsPerPage);
+            
+            let arr = [...prevSorted]; // 복사 필요 (splice 때문)
+            let hasPositionChange = false;
+            
+            actualChanges.forEach(deviceId => {
+              const newMachine = changedMachines.get(deviceId)!;
+              const oldIdx = arr.findIndex(x => x.deviceId === deviceId);
+              
+              if (oldIdx >= 0) {
+                const oldMachine = arr[oldIdx];
+                
+                // ✅ 정렬 순서 변경 여부 확인
+                const needsReposition = comparator(oldMachine, newMachine) !== 0;
+                
+                if (needsReposition) {
+                  // 위치 변경 필요: 제거 후 새 위치에 삽입
+                  arr.splice(oldIdx, 1);
+                  const insertAt = binarySearchInsert(arr, newMachine);
+                  arr.splice(insertAt, 0, newMachine);
+                  hasPositionChange = true;
+                  console.log(`📍 [Sort] deviceId=${deviceId} 위치 변경: ${oldIdx} → ${insertAt}`);
+                } else {
+                  // 위치 변경 불필요: 제자리에서 객체만 교체
+                  arr[oldIdx] = newMachine;
+                  console.log(`🔄 [Update] deviceId=${deviceId} 제자리 업데이트`);
+                }
+              }
+            });
+            
+            // ✅ 페이징 범위 유지
+            const result = arr.slice(0, (currentPage + 1) * itemsPerPage);
+            
+            if (hasPositionChange) {
+              console.log(`📊 [Sort] 정렬 순서 변경으로 인한 재배치 완료`);
+            }
+            
+            return result;
           });
+          
           return nextArr;
         }
-        return prev;
+        
+        console.log(`⏭️ [Incremental Update] 변경사항 없음 - 기존 배열 유지`);
+        return prev; // ✅ 변경 없으면 동일 배열 유지
       });
 
       // onEndReached 억제
