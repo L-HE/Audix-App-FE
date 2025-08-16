@@ -17,6 +17,7 @@ import {
   View
 } from 'react-native';
 import { LoginScreenStyles as style } from '../../shared/styles/screens';
+import { authLogic } from '@/shared/api/auth';
 
 // ─────────────────────────────────────────────
 // 프리로딩 상태 타입 및 모듈 스코프 캐시
@@ -192,14 +193,47 @@ const LoginScreenContent: React.FC = () => {
   //  - 데모: 약간의 지연 후 탭으로 이동
   // ───────────────────────────────────────────
   const handleLogin = useCallback(async () => {
+    // 입력값 검증
+    if (!userId.trim() || !password.trim()) {
+      setShowPasswordError(true);
+      return;
+    }
+
     setIsLoading(true);
     setShowPasswordError(false);
 
-    // TODO: 실제 인증 API 연동 및 에러 처리
-    setTimeout(() => {
-      router.replace('/(tabs)');
-    }, 100);
-  }, []);
+    try {
+      console.log('🔐 로그인 시도:', {
+        loginCode: userId.trim(),
+        password: '***' // 로그에는 패스워드 숨김
+      });
+
+      // 실제 API 호출
+      const result = await authLogic.login({
+        loginCode: userId.trim(),
+        password: password.trim(),
+      });
+
+      if (result.success) {
+        console.log('✅ 로그인 성공!', {
+          userId: result.data.user.id,
+          userName: result.data.user.name,
+          position: result.data.user.position,
+        });
+
+        // 성공 시 메인 화면으로 이동
+        router.replace('/(tabs)');
+      } else {
+        console.error('❌ 로그인 실패:', result.error);
+        setShowPasswordError(true);
+      }
+    } catch (error) {
+      console.error('❌ 로그인 중 예외 발생:', error);
+      setShowPasswordError(true);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [userId, password]);
 
   // ───────────────────────────────────────────
   // 포커스 핸들러
@@ -234,7 +268,7 @@ const LoginScreenContent: React.FC = () => {
     if (userIdChangeTimeoutRef.current) {
       clearTimeout(userIdChangeTimeoutRef.current);
     }
-    userIdChangeTimeoutRef.current = setTimeout(() => {}, 500);
+    userIdChangeTimeoutRef.current = setTimeout(() => { }, 500);
   }, []);
 
   const handlePasswordChange = useCallback((text: string) => {
@@ -242,7 +276,7 @@ const LoginScreenContent: React.FC = () => {
     if (passwordChangeTimeoutRef.current) {
       clearTimeout(passwordChangeTimeoutRef.current);
     }
-    passwordChangeTimeoutRef.current = setTimeout(() => {}, 500);
+    passwordChangeTimeoutRef.current = setTimeout(() => { }, 500);
   }, []);
 
   // ───────────────────────────────────────────
