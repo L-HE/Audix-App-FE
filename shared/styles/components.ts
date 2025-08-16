@@ -20,9 +20,9 @@ export const AppBarStyles = StyleSheet.create({
   },
   appBarCompact: { height: vh(0.13) * 0.6 },
   title: {
-    marginBottom: 12,
-    fontSize: vh(0.025),
-    fontWeight: '600',
+    marginBottom: 16,
+    fontSize: vh(0.02),
+    fontWeight: '700',
     color: Colors.textPrimary,
   },
   titleCentered: { marginBottom: 0 },

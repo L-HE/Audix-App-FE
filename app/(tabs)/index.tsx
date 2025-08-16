@@ -5,14 +5,17 @@ import { useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Animated, View } from 'react-native';
 
-import { Area, getAreaData } from '../../assets/data/areaData';
 import SkeletonLoader from '../../components/common/skeletonLoader';
 import AreaCard from '../../components/screens/areaCard';
 import { useRefreshStore } from '../../shared/store/refreshStore';
 import { AreaScreenStyles as style } from '../../shared/styles/screens';
 import { webSocketClient } from '../../shared/websocket/client';
+import { areaLogic, type AreaItem } from '../../shared/api/area';
 
 export const headerShown = false;
+
+// API 응답 타입을 기존 Area 타입으로 사용
+type Area = AreaItem;
 
 // ─────────────────────────────────────────────
 // 상태 우선순위 매핑(정렬에 사용)
@@ -63,7 +66,7 @@ const MemoizedAreaCardWrapper = React.memo<{
   index: number;
   onPress: (id: string) => void;
 }>(({ item, index, onPress }) => {
-  const handlePress = useCallback(() => onPress(item.id), [item.id, onPress]);
+  const handlePress = useCallback(() => onPress(String(item.id)), [item.id, onPress]);
 
   const shouldFade = index < 2; // 상위 2개만 페이드인
   const delay = index * 30;
@@ -114,27 +117,51 @@ const AreaScreenContent: React.FC = () => {
         useNativeDriver: true,
       }).start();
 
-      return () => {};
+      return () => { };
     }, [opacityAnim])
   );
 
-  // ───────── 데이터 로딩 (스켈레톤 최소 노출 시간 보장) ─────────
+  // ───────── 데이터 로딩 (실제 API 호출로 변경) ─────────
   const loadAreas = useCallback(async (isRefresh = false) => {
     try {
       if (!isRefresh) setLoading(true);
 
-      const minSkeletonTime = isRefresh ? 0 : 600;
-      const dataPromise = getAreaData();
-      const timePromise = new Promise((resolve) => setTimeout(resolve, minSkeletonTime));
-      const [data] = await Promise.all([dataPromise, timePromise]);
+      console.log('📋 Area 데이터 로딩 시작...');
 
-      setAreas(data);
-      setIsOnlineMode(data.length > 4);
+      const minSkeletonTime = isRefresh ? 0 : 600;
+
+      // 실제 API 호출
+      const apiPromise = areaLogic.getList();
+      const timePromise = new Promise((resolve) => setTimeout(resolve, minSkeletonTime));
+
+      const [apiResult] = await Promise.all([apiPromise, timePromise]);
+
+      if (apiResult.success) {
+        console.log('✅ Area 데이터 로드 성공:', {
+          count: apiResult.data.length,
+          areas: apiResult.data.map(area => `${area.name} (${area.status})`)
+        });
+
+        // API 응답을 그대로 사용 (AreaItem = Area)
+        setAreas(apiResult.data);
+        setIsOnlineMode(apiResult.data.length > 0); // 데이터가 있으면 온라인 모드
+      } else {
+        console.error('❌ Area 데이터 로드 실패:', apiResult.error);
+
+        // 실패 시 빈 배열로 설정
+        setAreas([]);
+        setIsOnlineMode(false);
+
+        // 필요시 에러 토스트 표시
+        // showErrorToast(apiResult.error || 'Area 데이터를 불러올 수 없습니다.');
+      }
 
       if (isInitialLoadRef.current) {
         isInitialLoadRef.current = false;
       }
     } catch (error) {
+      console.error('❌ Area 데이터 로딩 중 예외 발생:', error);
+      setAreas([]);
       setIsOnlineMode(false);
     } finally {
       setLoading(false);
