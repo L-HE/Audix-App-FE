@@ -5,11 +5,15 @@ import { useLocalSearchParams } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Text, View } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
-import { Machine, getMachineDataByAreaId } from '../../../assets/data/machineData';
 import MachineCard from '../../../components/screens/machineCard';
 import { useLoadingStore } from '../../../shared/store/loadingStore';
 import { useRefreshStore } from '../../../shared/store/refreshStore';
 import { DetailScreenStyles as style } from '../../../shared/styles/screens';
+import { deviceLogic, type DeviceItem } from '@/shared/api/device';
+
+
+// Machine 타입 별칭 정의 (기존 코드와의 호환성을 위해)
+type Machine = DeviceItem;
 
 /* ─────────────────────────────────────────────────────────────
  * 이미지 프리로딩/캐시: ExpoImage.prefetch 기반의 간단 캐시
@@ -123,17 +127,35 @@ class APIOptimizer {
     }
   }
 
+  private async callDeviceAPI(areaId: number): Promise<Machine[]> {
+    console.log('🔧 Device API 호출:', { areaId });
+
+    const result = await deviceLogic.getListByArea(areaId);
+
+    if (result.success) {
+      console.log('✅ Device API 성공:', {
+        areaId,
+        count: result.data.length
+      });
+      return result.data;
+    } else {
+      console.error('❌ Device API 실패:', result.error);
+      throw new Error(result.error || 'Device API 호출 실패');
+    }
+  }
+
   // 실제 요청 수행(타임아웃/취소 지원)
   private async executeRequest(areaId: string, signal: AbortSignal): Promise<Machine[]> {
     const timeoutPromise = new Promise<never>((_, reject) => {
-      const timeout = setTimeout(() => reject(new Error('Request timeout')), 5000);
+      const timeout = setTimeout(() => reject(new Error('Request timeout')), 10000); // 10초로 증가
       signal.addEventListener('abort', () => {
         clearTimeout(timeout);
         reject(new Error('Request aborted'));
       });
     });
 
-    const dataPromise = getMachineDataByAreaId(areaId);
+    // 실제 API 호출로 변경
+    const dataPromise = this.callDeviceAPI(Number(areaId));
     return Promise.race([dataPromise, timeoutPromise]);
   }
 
@@ -505,9 +527,9 @@ const DetailScreen: React.FC = () => {
       const onLayoutMeasure =
         !measuredItemHeight
           ? (e: any) => {
-              const h = e.nativeEvent.layout.height;
-              if (h > 0 && !measuredItemHeight) setMeasuredItemHeight(h);
-            }
+            const h = e.nativeEvent.layout.height;
+            if (h > 0 && !measuredItemHeight) setMeasuredItemHeight(h);
+          }
           : undefined;
 
       const animateOnFirstMount = index < 2;
