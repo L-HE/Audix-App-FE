@@ -9,9 +9,10 @@ import { ModalProvider, useModal } from '../shared/api/modalContextApi';
 import { useTimeStore } from '../shared/store/timeStore';
 import { webSocketClient, alarmManager, deviceUpdateBroadcaster } from '../shared/websocket';
 import { DeviceAlertData } from '../shared/websocket/types';
-import { AlarmData } from '../assets/data/alarmData';
+import { AlarmData, createAlarmFromWebSocketData } from '../assets/data/alarmData';
 import { CardState } from '../assets/data/areaData';
 import { preloadLoginAssets } from './(auth)/login';
+
 
 export const headerShown = false;
 
@@ -86,19 +87,7 @@ function RootLayoutContent() {
               wsSubscriptionRef.current = deviceUpdateBroadcaster.subscribe((deviceData: DeviceAlertData) => {
                 const now = Date.now();
 
-                // deviceId가 70인 경우 안전 경고 모달 표시 (숫자/문자열 모두 체크)
-                if (Number(deviceData.deviceId) === 70) {
-                  console.log('✅ deviceId 70 매칭됨! Alert 표시');
-                  Alert.alert(
-                    '⚠️ 안전 경고',
-                    '안전 주의가 필요한 장비입니다.',
-                    [{ text: '확인' }],
-                    { cancelable: false }
-                  );
-                  return;
-                }
-
-                // 시간 기반 쓰로틀링
+                // 시간 기반 쓰로틀링 (먼저 체크!)
                 if (now - lastModalTimeRef.current < modalThrottleMs) {
                   console.log('🚫 모달 표시 스킵 (쓰로틀링:', now - lastModalTimeRef.current, 'ms)');
                   return;
@@ -111,22 +100,31 @@ function RootLayoutContent() {
                   timeSinceLastModal: now - lastModalTimeRef.current
                 });
 
-                // DeviceAlertData를 AlarmData 형식으로 변환
-                const alarmData: AlarmData = {
-                  alarmId: `alarm-${deviceData.deviceId}-${now}`,
-                  regionName: deviceData.name || 'Unknown Device',
-                  regionLocation: deviceData.address || '위치 정보 없음',
-                  status: mapDeviceStatusToCardState(deviceData.status),
-                  type: 'machine' as const,
-                  createdAt: new Date(),
-                  message: deviceData.aiText || deviceData.message || '디바이스 알림이 발생했습니다.',
+                // createAlarmFromWebSocketData 사용 (safety 타입 자동 판별)
+                const alarmData = createAlarmFromWebSocketData({
+                  deviceId: deviceData.deviceId,
+                  name: deviceData.name,
+                  address: deviceData.address,
+                  status: deviceData.status,
                   model: deviceData.model || 'Unknown Model',
-                };
+                  message: deviceData.message,
+                  aiText: deviceData.aiText
+                });
+
+                // safety 타입일 때 추가 Alert
+                if (alarmData.type === 'safety') {
+                  Alert.alert(
+                    '⚠️ 안전 경고',
+                    alarmData.message,
+                    [{ text: '확인' }],
+                    { cancelable: false }
+                  );
+                }
 
                 console.log('🎭 변환된 알람 데이터:', alarmData);
                 console.log('🎭 새 모달 표시');
 
-                // 새 모달 표시 및 시간 업데이트
+                // 모달 표시 및 시간 업데이트
                 showModal(alarmData);
                 lastModalTimeRef.current = now;
               });

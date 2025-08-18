@@ -59,14 +59,55 @@ export const createAlarmFromWebSocketData = (
     }
   };
 
+  // 메시지 내용으로 safety 타입 판별
+  const determineAlarmType = (): AlarmType => {
+    const combinedMessage = `${deviceData.message || ''} ${deviceData.aiText || ''}`.toLowerCase();
+
+    // safety 타입으로 분류할 키워드들
+    const safetyKeywords = [
+      '비명',
+      '화재',
+      '불',
+      '연기',
+      '폭발',
+      '비상',
+      '대피',
+      '사고',
+      '부상',
+      '응급',
+      '구조',
+      '위급'
+    ];
+
+    // 키워드가 포함되어 있으면 safety 타입으로 분류
+    const isSafety = safetyKeywords.some(keyword => combinedMessage.includes(keyword));
+
+    return isSafety ? 'safety' : 'machine';
+  };
+
+  // 최종 메시지 결정 (safety 타입일 경우 특별 처리)
+  const getFinalMessage = (): string => {
+    const combinedMessage = `${deviceData.message || ''} ${deviceData.aiText || ''}`;
+
+    // "비명" 키워드가 있으면 특별 메시지
+    if (combinedMessage.includes('비명')) {
+      return '비명 소리가 들립니다.\n즉시 확인이 필요합니다.';
+    }
+
+    // 기존 메시지 로직 유지
+    return deviceData.message || deviceData.aiText || '디바이스 알림이 발생했습니다.';
+  };
+
+  const alarmType = determineAlarmType();
+
   return {
     alarmId: `alarm-${deviceData.deviceId}-${Date.now()}`,
     regionName: deviceData.name || 'Unknown Device',
     regionLocation: deviceData.address || '위치 정보 없음',
     status: mapStatusToCardState(deviceData.status),
-    type: 'machine' as const,
+    type: alarmType,  // ← 변경!
     createdAt: new Date(),
-    message: deviceData.message || deviceData.aiText || '디바이스 알림이 발생했습니다.',
+    message: getFinalMessage(),  // ← 변경!
     model: deviceData.model || 'Unknown Model',
   };
 };
