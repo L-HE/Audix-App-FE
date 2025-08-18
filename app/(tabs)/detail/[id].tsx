@@ -1,4 +1,4 @@
-// app/detail/[id].tsx
+// app/(tabs)/detail/[id].tsx
 import { FlashList } from '@shopify/flash-list';
 import { Image as ExpoImage } from 'expo-image';
 import { useLocalSearchParams } from 'expo-router';
@@ -12,7 +12,6 @@ import { DetailScreenStyles as style } from '../../../shared/styles/screens';
 import { deviceLogic, type DeviceItem } from '@/shared/api/device';
 import { deviceUpdateBroadcaster } from '@/shared/websocket/alarmManager';
 import type { DeviceAlertData } from '@/shared/websocket/types';
-
 
 // Machine 타입 별칭 정의 (기존 코드와의 호환성을 위해)
 type Machine = DeviceItem;
@@ -149,7 +148,7 @@ class APIOptimizer {
   // 실제 요청 수행(타임아웃/취소 지원)
   private async executeRequest(areaId: string, signal: AbortSignal): Promise<Machine[]> {
     const timeoutPromise = new Promise<never>((_, reject) => {
-      const timeout = setTimeout(() => reject(new Error('Request timeout')), 10000); // 10초로 증가
+      const timeout = setTimeout(() => reject(new Error('Request timeout')), 10000);
       signal.addEventListener('abort', () => {
         clearTimeout(timeout);
         reject(new Error('Request aborted'));
@@ -473,7 +472,7 @@ const DetailScreen: React.FC = () => {
     });
 
     return () => {
-      unsubscribe(); // cleanup
+      unsubscribe();
     };
   }, [batchManager]);
 
@@ -548,13 +547,12 @@ const DetailScreen: React.FC = () => {
   // 개별 아이템 렌더러(상단 일부만 진입 애니메이션)
   const renderMachine = useCallback(
     ({ item, index }: { item: Machine; index: number }) => {
-      const onLayoutMeasure =
-        !measuredItemHeight
-          ? (e: any) => {
-            const h = e.nativeEvent.layout.height;
-            if (h > 0 && !measuredItemHeight) setMeasuredItemHeight(h);
-          }
-          : undefined;
+      const onLayoutMeasure = !measuredItemHeight
+        ? (e: any) => {
+          const h = e.nativeEvent.layout.height;
+          if (h > 0 && !measuredItemHeight) setMeasuredItemHeight(h);
+        }
+        : undefined;
 
       const animateOnFirstMount = index < 2;
       return (

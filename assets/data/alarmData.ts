@@ -19,6 +19,58 @@ export interface AlarmCardProps extends AlarmData {
   onPress: () => void;
 }
 
+// 웹소켓 데이터를 AlarmData로 변환하는 헬퍼 함수
+export const createAlarmFromWebSocketData = (
+  deviceData: {
+    deviceId: number;
+    name: string;
+    address: string;
+    status: string;
+    model: string;
+    message?: string;
+    aiText?: string;
+  }
+): AlarmData => {
+  // status 문자열을 CardState로 변환
+  const mapStatusToCardState = (status: string): CardState => {
+    const statusLower = status.toLowerCase();
+    switch (statusLower) {
+      case 'danger':
+      case 'critical':
+      case 'error':
+        return 'danger';
+      case 'warning':
+      case 'caution':
+        return 'warning';
+      case 'normal':
+      case 'ok':
+      case 'good':
+        return 'normal';
+      case 'repair':
+      case 'maintenance':
+      case 'fixing':
+        return 'repair';
+      case 'offline':
+      case 'disconnected':
+      case 'mic_issue':
+        return 'offline';
+      default:
+        return 'warning'; // 기본값
+    }
+  };
+
+  return {
+    alarmId: `alarm-${deviceData.deviceId}-${Date.now()}`,
+    regionName: deviceData.name || 'Unknown Device',
+    regionLocation: deviceData.address || '위치 정보 없음',
+    status: mapStatusToCardState(deviceData.status),
+    type: 'machine' as const,
+    createdAt: new Date(),
+    message: deviceData.message || deviceData.aiText || '디바이스 알림이 발생했습니다.',
+    model: deviceData.model || 'Unknown Model',
+  };
+};
+
 export const alarmData: AlarmData[] = [
   {
     alarmId: '8',
