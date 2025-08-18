@@ -46,11 +46,11 @@ const mapDeviceStatusToCardState = (status: string): CardState => {
 function RootLayoutContent() {
   const [isAppInitialized, setIsAppInitialized] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const { showModal, modalVisible } = useModal(); // hideModal 제거
+  const { showModal } = useModal(); // modalVisible 제거 - 의존성에서 제외
   const initializationStartedRef = useRef(false);
   const wsSubscriptionRef = useRef<(() => void) | null>(null);
   const lastModalTimeRef = useRef(0);
-  const modalThrottleMs = 2000; // 2초로 증가 - 사용자가 모달을 볼 시간 확보
+  const modalThrottleMs = 1000; // 1초로 다시 조정 - 적당한 간격
 
   const startTimer = useTimeStore((s) => s.startTimer);
   const stopTimer = useTimeStore((s) => s.stopTimer);
@@ -70,7 +70,7 @@ function RootLayoutContent() {
           webSocketClient.connect();
           alarmManager.initialize();
 
-          // WebSocket 알림 처리 (자동 닫기 제거)
+          // WebSocket 알림 처리 (간단한 시간 기반 쓰로틀링만)
           if (wsSubscriptionRef.current) {
             wsSubscriptionRef.current();
           }
@@ -78,16 +78,17 @@ function RootLayoutContent() {
           wsSubscriptionRef.current = deviceUpdateBroadcaster.subscribe((deviceData: DeviceAlertData) => {
             const now = Date.now();
 
-            // 쓰로틀링: 모달이 열려있지 않거나 충분한 시간이 지났을 때만 새 모달 표시
-            if (modalVisible && (now - lastModalTimeRef.current < modalThrottleMs)) {
-              console.log('🚫 모달 표시 스킵 (기존 모달 표시 중 또는 너무 빈번함)');
+            // 시간 기반 쓰로틀링만 사용 (모달 상태와 무관)
+            if (now - lastModalTimeRef.current < modalThrottleMs) {
+              console.log('🚫 모달 표시 스킵 (쓰로틀링:', now - lastModalTimeRef.current, 'ms)');
               return;
             }
 
             console.log('🚨 WebSocket 알림 수신:', {
               name: deviceData.name,
               status: deviceData.status,
-              deviceId: deviceData.deviceId
+              deviceId: deviceData.deviceId,
+              timeSinceLastModal: now - lastModalTimeRef.current
             });
 
             // DeviceAlertData를 AlarmData 형식으로 변환
@@ -98,14 +99,14 @@ function RootLayoutContent() {
               status: mapDeviceStatusToCardState(deviceData.status),
               type: 'machine' as const,
               createdAt: new Date(),
-              message: deviceData.message || deviceData.aiText || '디바이스 알림이 발생했습니다.',
+              message: deviceData.aiText || deviceData.message || '디바이스 알림이 발생했습니다.',
               model: deviceData.model || 'Unknown Model',
             };
 
             console.log('🎭 변환된 알람 데이터:', alarmData);
-
-            // 자동 닫기 제거 - 오직 새 모달만 표시
             console.log('🎭 새 모달 표시');
+
+            // 새 모달 표시 및 시간 업데이트
             showModal(alarmData);
             lastModalTimeRef.current = now;
           });
@@ -137,7 +138,7 @@ function RootLayoutContent() {
       webSocketClient.disconnect();
       stopTimer();
     };
-  }, [showModal, modalVisible, startTimer, stopTimer]); // modalVisible 의존성 추가
+  }, [showModal, startTimer, stopTimer]); // modalVisible 의존성 제거
 
   if (!isAppInitialized) {
     return <SplashScreen onInitializationComplete={() => { }} />;
