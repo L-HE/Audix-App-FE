@@ -10,6 +10,8 @@ import { useLoadingStore } from '../../../shared/store/loadingStore';
 import { useRefreshStore } from '../../../shared/store/refreshStore';
 import { DetailScreenStyles as style } from '../../../shared/styles/screens';
 import { deviceLogic, type DeviceItem } from '@/shared/api/device';
+import { deviceUpdateBroadcaster } from '@/shared/websocket/alarmManager';
+import type { DeviceAlertData } from '@/shared/websocket/types';
 
 
 // Machine 타입 별칭 정의 (기존 코드와의 호환성을 위해)
@@ -452,6 +454,28 @@ const DetailScreen: React.FC = () => {
     const fullSorted = [...machines].sort(comparator);
     setSortedMachines(fullSorted.slice(0, end));
   }, [currentPage, machines, comparator, itemsPerPage, sortedMachines.length]);
+
+  // WebSocket device 업데이트 구독
+  useEffect(() => {
+    const unsubscribe = deviceUpdateBroadcaster.subscribe((deviceData: DeviceAlertData) => {
+      console.log('🔄 Device 업데이트 수신:', deviceData.deviceId, deviceData.status, deviceData.normalScore);
+
+      // BatchUpdateManager를 통해 UI 업데이트
+      const update = {
+        deviceId: deviceData.deviceId,
+        normalScore: deviceData.normalScore,
+        status: deviceData.status as 'normal' | 'warning' | 'danger',
+        aiText: deviceData.aiText || '',
+      };
+
+      batchManager.enqueueUpdate(update);
+      console.log('✅ Device UI 업데이트 완료');
+    });
+
+    return () => {
+      unsubscribe(); // cleanup
+    };
+  }, [batchManager]);
 
   // 배치 업데이트 콜백 등록/해제
   useEffect(() => {
