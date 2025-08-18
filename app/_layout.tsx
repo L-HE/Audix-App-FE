@@ -3,6 +3,7 @@ import { Slot } from 'expo-router';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Host } from 'react-native-portalize';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { Alert } from 'react-native';
 import SplashScreen from '../components/common/splashScreen';
 import { ModalProvider, useModal } from '../shared/api/modalContextApi';
 import { useTimeStore } from '../shared/store/timeStore';
@@ -46,11 +47,11 @@ const mapDeviceStatusToCardState = (status: string): CardState => {
 function RootLayoutContent() {
   const [isAppInitialized, setIsAppInitialized] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const { showModal } = useModal(); // modalVisible 제거 - 의존성에서 제외
+  const { showModal } = useModal();
   const initializationStartedRef = useRef(false);
   const wsSubscriptionRef = useRef<(() => void) | null>(null);
   const lastModalTimeRef = useRef(0);
-  const modalThrottleMs = 1000; // 1초로 다시 조정 - 적당한 간격
+  const modalThrottleMs = 1000;
 
   const startTimer = useTimeStore((s) => s.startTimer);
   const stopTimer = useTimeStore((s) => s.stopTimer);
@@ -70,7 +71,7 @@ function RootLayoutContent() {
           webSocketClient.connect();
           alarmManager.initialize();
 
-          // WebSocket 알림 처리 (간단한 시간 기반 쓰로틀링만)
+          // WebSocket 알림 처리
           if (wsSubscriptionRef.current) {
             wsSubscriptionRef.current();
           }
@@ -78,7 +79,26 @@ function RootLayoutContent() {
           wsSubscriptionRef.current = deviceUpdateBroadcaster.subscribe((deviceData: DeviceAlertData) => {
             const now = Date.now();
 
-            // 시간 기반 쓰로틀링만 사용 (모달 상태와 무관)
+            // 🔍 디버깅용 로그 추가
+            console.log('🔍 deviceUpdateBroadcaster 데이터:', {
+              deviceId: deviceData.deviceId,
+              name: deviceData.name,
+              type: typeof deviceData.deviceId
+            });
+
+            // deviceId가 70인 경우 안전 경고 모달 표시
+            if (deviceData.deviceId === 70) {
+              console.log('✅ deviceId 70 매칭됨! Alert 표시');
+              Alert.alert(
+                '⚠️ 안전 경고',
+                '안전 주의가 필요한 장비입니다.',
+                [{ text: '확인' }],
+                { cancelable: false }
+              );
+              return;
+            }
+
+            // 시간 기반 쓰로틀링
             if (now - lastModalTimeRef.current < modalThrottleMs) {
               console.log('🚫 모달 표시 스킵 (쓰로틀링:', now - lastModalTimeRef.current, 'ms)');
               return;
@@ -138,7 +158,7 @@ function RootLayoutContent() {
       webSocketClient.disconnect();
       stopTimer();
     };
-  }, [showModal, startTimer, stopTimer]); // modalVisible 의존성 제거
+  }, [showModal, startTimer, stopTimer]);
 
   if (!isAppInitialized) {
     return <SplashScreen onInitializationComplete={() => { }} />;
