@@ -1,16 +1,17 @@
-import React, { createContext, ReactNode, useContext, useState } from 'react';
+// shared/api/modalContextApi.tsx
+import React, { createContext, ReactNode, useContext, useState, useCallback } from 'react';
 import { AlarmData } from '../../assets/data/alarmData';
 
 /* ==============================
    ModalContext 타입 정의
    ============================== */
 interface ModalContextType {
-  modalVisible: boolean;                    // 모달 표시 여부
-  modalData: AlarmData | null;               // 모달에 전달되는 알람 데이터
-  setModalVisible: (visible: boolean) => void; // 모달 표시 여부 직접 변경
-  setModalData: (data: AlarmData | null) => void; // 모달 데이터 직접 변경
-  showModal: (data: AlarmData) => void;      // 모달 표시 + 데이터 설정
-  hideModal: () => void;                     // 모달 숨김 + 데이터 초기화
+  modalVisible: boolean;
+  modalData: AlarmData | null;
+  setModalVisible: (visible: boolean) => void;
+  setModalData: (data: AlarmData | null) => void;
+  showModal: (data: AlarmData) => void;
+  hideModal: () => void;
 }
 
 /* ==============================
@@ -20,7 +21,6 @@ const ModalContext = createContext<ModalContextType | undefined>(undefined);
 
 /* ==============================
    Context 전용 커스텀 훅
-   - 반드시 ModalProvider 내부에서만 사용 가능
    ============================== */
 export const useModal = () => {
   const context = useContext(ModalContext);
@@ -34,44 +34,51 @@ export const useModal = () => {
    ModalProvider Props 타입
    ============================== */
 interface ModalProviderProps {
-  children: ReactNode; // Provider 하위에서 렌더링할 컴포넌트들
+  children: ReactNode;
 }
 
 /* ==============================
    ModalProvider 컴포넌트
-   - 모달 상태/제어 함수를 Context로 제공
    ============================== */
 export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
-  // 모달 표시 여부 상태
   const [modalVisible, setModalVisible] = useState(false);
-  // 모달에 표시할 알람 데이터
   const [modalData, setModalData] = useState<AlarmData | null>(null);
 
   // 모달 표시 + 데이터 설정
-  const showModal = (data: AlarmData) => {
-    console.log('🎭 modalContext showModal 호출됨:', data);
+  const showModal = useCallback((data: AlarmData) => {
+    console.log('🎭 modalContext showModal 호출됨:', {
+      alarmId: data.alarmId,
+      regionName: data.regionName,
+      status: data.status
+    });
+
     setModalData(data);
     setModalVisible(true);
-    console.log('🎭 모달 상태 업데이트 완료');
-  };
+
+    console.log('🎭 모달 상태 업데이트 완료 - visible: true');
+  }, []);
 
   // 모달 숨김 + 데이터 초기화
-  const hideModal = () => {
+  const hideModal = useCallback(() => {
+    console.log('🎭 모달 숨김 요청');
     setModalVisible(false);
-    setModalData(null);
+    // 애니메이션이 끝난 후 데이터 정리
+    setTimeout(() => {
+      setModalData(null);
+    }, 300);
+  }, []);
+
+  const contextValue: ModalContextType = {
+    modalVisible,
+    modalData,
+    setModalVisible,
+    setModalData,
+    showModal,
+    hideModal
   };
 
   return (
-    <ModalContext.Provider
-      value={{
-        modalVisible,
-        modalData,
-        setModalVisible,
-        setModalData,
-        showModal,
-        hideModal
-      }}
-    >
+    <ModalContext.Provider value={contextValue}>
       {children}
     </ModalContext.Provider>
   );

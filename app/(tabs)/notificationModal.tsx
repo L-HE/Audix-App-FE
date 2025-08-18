@@ -1,6 +1,6 @@
 // app/(tabs)/notificationModal.tsx
 import { CardState } from '@/assets/data/areaData';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import RNModal from 'react-native-modal';
 import { Portal } from 'react-native-portalize';
@@ -11,17 +11,21 @@ import { NotificationModalStyles as style } from '../../shared/styles/screens';
 
 /**
  * 알림 모달 내부 콘텐츠
- * - 모달 컨텍스트에서 가시성/데이터/닫기 핸들러를 받아 표시
- * - safety/machine 타입에 따라 라벨/색상/본문 구성을 다르게 처리
  */
 const NotificationModalContent: React.FC = () => {
-  // 모달 전역 상태 훅
   const { modalVisible, modalData, hideModal } = useModal();
+
+  // 모달 상태 변화 로깅
+  useEffect(() => {
+    console.log('🎭 모달 상태 변화:', {
+      visible: modalVisible,
+      hasData: !!modalData,
+      alarmId: modalData?.alarmId
+    });
+  }, [modalVisible, modalData]);
 
   /**
    * 상단 타이틀 계산
-   * - safety: 고정 "안전 사고 발생"
-   * - machine: 상태에 따른 라벨
    */
   const displayTitle = React.useMemo(() => {
     if (!modalData) return '';
@@ -37,8 +41,17 @@ const NotificationModalContent: React.FC = () => {
     return STATUS_LABELS[modalData.status];
   }, [modalData?.type, modalData?.status]);
 
-  // 데이터가 없으면 렌더링하지 않음
-  if (!modalData) return null;
+  // 모달이 보이지 않거나 데이터가 없으면 렌더링하지 않음
+  if (!modalVisible || !modalData) {
+    console.log('🎭 모달 렌더링 스킵:', { visible: modalVisible, hasData: !!modalData });
+    return null;
+  }
+
+  console.log('🎭 모달 렌더링 시작:', {
+    visible: modalVisible,
+    regionName: modalData.regionName,
+    status: modalData.status
+  });
 
   // 상태/타입별 색상 및 라벨 매핑
   const STATUS_COLORS: Record<CardState, string> = {
@@ -48,6 +61,7 @@ const NotificationModalContent: React.FC = () => {
     repair: Colors.repair,
     offline: Colors.offline,
   };
+
   const STATUS_LABELS: Record<CardState, string> = {
     danger: '위험',
     warning: '점검 요망',
@@ -55,6 +69,7 @@ const NotificationModalContent: React.FC = () => {
     repair: '점검 중',
     offline: '마이크 미연결',
   };
+
   const ALARM_LABELS: Record<AlarmType, string> = {
     machine: '장비 알람',
     safety: '비상 알람',
@@ -69,6 +84,11 @@ const NotificationModalContent: React.FC = () => {
   const isSafetyAlarm = modalData.type === 'safety';
   const bodyBackgroundColor = isSafetyAlarm ? Colors.danger : Colors.background;
 
+  const handleHideModal = () => {
+    console.log('🎭 모달 닫기 버튼 클릭');
+    hideModal();
+  };
+
   return (
     <Portal>
       <RNModal
@@ -80,8 +100,8 @@ const NotificationModalContent: React.FC = () => {
         animationOutTiming={300}
         statusBarTranslucent
         useNativeDriver
-        onBackdropPress={hideModal}
-        onBackButtonPress={hideModal}
+        onBackdropPress={handleHideModal}
+        onBackButtonPress={handleHideModal}
         style={{ zIndex: 10000 }}
       >
         <View style={[style.container, { backgroundColor: bodyBackgroundColor }]}>
@@ -98,15 +118,17 @@ const NotificationModalContent: React.FC = () => {
             <Text style={style.alarmSubtitle}>{modalData.regionLocation}</Text>
 
             {/* machine 타입일 때만 모델 정보 노출 */}
-            {!isSafetyAlarm && <Text style={style.alarmSubtitle}>{modalData.model}</Text>}
+            {!isSafetyAlarm && modalData.model && (
+              <Text style={style.alarmSubtitle}>모델: {modalData.model}</Text>
+            )}
 
-            {/* 메시지 박스 (safety일 때 배경 강조) */}
+            {/* 메시지 박스 */}
             <View
               style={[
                 style.messageBox,
                 {
                   backgroundColor: isSafetyAlarm
-                    ? Colors.backgroundSafetyAlarm
+                    ? Colors.backgroundSafetyAlarm || Colors.danger
                     : Colors.backgroundSecondary,
                 },
               ]}
@@ -122,7 +144,13 @@ const NotificationModalContent: React.FC = () => {
             </View>
 
             {/* 닫기 버튼 */}
-            <TouchableOpacity style={style.closeButton} onPress={hideModal}>
+            <TouchableOpacity
+              style={[
+                style.closeButton,
+                { backgroundColor: Colors.backgroundSecondary }
+              ]}
+              onPress={handleHideModal}
+            >
               <Text
                 style={[
                   style.closeButtonText,
@@ -140,8 +168,7 @@ const NotificationModalContent: React.FC = () => {
 };
 
 /**
- * 모달 컴포넌트 (Profiler 제거)
- * - 포털 내부에 모달 콘텐츠만 렌더
+ * 모달 컴포넌트
  */
 const NotificationModal: React.FC = () => {
   return <NotificationModalContent />;
