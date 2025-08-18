@@ -68,70 +68,73 @@ function RootLayoutContent() {
 
         // WebSocket 초기화
         try {
+          // 1. 먼저 연결
           webSocketClient.connect();
-          alarmManager.initialize();
 
-          // WebSocket 알림 처리
-          if (wsSubscriptionRef.current) {
-            wsSubscriptionRef.current();
-          }
+          // 2. 연결 완료 후 alarmManager 초기화 (더 긴 딜레이)
+          setTimeout(() => {
+            console.log('🔄 AlarmManager 초기화 시작');
+            alarmManager.initialize();
 
-          wsSubscriptionRef.current = deviceUpdateBroadcaster.subscribe((deviceData: DeviceAlertData) => {
-            const now = Date.now();
+            // 3. 구독 설정도 약간 늦게
+            setTimeout(() => {
+              // WebSocket 알림 처리
+              if (wsSubscriptionRef.current) {
+                wsSubscriptionRef.current();
+              }
 
-            // 🔍 디버깅용 로그 추가
-            console.log('🔍 deviceUpdateBroadcaster 데이터:', {
-              deviceId: deviceData.deviceId,
-              name: deviceData.name,
-              type: typeof deviceData.deviceId
-            });
+              wsSubscriptionRef.current = deviceUpdateBroadcaster.subscribe((deviceData: DeviceAlertData) => {
+                const now = Date.now();
 
-            // deviceId가 70인 경우 안전 경고 모달 표시
-            if (deviceData.deviceId === 70) {
-              console.log('✅ deviceId 70 매칭됨! Alert 표시');
-              Alert.alert(
-                '⚠️ 안전 경고',
-                '안전 주의가 필요한 장비입니다.',
-                [{ text: '확인' }],
-                { cancelable: false }
-              );
-              return;
-            }
+                // deviceId가 70인 경우 안전 경고 모달 표시 (숫자/문자열 모두 체크)
+                if (Number(deviceData.deviceId) === 70) {
+                  console.log('✅ deviceId 70 매칭됨! Alert 표시');
+                  Alert.alert(
+                    '⚠️ 안전 경고',
+                    '안전 주의가 필요한 장비입니다.',
+                    [{ text: '확인' }],
+                    { cancelable: false }
+                  );
+                  return;
+                }
 
-            // 시간 기반 쓰로틀링
-            if (now - lastModalTimeRef.current < modalThrottleMs) {
-              console.log('🚫 모달 표시 스킵 (쓰로틀링:', now - lastModalTimeRef.current, 'ms)');
-              return;
-            }
+                // 시간 기반 쓰로틀링
+                if (now - lastModalTimeRef.current < modalThrottleMs) {
+                  console.log('🚫 모달 표시 스킵 (쓰로틀링:', now - lastModalTimeRef.current, 'ms)');
+                  return;
+                }
 
-            console.log('🚨 WebSocket 알림 수신:', {
-              name: deviceData.name,
-              status: deviceData.status,
-              deviceId: deviceData.deviceId,
-              timeSinceLastModal: now - lastModalTimeRef.current
-            });
+                console.log('🚨 WebSocket 알림 수신:', {
+                  name: deviceData.name,
+                  status: deviceData.status,
+                  deviceId: deviceData.deviceId,
+                  timeSinceLastModal: now - lastModalTimeRef.current
+                });
 
-            // DeviceAlertData를 AlarmData 형식으로 변환
-            const alarmData: AlarmData = {
-              alarmId: `alarm-${deviceData.deviceId}-${now}`,
-              regionName: deviceData.name || 'Unknown Device',
-              regionLocation: deviceData.address || '위치 정보 없음',
-              status: mapDeviceStatusToCardState(deviceData.status),
-              type: 'machine' as const,
-              createdAt: new Date(),
-              message: deviceData.aiText || deviceData.message || '디바이스 알림이 발생했습니다.',
-              model: deviceData.model || 'Unknown Model',
-            };
+                // DeviceAlertData를 AlarmData 형식으로 변환
+                const alarmData: AlarmData = {
+                  alarmId: `alarm-${deviceData.deviceId}-${now}`,
+                  regionName: deviceData.name || 'Unknown Device',
+                  regionLocation: deviceData.address || '위치 정보 없음',
+                  status: mapDeviceStatusToCardState(deviceData.status),
+                  type: 'machine' as const,
+                  createdAt: new Date(),
+                  message: deviceData.aiText || deviceData.message || '디바이스 알림이 발생했습니다.',
+                  model: deviceData.model || 'Unknown Model',
+                };
 
-            console.log('🎭 변환된 알람 데이터:', alarmData);
-            console.log('🎭 새 모달 표시');
+                console.log('🎭 변환된 알람 데이터:', alarmData);
+                console.log('🎭 새 모달 표시');
 
-            // 새 모달 표시 및 시간 업데이트
-            showModal(alarmData);
-            lastModalTimeRef.current = now;
-          });
+                // 새 모달 표시 및 시간 업데이트
+                showModal(alarmData);
+                lastModalTimeRef.current = now;
+              });
 
-          console.log('✅ WebSocket 및 알림 시스템 초기화 완료');
+              console.log('✅ WebSocket 및 알림 시스템 초기화 완료');
+            }, 200); // 구독은 200ms 후
+          }, 500); // alarmManager는 500ms 후 초기화
+
         } catch (error) {
           console.error('❌ WebSocket 연결 실패:', error);
         }

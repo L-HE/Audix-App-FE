@@ -1,5 +1,4 @@
-// shared/websocket/client.ts 수정
-
+// shared/websocket/client.ts
 import { io, Socket } from 'socket.io-client';
 import { DeviceAlertData } from './types';
 
@@ -8,25 +7,27 @@ class WebSocketClient {
     private onAlertCallback?: (data: DeviceAlertData) => void;
 
     connect() {
-        if (this.socket?.connected) {
-            console.log('🔌 이미 연결됨');
+        // 이미 소켓이 있으면 아무것도 하지 않음
+        if (this.socket) {
             return;
         }
 
-        console.log('🔌 Socket.IO 연결 중...');
+        console.log('🔌 Socket.IO 연결 시작');
 
         this.socket = io('http://165.246.116.18:3000', {
             transports: ['polling'],
             autoConnect: true,
         });
 
-        this.socket.on('connect', () => {
+        // 연결 성공 시
+        this.socket.once('connect', () => {
             console.log('✅ Socket.IO 연결 성공');
             this.setupListener();
         });
 
-        this.socket.on('connect_error', (error) => {
-            console.error('❌ 연결 실패:', error.message);
+        // 에러는 무시 (로그 출력 안함)
+        this.socket.on('connect_error', () => {
+            // 에러 로그 출력하지 않음
         });
     }
 
@@ -35,18 +36,6 @@ class WebSocketClient {
 
         this.socket.on('device-alert', (data: DeviceAlertData) => {
             console.log('📡 알림 수신:', data.name);
-
-            // deviceId가 119인 경우 안전 모달 이벤트 발생
-            if (data.deviceId === 70) {
-                if (typeof window !== 'undefined') {
-                    window.dispatchEvent(new CustomEvent('showSafetyModal', {
-                        detail: {
-                            deviceId: 70,
-                            message: '안전 주의가 필요한 장비입니다.'
-                        }
-                    }));
-                }
-            }
 
             if (this.onAlertCallback) {
                 this.onAlertCallback(data);
