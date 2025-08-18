@@ -1,7 +1,7 @@
 // app/(tabs)/notificationModal.tsx
 import { CardState } from '@/assets/data/areaData';
-import React, { useEffect } from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useCallback } from 'react';
+import { Text, TouchableOpacity, View, BackHandler } from 'react-native';
 import RNModal from 'react-native-modal';
 import { Portal } from 'react-native-portalize';
 import { AlarmType } from '../../assets/data/alarmData';
@@ -24,6 +24,19 @@ const NotificationModalContent: React.FC = () => {
     });
   }, [modalVisible, modalData]);
 
+  // Android 뒤로가기 버튼 처리
+  useEffect(() => {
+    if (!modalVisible) return;
+
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      console.log('🎭 Android 뒤로가기 버튼 - 모달 닫기');
+      hideModal();
+      return true; // 이벤트 소비
+    });
+
+    return () => backHandler.remove();
+  }, [modalVisible, hideModal]);
+
   /**
    * 상단 타이틀 계산
    */
@@ -40,6 +53,12 @@ const NotificationModalContent: React.FC = () => {
     };
     return STATUS_LABELS[modalData.status];
   }, [modalData?.type, modalData?.status]);
+
+  // 모달 닫기 핸들러 (사용자 액션에 의해서만)
+  const handleHideModal = useCallback(() => {
+    console.log('🎭 사용자 액션으로 모달 닫기');
+    hideModal();
+  }, [hideModal]);
 
   // 모달이 보이지 않거나 데이터가 없으면 렌더링하지 않음
   if (!modalVisible || !modalData) {
@@ -84,27 +103,44 @@ const NotificationModalContent: React.FC = () => {
   const isSafetyAlarm = modalData.type === 'safety';
   const bodyBackgroundColor = isSafetyAlarm ? Colors.danger : Colors.background;
 
-  const handleHideModal = () => {
-    console.log('🎭 모달 닫기 버튼 클릭');
-    hideModal();
-  };
-
   return (
     <Portal>
       <RNModal
         isVisible={modalVisible}
         backdropOpacity={0.5}
-        animationIn="zoomInDown"
+        animationIn="slideInDown"
         animationInTiming={400}
-        animationOut="zoomOutDown"
+        animationOut="slideOutUp"
         animationOutTiming={300}
-        statusBarTranslucent
-        useNativeDriver
+        statusBarTranslucent={false}
+        useNativeDriver={true}
         onBackdropPress={handleHideModal}
         onBackButtonPress={handleHideModal}
-        style={{ zIndex: 10000 }}
+        onModalWillShow={() => console.log('🎭 모달 표시 시작')}
+        onModalShow={() => console.log('🎭 모달 표시 완료')}
+        onModalWillHide={() => console.log('🎭 모달 숨김 시작')}
+        onModalHide={() => console.log('🎭 모달 숨김 완료')}
+        style={{
+          justifyContent: 'center',
+          alignItems: 'center',
+          margin: 0,
+          zIndex: 10000
+        }}
+        // 자동 닫기 방지를 위한 추가 옵션
+        swipeDirection={undefined} // 스와이프로 닫기 완전 비활성화
+        propagateSwipe={false}
+        coverScreen={true}
+        hasBackdrop={true}
       >
-        <View style={[style.container, { backgroundColor: bodyBackgroundColor }]}>
+        <View style={[
+          style.container,
+          {
+            backgroundColor: bodyBackgroundColor,
+            width: '90%',
+            maxWidth: 400,
+            alignSelf: 'center'
+          }
+        ]}>
           {/* 상단: 알람 종류/상태 뱃지 영역 */}
           <View style={[style.header, { backgroundColor: topColor }]}>
             <Text style={style.headerTitle}>{alarmType}</Text>
@@ -150,6 +186,7 @@ const NotificationModalContent: React.FC = () => {
                 { backgroundColor: Colors.backgroundSecondary }
               ]}
               onPress={handleHideModal}
+              activeOpacity={0.7}
             >
               <Text
                 style={[
@@ -157,7 +194,7 @@ const NotificationModalContent: React.FC = () => {
                   { color: Colors.textPrimary },
                 ]}
               >
-                닫기
+                확인
               </Text>
             </TouchableOpacity>
           </View>

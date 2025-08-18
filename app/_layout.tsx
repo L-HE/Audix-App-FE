@@ -46,11 +46,11 @@ const mapDeviceStatusToCardState = (status: string): CardState => {
 function RootLayoutContent() {
   const [isAppInitialized, setIsAppInitialized] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const { showModal, hideModal } = useModal();
+  const { showModal, modalVisible } = useModal(); // hideModal 제거
   const initializationStartedRef = useRef(false);
   const wsSubscriptionRef = useRef<(() => void) | null>(null);
   const lastModalTimeRef = useRef(0);
-  const modalThrottleMs = 1000; // 1초 간격으로 모달 제한
+  const modalThrottleMs = 2000; // 2초로 증가 - 사용자가 모달을 볼 시간 확보
 
   const startTimer = useTimeStore((s) => s.startTimer);
   const stopTimer = useTimeStore((s) => s.stopTimer);
@@ -70,7 +70,7 @@ function RootLayoutContent() {
           webSocketClient.connect();
           alarmManager.initialize();
 
-          // WebSocket 알림 처리 (중복 방지)
+          // WebSocket 알림 처리 (자동 닫기 제거)
           if (wsSubscriptionRef.current) {
             wsSubscriptionRef.current();
           }
@@ -78,9 +78,9 @@ function RootLayoutContent() {
           wsSubscriptionRef.current = deviceUpdateBroadcaster.subscribe((deviceData: DeviceAlertData) => {
             const now = Date.now();
 
-            // 1초 이내 중복 모달 방지
-            if (now - lastModalTimeRef.current < modalThrottleMs) {
-              console.log('🚫 모달 표시 스킵 (너무 빈번함)');
+            // 쓰로틀링: 모달이 열려있지 않거나 충분한 시간이 지났을 때만 새 모달 표시
+            if (modalVisible && (now - lastModalTimeRef.current < modalThrottleMs)) {
+              console.log('🚫 모달 표시 스킵 (기존 모달 표시 중 또는 너무 빈번함)');
               return;
             }
 
@@ -104,15 +104,10 @@ function RootLayoutContent() {
 
             console.log('🎭 변환된 알람 데이터:', alarmData);
 
-            // 기존 모달이 열려있다면 즉시 교체
-            hideModal();
-
-            // 짧은 딜레이 후 새 모달 표시
-            setTimeout(() => {
-              console.log('🎭 모달 표시 시작');
-              showModal(alarmData);
-              lastModalTimeRef.current = now;
-            }, 100);
+            // 자동 닫기 제거 - 오직 새 모달만 표시
+            console.log('🎭 새 모달 표시');
+            showModal(alarmData);
+            lastModalTimeRef.current = now;
           });
 
           console.log('✅ WebSocket 및 알림 시스템 초기화 완료');
@@ -142,7 +137,7 @@ function RootLayoutContent() {
       webSocketClient.disconnect();
       stopTimer();
     };
-  }, [showModal, hideModal, startTimer, stopTimer]);
+  }, [showModal, modalVisible, startTimer, stopTimer]); // modalVisible 의존성 추가
 
   if (!isAppInitialized) {
     return <SplashScreen onInitializationComplete={() => { }} />;
