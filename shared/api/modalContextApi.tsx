@@ -49,8 +49,10 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
 
   // 모달 표시 + 데이터 설정
   const showModal = (data: AlarmData) => {
+    console.log('🎭 modalContext showModal 호출됨:', data);
     setModalData(data);
     setModalVisible(true);
+    console.log('🎭 모달 상태 업데이트 완료');
   };
 
   // 모달 숨김 + 데이터 초기화
@@ -60,14 +62,14 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
   };
 
   return (
-    <ModalContext.Provider 
-      value={{ 
-        modalVisible, 
-        modalData, 
-        setModalVisible, 
-        setModalData, 
-        showModal, 
-        hideModal 
+    <ModalContext.Provider
+      value={{
+        modalVisible,
+        modalData,
+        setModalVisible,
+        setModalData,
+        showModal,
+        hideModal
       }}
     >
       {children}
