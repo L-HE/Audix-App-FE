@@ -9,7 +9,6 @@ import SkeletonLoader from '../../components/common/skeletonLoader';
 import AreaCard from '../../components/screens/areaCard';
 import { useRefreshStore } from '../../shared/store/refreshStore';
 import { AreaScreenStyles as style } from '../../shared/styles/screens';
-// ❌ webSocketClient import 제거 - _layout.tsx에서 처리
 import { areaLogic, type AreaItem } from '../../shared/api/area';
 
 export const headerShown = false;
@@ -143,4 +142,127 @@ const AreaScreenContent: React.FC = () => {
           areas: apiResult.data.map(area => `${area.name} (${area.status})`)
         });
 
-// API 응답을 그대로 사용 (AreaItem = Area)
+        // API 응답을 그대로 사용 (AreaItem = Area)
+        setAreas(apiResult.data);
+        setIsOnlineMode(apiResult.data.length > 0); // 데이터가 있으면 온라인 모드
+      } else {
+        console.error('❌ Area 데이터 로드 실패:', apiResult.error);
+
+        // 실패 시 빈 배열로 설정
+        setAreas([]);
+        setIsOnlineMode(false);
+      }
+
+      if (isInitialLoadRef.current) {
+        isInitialLoadRef.current = false;
+      }
+    } catch (error) {
+      console.error('❌ Area 데이터 로딩 중 예외 발생:', error);
+      setAreas([]);
+      setIsOnlineMode(false);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // ───────── 정렬된 카드 목록 메모이제이션 ─────────
+  const sortedCards = useMemo(() => {
+    const sortStart = performance.now();
+    renderCountRef.current++;
+
+    if (areas.length === 0) return [];
+
+    const result = sortAreasByState(areas);
+    lastSortTimeRef.current = performance.now();
+    void sortStart; // (미사용 변수 경고 방지용)
+
+    return result;
+  }, [areas]);
+
+  // ───────── 네비게이션 핸들러 ─────────
+  const handleAreaPress = useCallback(
+    (areaId: string) => {
+      router.push({ pathname: '/detail/[id]', params: { id: areaId } });
+    },
+    [router]
+  );
+
+  // ───────── FlashList 렌더 함수 ─────────
+  const renderAreaCard: ListRenderItem<Area> = useCallback(
+    ({ item, index }) => (
+      <MemoizedAreaCardWrapper item={item} index={index} onPress={handleAreaPress} />
+    ),
+    [handleAreaPress]
+  );
+
+  // ───────── 키/타입/레이아웃 최적화: FlashList 힌트 ─────────
+  const keyExtractor = useCallback((item: Area) => `area-${item.id}`, []);
+  const getItemType = useCallback(() => 'areaCard', []);
+  const overrideItemLayout = useCallback((layout: any) => {
+    layout.size = 120;
+  }, []);
+
+  // ───────── 초기화: 데이터 로드 (웹소켓 연결 제거) ─────────
+  const initializeApp = useCallback(async () => {
+    await loadAreas(false);
+  }, [loadAreas]);
+
+  useEffect(() => {
+    initializeApp();
+  }, [initializeApp]);
+
+  // ───────── 새로고침(디바운싱) ─────────
+  const refreshTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (refreshTrigger > 0 && isOnlineMode && !loading) {
+      if (refreshTimeoutRef.current) clearTimeout(refreshTimeoutRef.current);
+      refreshTimeoutRef.current = setTimeout(() => {
+        loadAreas(true);
+      }, 200);
+    }
+    return () => {
+      if (refreshTimeoutRef.current) clearTimeout(refreshTimeoutRef.current);
+    };
+  }, [refreshTrigger, isOnlineMode, loading, loadAreas]);
+
+  // ───────── 리스트 스타일 메모이제이션 ─────────
+  const contentContainerStyle = useMemo(
+    () => ({
+      paddingHorizontal: 16,
+      paddingTop: 8,
+      paddingBottom: 16,
+    }),
+    []
+  );
+
+  // ───────── 렌더링 ─────────
+  return (
+    <Animated.View style={[style.container, { opacity: opacityAnim }]}>
+      {loading ? (
+        <SkeletonLoader />
+      ) : (
+        <FlashList
+          data={sortedCards}
+          renderItem={renderAreaCard}
+          keyExtractor={keyExtractor}
+          getItemType={getItemType}
+          overrideItemLayout={overrideItemLayout}
+          estimatedItemSize={120}
+          contentContainerStyle={contentContainerStyle}
+          showsVerticalScrollIndicator={false}
+          extraData={areas.length}
+        />
+      )}
+    </Animated.View>
+  );
+};
+
+// ─────────────────────────────────────────────
+// 메인 화면 래퍼 (기타 성능 최적화 등)
+// ─────────────────────────────────────────────
+const AreaScreen: React.FC = () => {
+  return <AreaScreenContent />;
+};
+
+export default AreaScreen;
