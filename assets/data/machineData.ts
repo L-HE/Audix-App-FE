@@ -64,14 +64,14 @@ const transformDeviceToMachine = (device: any, isOnline: boolean): Machine => {
           throw new Error('Invalid BASE_URL');
         }
 
-        const imagePath = device.image.startsWith('/images/') 
-          ? device.image.substring(8) 
+        const imagePath = device.image.startsWith('/images/')
+          ? device.image.substring(8)
           : device.image;
-        
+
         const cleanImagePath = String(imagePath).trim();
         const cleanBaseUrl = String(BASE_URL).trim();
         const imageUri = `${cleanBaseUrl}/images/${cleanImagePath}`;
-        
+
         // URI 검증
         if (imageUri && typeof imageUri === 'string' && imageUri.startsWith('http')) {
           imageSource = { uri: imageUri };
@@ -132,17 +132,17 @@ const transformDeviceToMachine = (device: any, isOnline: boolean): Machine => {
 export const getMachineDataByAreaId = async (areaId: string): Promise<Machine[]> => {
   // 1단계: WebSocket 연결 상태 확인
   const isWebSocketConnected = webSocketClient.getConnectionStatus();
-  
+
   // 2단계: WebSocket 연결이 안되어 있으면 오프라인 모드
   if (!isWebSocketConnected) {
     console.log('📱 WebSocket 연결 실패 → 오프라인 모드: 즉시 fallback 데이터 사용');
     const numericAreaId = parseInt(areaId, 10);
     const fallbackData = machineData.filter(machine => machine.areaId === numericAreaId);
-    
+
     if (fallbackData.length === 0) {
       return generateFallbackData(numericAreaId);
     }
-    
+
     return fallbackData;
   }
 
@@ -153,26 +153,26 @@ export const getMachineDataByAreaId = async (areaId: string): Promise<Machine[]>
 
     if (!devices || devices.length === 0) {
       const fallbackData = machineData.filter(machine => machine.areaId === numericAreaId);
-      
+
       if (fallbackData.length === 0) {
         return generateFallbackData(numericAreaId);
       }
-      
+
       return fallbackData;
     }
 
     // API 데이터를 온라인 모드로 변환 (API 이미지 시도)
     const transformedData = devices.map(device => transformDeviceToMachine(device, true));
-    
+
     return transformedData;
 
   } catch (error) {
-    
+
     // API 실패 시에도 WebSocket이 연결되어 있으면 온라인으로 간주
     // 하지만 이미지는 로컬 이미지 사용
     const numericAreaId = parseInt(areaId, 10);
     const fallbackData = machineData.filter(machine => machine.areaId === numericAreaId);
-    
+
     if (fallbackData.length === 0) {
       return generateFallbackData(numericAreaId);
     }
