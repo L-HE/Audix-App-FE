@@ -65,18 +65,7 @@ export const createAlarmFromWebSocketData = (
 
     // safety 타입으로 분류할 키워드들
     const safetyKeywords = [
-      '비명',
-      '화재',
-      '불',
-      '연기',
-      '폭발',
-      '비상',
-      '대피',
-      '사고',
-      '부상',
-      '응급',
-      '구조',
-      '위급'
+      '비명'
     ];
 
     // 키워드가 포함되어 있으면 safety 타입으로 분류
@@ -95,7 +84,7 @@ export const createAlarmFromWebSocketData = (
     }
 
     // 기존 메시지 로직 유지
-    return deviceData.message || deviceData.aiText || '디바이스 알림이 발생했습니다.';
+    return deviceData.aiText || deviceData.aiText || '디바이스 알림이 발생했습니다.';
   };
 
   const alarmType = determineAlarmType();

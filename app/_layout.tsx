@@ -111,15 +111,15 @@ function RootLayoutContent() {
                   aiText: deviceData.aiText
                 });
 
-                // safety 타입일 때 추가 Alert
-                if (alarmData.type === 'safety') {
-                  Alert.alert(
-                    '⚠️ 안전 경고',
-                    alarmData.message,
-                    [{ text: '확인' }],
-                    { cancelable: false }
-                  );
-                }
+                // // safety 타입일 때 추가 Alert
+                // if (alarmData.type === 'safety') {
+                //   Alert.alert(
+                //     '⚠️ 안전 경고',
+                //     alarmData.message,
+                //     [{ text: '확인' }],
+                //     { cancelable: false }
+                //   );
+                // }
 
                 console.log('🎭 변환된 알람 데이터:', alarmData);
                 console.log('🎭 새 모달 표시');
